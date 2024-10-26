@@ -1,0 +1,35 @@
+{
+  "name": "@tpg/js",
+  "version": "0.0.1",
+  "description": "A web SDK for TPG transactions",
+  "main": "dist/index.js",
+  "module": "dist/index.m.js",
+  "unpkg": "dist/index.min.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "require": "./dist/index.js",
+    "default": "./dist/index.modern.mjs"
+  },
+  "scripts": {
+    "test": "jest",
+    "dev": "microbundle --watch --tsconfig tsconfig.json --no-sourcemap --name TPG",
+    "build": "rm -rf dist && microbundle --tsconfig tsconfig.json --no-sourcemap --name TPG",
+    "build:web": "rm -rf dist && microbundle -f umd --external none --tsconfig tsconfig.json --target web --name TPG"
+  },
+  "author": "Tether Payments Group",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/qrcode": "^1.5.5",
+    "fetch-mock": "^12.0.0",
+    "jest": "^29.7.0",
+    "microbundle": "^0.15.1",
+    "qrcode": "^1.5.4",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  },
+  "files": [
+    "dist"
+  ]
+}
