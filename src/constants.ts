@@ -7,6 +7,11 @@ export const TransactionResponseStatus = {
     REJECTED: 'REJECTED',
 }
 
+export enum ScanType {
+  SESSION = "1",
+  TRANSACTION = "2",
+}
+
 export const QRCodeTextProtocol = 'tpg://';
 
 export const QRCodeDefaults: QRCodeToDataURLOptions = {
