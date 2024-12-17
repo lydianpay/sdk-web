@@ -4,9 +4,11 @@ import {
   pollingIntervalInMilliseconds,
   QRCodeDefaults,
   QRCodeTextProtocol,
+  ScanType,
   TransactionResponseStatus,
 } from './constants';
 import QrCode from 'qrcode';
+import { extractCountryCodeFromUrl } from './utils';
 
 export type ListenerParams = {
   sessionUUID: string;
@@ -20,13 +22,10 @@ export type ListenParams = {
 };
 
 export abstract class Listener extends Poller {
-  private sessionUUID: string;
   private poller: NodeJS.Timeout;
 
   constructor(config: PollerParams) {
     super(config);
-
-    this.sessionUUID = config.sessionUUID;
   }
 
   public listen({ onConfirm, onReject, onError }: ListenParams) {
@@ -67,8 +66,11 @@ export abstract class Listener extends Poller {
       return;
     }
 
+    const country = extractCountryCodeFromUrl(this.socketUrl);
+    const type = ScanType.SESSION;
+
     const paymentCodeElem = document.createElement('canvas');
-    QrCode.toDataURL(paymentCodeElem, `${QRCodeTextProtocol}${sessionUUID}`, QRCodeDefaults);
+    QrCode.toDataURL(paymentCodeElem, `${QRCodeTextProtocol}${country}/${type}/${sessionUUID}`, QRCodeDefaults);
 
     paymentCodeContainer.appendChild(paymentCodeElem);
   }

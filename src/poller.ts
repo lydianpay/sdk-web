@@ -6,11 +6,11 @@ export type PollerParams = {
 };
 
 export abstract class Poller {
-  private sessionUUIO: string;
-  private socketUrl: string;
+  protected sessionUUID: string;
+  protected socketUrl: string;
 
   constructor(config: PollerParams) {
-    this.sessionUUIO = config.sessionUUID;
+    this.sessionUUID = config.sessionUUID;
     this.socketUrl = config.socketUrl || 'http://example.com';
   }
 
@@ -19,7 +19,7 @@ export abstract class Poller {
   // are that the customer will confirm the transactions within the first minute or two
 
   protected async poll(resource: string = '/session') {
-    const url = `${this.socketUrl}${resource}/${this.sessionUUIO}`;
+    const url = `${this.socketUrl}${resource}/${this.sessionUUID}`;
     const response = await fetch(url);
 
     if (response.ok) {
