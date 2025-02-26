@@ -57,20 +57,23 @@ export abstract class Listener extends Poller {
     }
   }
 
-  renderQrCode(elementId: string = 'tpg-payment-code') {
+  getSessionUrl() {
     const sessionUUID = this.sessionUUID;
+    const country = extractCountryCodeFromUrl(this.socketUrl);
+    const type = ScanType.SESSION;
 
+    return `${QRCodeTextProtocol}${country}/${type}/${sessionUUID}`;
+  }
+
+  renderQrCode(elementId: string = 'tpg-payment-code') {
     const paymentCodeContainer = document.getElementById(elementId);
     if (!paymentCodeContainer) {
       console.error(`cannot find element with id ${elementId}`);
       return;
     }
 
-    const country = extractCountryCodeFromUrl(this.socketUrl);
-    const type = ScanType.SESSION;
-
     const paymentCodeElem = document.createElement('canvas');
-    QrCode.toDataURL(paymentCodeElem, `${QRCodeTextProtocol}${country}/${type}/${sessionUUID}`, QRCodeDefaults);
+    QrCode.toDataURL(paymentCodeElem, this.getSessionUrl(), QRCodeDefaults);
 
     paymentCodeContainer.appendChild(paymentCodeElem);
   }
