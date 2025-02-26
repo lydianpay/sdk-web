@@ -37,10 +37,6 @@ const session = new TPG.Session({
     socketUrl: `http://us.examplechain.com`,
 });
 
-// Render the QR code to an element in the dom
-// ex. <div id="tpg-payment-code"></div>
-session.renderQrCode('tpg-payment-code');
-
 // Start listening for customer interaction
 session.listen({
     onConfirm(data) {
@@ -53,6 +49,16 @@ session.listen({
         // Something went wrong :/
     },
 });
+
+// Render the QR code to an element in the dom
+// ex. <div id="tpg-payment-code"></div>
+session.renderQrCode('tpg-payment-code');
+
+// OR return the URL to deeplink into wallet app (if mobile)
+if (isMobile()) {
+    const codeUrl = session.getSessionUrl();
+    window.location.href = codeUrl;
+}
 
 // The session is automatically closed after recieving any event
 // or after some timeout, ex. 15 minutes
