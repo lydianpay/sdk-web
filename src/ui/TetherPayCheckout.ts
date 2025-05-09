@@ -71,6 +71,9 @@ export class TetherPayCheckout extends HTMLElement {
 
     private showPaymentSuccess(): void {
         this.tetherPayPaymentSuccessContainer?.classList.remove('hidden');
+        this.hideProcessing();
+        this.hideButtons();
+        this.hideQRCode();
     }
 
     private hidePaymentSuccess(): void {
