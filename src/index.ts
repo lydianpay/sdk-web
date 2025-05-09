@@ -1,49 +1,26 @@
 import {TetherPayCheckout} from './ui/TetherPayCheckout';
-import {TetherPayOptions} from "./types";
+import {currencies, isCurrency, TetherPayOptions, Transaction} from "./types";
 
 // Register the custom HTML element
 if (!customElements.get('tetherpay-checkout')) {
     customElements.define('tetherpay-checkout', TetherPayCheckout);
 }
 
-function init(tetherPayOptions: TetherPayOptions) {
+function init(tetherPayOptions: TetherPayOptions): void {
     const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+    if (!tetherPayOptions.baseUri || !tetherPayOptions.publishableKey ||
+        !tetherPayOptions.initialTransaction.amount || !tetherPayOptions.initialTransaction.currency) {
+        throw new Error('Tether Pay initialization requires a baseUri, publishableKey, and initial transaction');
+    }
+    if (!isCurrency(tetherPayOptions.initialTransaction.currency)) {
+        throw new Error('Invalid value for currency, valid values are: ' + currencies.join(', '));
+    }
     tetherPayCheckout.setTetherPayOptions(tetherPayOptions);
 }
 
-function displayPaymentSuccess(): void {
+function updateTransaction(transaction: Transaction): void {
     const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
-    tetherPayCheckout.displayPaymentSuccess();
+    tetherPayCheckout.updateTransaction(transaction);
 }
 
-function displayProcessing(): void {
-    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
-    tetherPayCheckout.displayProcessing();
-}
-
-function hideProcessing(): void {
-    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
-    tetherPayCheckout.hideProcessing();
-}
-
-function displayButtons(): void {
-    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
-    tetherPayCheckout.displayButtons();
-}
-
-function hideButtons(): void {
-    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
-    tetherPayCheckout.hideButtons();
-}
-
-function displayQRCode(qrData: string): void {
-    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
-    tetherPayCheckout.displayQRCode(qrData);
-}
-
-function hideQRCode(): void {
-    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
-    tetherPayCheckout.hideQRCode();
-}
-
-(window as any).TetherPay = { init, displayPaymentSuccess, displayProcessing, hideProcessing, displayButtons, hideButtons, displayQRCode, hideQRCode };
+(window as any).TetherPay = {init, updateTransaction};

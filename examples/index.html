@@ -8,32 +8,45 @@
 <h1>TetherPay SDK Example</h1>
 <script src="../dist/tetherpay.iife.js"></script>
 
-<div style="width: 25%">
+<div style="width: 35%">
     <tetherpay-checkout></tetherpay-checkout>
 </div>
 
 <script>
-    window.TetherPay.init({
-        enableTetherPayAppPayment: true,
-        handleTetherPayAppButtonClick: () => {
-            window.TetherPay.displayProcessing();
-            setTimeout(() => {
-                window.TetherPay.displayQRCode("https://tetherpay.com");
-                setTimeout(() => {
-                    window.TetherPay.displayPaymentSuccess();
-                }, 5000);
-            }, 2000);
-        },
-        handleTetherPayWalletButtonClick: (chain) => {
-            window.TetherPay.displayProcessing();
-            setTimeout(() => {
-                window.TetherPay.displayQRCode("https://tetherpay.com");
-                setTimeout(() => {
-                    window.TetherPay.displayPaymentSuccess();
-                }, 5000);
-            }, 2000);
-        },
-    });
+    try {
+        window.TetherPay.init({
+            enableTetherPayAppPayment: true,
+            baseUri: 'https://fence.dev.tetherpayments.group',
+            publishableKey: 'YOUR_PUBLISHABLE_KEY',
+            initialTransaction: {
+                amount: 2.45,
+                currency: 'TRY',
+                descriptor: 'YOUR_DESCRIPTOR',
+                referenceNumber: 'YOUR_REFERENCE_NUMBER',
+            },
+            paymentFailedListener: (failureMessage) => {
+                alert(failureMessage);
+            },
+            paymentSuccessListener: () => {
+                alert("Payment Success!");
+            }
+        });
+    } catch (e) {
+        console.error(e);
+    }
+    // transaction details can be updated by calling the following function updateTransaction
+    // setTimeout(function () {
+    //     try {
+    //         window.TetherPay.updateTransaction({
+    //             amount: 1.45,
+    //             currency: "USD",
+    //             descriptor: 'YOUR_DESCRIPTOR',
+    //             referenceNumber: 'YOUR_REFERENCE_NUMBER',
+    //         });
+    //     } catch (e) {
+    //         console.error(e);
+    //     }
+    // }, 1000);
 </script>
 </body>
 </html>

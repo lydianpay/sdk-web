@@ -1,7 +1,7 @@
 <div class="font-antic mt-6">
     <div id="tetherPayPaymentSuccessContainer" class="hidden flex flex-col items-center justify-center min-h-[200px]">
         <p class="mt-4 text-gray-600 text-lg font-medium">Payment Success!</p>
-        <img class="max-w-32 mt-4" src="https://brimspire.com/success-checkmark.png"
+        <img class="max-w-32 mt-4" src="https://tetherpay.com/images/475982cd-2f7b-4a57-c9b2-13b5014d7100/public"
              alt="Payment Success!"/>
     </div>
     <div id="tetherPayQRCodeContainer" class="hidden flex flex-col items-center justify-center mt-8">
@@ -9,7 +9,7 @@
         <div class="border p-2 border-gray-500 h-64 w-64">
             <canvas id="tetherPayQRCodeCanvas"></canvas>
         </div>
-        <p class="text-lg text-gray-900 sm:text-xl text-center mt-4">USDT AMOUNT</p>
+        <p id="tetherPayUSDTAmount" class="text-lg text-gray-900 sm:text-xl text-center mt-4"></p>
     </div>
     <div id="tetherPayProcessingContainer" class="hidden flex flex-col items-center justify-center min-h-[200px]">
         <div
@@ -34,7 +34,7 @@
             id="tetherPayUsdtPaymentContainer"
             class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 mt-4 hidden">
         <div class="flex items-center space-x-2">
-            <img src="https://brimspire.com/tether-logo.svg" alt="USDT" class="h-6"/>
+            <img src="https://tetherpay.com/images/7065960c-8ebd-4d80-f352-8027ff2bb600/public" alt="USDT" class="h-6"/>
             <div class="text-lg font-medium">USDT (Tether)</div>
         </div>
 
@@ -44,37 +44,37 @@
             <button
                     id="tetherPayBtnEthereumPayment"
                     class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://brimspire.com/ethereum-logo.png" alt="Ethereum" class="h-5"/>
+                <img src="https://tetherpay.com/images/327ef8ac-bc72-46ea-2362-878e91c49300/public" alt="Ethereum" class="h-5"/>
                 <span>Ethereum</span>
             </button>
             <button
                     id="tetherPayBtnTronPayment"
                     class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://brimspire.com/tron-logo.svg" alt="Tron" class="h-5"/>
+                <img src="https://tetherpay.com/images/b51f79ea-c12b-4c01-246d-592c51214000/public" alt="Tron" class="h-5"/>
                 <span>Tron</span>
             </button>
             <button
                     id="tetherPayBtnSolanaPayment"
                     class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://brimspire.com/solana-logo.svg" alt="Tron" class="h-5"/>
+                <img src="https://tetherpay.com/images/5850fc57-4451-4f45-b053-3857b1d54e00/public" alt="Tron" class="h-5"/>
                 <span>Solana</span>
             </button>
             <button
                     id="tetherPayBtnTonPayment"
                     class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://brimspire.com/ton-logo.svg" alt="Tron" class="h-5"/>
+                <img src="https://tetherpay.com/images/a741a20b-6124-4c69-e678-4578b81a5f00/public" alt="Tron" class="h-5"/>
                 <span>Ton</span>
             </button>
             <button
                     id="tetherPayBtnAvalanchePayment"
                     class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://brimspire.com/avalanche-logo.png" alt="Tron" class="h-5"/>
+                <img src="https://tetherpay.com/images/ebd47494-9bae-4687-7762-19a4184e5400/public" alt="Tron" class="h-5"/>
                 <span>Avalanche</span>
             </button>
             <button
                     id="tetherPayBtnAptosPayment"
                     class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://brimspire.com/aptos-logo.svg" alt="Tron" class="h-5"/>
+                <img src="https://tetherpay.com/images/f2b2a145-2c37-4082-5f18-6271081d1500/public" alt="Tron" class="h-5"/>
                 <span>Aptos</span>
             </button>
         </div>

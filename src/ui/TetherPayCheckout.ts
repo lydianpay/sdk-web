@@ -1,12 +1,16 @@
 import tetherPayCSS from './tetherpay.generated.css?inline';
 import checkoutTemplate from './checkout-template.html?raw';
-import {TetherPayOptions} from "../types";
+import {CreateWalletTransactionResponse, currencies, isCurrency, TetherPayOptions, Transaction} from "../types";
 import QrCode from 'qrcode';
 import {QRCodeDefaults} from "../constants";
+import {TetherPayApi} from "../network";
 
 export class TetherPayCheckout extends HTMLElement {
     private shadow: ShadowRoot;
     private tetherPayOptions: TetherPayOptions | null = null;
+
+    private walletTransaction: CreateWalletTransactionResponse | null = null;
+    private tetherPayApi: TetherPayApi | null = null;
 
     private tetherPayUsdtPaymentContainer: HTMLDivElement | null = null;
     private tetherPayPaymentSuccessContainer: HTMLDivElement | null = null;
@@ -14,6 +18,8 @@ export class TetherPayCheckout extends HTMLElement {
     private tetherPayProcessingContainer: HTMLDivElement | null = null;
 
     private tetherPayQRCodeCanvas: HTMLCanvasElement | null = null;
+
+    private tetherPayUSDTAmount: HTMLParagraphElement | null = null;
 
     private tetherPayBtnCustomPayment: HTMLButtonElement | null = null;
     private tetherPayBtnWalletPayment: HTMLButtonElement | null = null;
@@ -32,40 +38,67 @@ export class TetherPayCheckout extends HTMLElement {
 
     public setTetherPayOptions(options: TetherPayOptions): void {
         this.tetherPayOptions = options;
+        this.tetherPayApi = new TetherPayApi(options.baseUri);
         this.render();
         this.initializeComponents();
         this.updateUI();
         this.attachListeners();
     }
 
-    public displayPaymentSuccess(): void {
-        this.hideButtons();
-        this.hideQRCode();
+    public updateTransaction(transaction: Transaction): void {
+        if (!this.tetherPayOptions) {
+            throw new Error('Tether Pay not initialized.');
+        }
+        if (!transaction.amount || !transaction.currency) {
+            throw new Error("Amount and currency are required.");
+        }
+        if (!isCurrency(transaction.currency)) {
+            throw new Error('Invalid value for currency, valid values are: ' + currencies.join(', '));
+        }
+        this.tetherPayOptions.initialTransaction = transaction;
+        this.loadInitialState();
+    }
+
+    private loadInitialState(): void {
+        this.showButtons();
+        this.hidePaymentSuccess();
         this.hideProcessing();
+        this.hideQRCode();
+        this.tetherPayUsdtPaymentContainer?.classList.add('hidden');
+    }
+
+    private showPaymentSuccess(): void {
         this.tetherPayPaymentSuccessContainer?.classList.remove('hidden');
     }
 
-    public displayProcessing(): void {
+    private hidePaymentSuccess(): void {
+        this.tetherPayPaymentSuccessContainer?.classList.add('hidden');
+    }
+
+    private showProcessing(): void {
         this.tetherPayProcessingContainer?.classList.remove('hidden');
     }
 
-    public hideProcessing(): void {
+    private hideProcessing(): void {
         this.tetherPayProcessingContainer?.classList.add('hidden');
     }
 
-    public displayButtons(): void {
+    private showButtons(): void {
         this.tetherPayBtnCustomPayment?.classList.remove('hidden');
         this.tetherPayBtnWalletPayment?.classList.remove('hidden');
     }
 
-    public hideButtons(): void {
+    private hideButtons(): void {
         this.tetherPayBtnCustomPayment?.classList.add('hidden');
         this.tetherPayBtnWalletPayment?.classList.add('hidden');
         this.tetherPayUsdtPaymentContainer?.classList.add('hidden');
     }
 
-    public displayQRCode(qrData: string): void {
+    private showQRCode(qrData: string, usdtAmount: number): void {
         this.tetherPayQRCodeContainer?.classList.remove('hidden');
+        if (this.tetherPayUSDTAmount) {
+            this.tetherPayUSDTAmount.innerText = "USDT AMOUNT " + usdtAmount;
+        }
         if (this.tetherPayQRCodeCanvas) {
             if (this.tetherPayQRCodeCanvas?.parentElement) {
                 let qrCodeWidth = this.tetherPayQRCodeCanvas.parentElement.clientWidth;
@@ -77,7 +110,7 @@ export class TetherPayCheckout extends HTMLElement {
         }
     }
 
-    public hideQRCode(): void {
+    private hideQRCode(): void {
         this.tetherPayQRCodeContainer?.classList.add('hidden');
         if (this.tetherPayQRCodeCanvas) {
             const ctx = this.tetherPayQRCodeCanvas.getContext('2d');
@@ -96,6 +129,8 @@ export class TetherPayCheckout extends HTMLElement {
         this.tetherPayProcessingContainer = this.shadowRoot?.getElementById('tetherPayProcessingContainer') as HTMLDivElement;
 
         this.tetherPayQRCodeCanvas = this.shadowRoot?.getElementById('tetherPayQRCodeCanvas') as HTMLCanvasElement;
+
+        this.tetherPayUSDTAmount = this.shadowRoot?.getElementById('tetherPayUSDTAmount') as HTMLParagraphElement;
 
         this.tetherPayBtnCustomPayment = this.shadowRoot?.getElementById('tetherPayBtnCustomPayment') as HTMLButtonElement;
         this.tetherPayBtnWalletPayment = this.shadowRoot?.getElementById('tetherPayBtnWalletPayment') as HTMLButtonElement;
@@ -116,11 +151,7 @@ export class TetherPayCheckout extends HTMLElement {
 
     private attachListeners(): void {
         this.tetherPayBtnCustomPayment?.addEventListener('click', (e) => {
-            if (this.tetherPayOptions?.handleTetherPayAppButtonClick) {
-                this.tetherPayOptions.handleTetherPayAppButtonClick();
-                this.hideButtons();
-                this.displayProcessing();
-            }
+            console.log("TODO: NOT IMPLEMENTED")
         })
 
         this.tetherPayBtnWalletPayment?.addEventListener('click', () => {
@@ -133,35 +164,54 @@ export class TetherPayCheckout extends HTMLElement {
             this.tetherPayUsdtPaymentContainer?.classList.toggle('hidden');
         });
 
-        this.tetherPayBtnEthereumPayment?.addEventListener('click', () => {
-            this.tetherPayOptions?.handleTetherPayWalletButtonClick("ethereum");
-            this.hideButtons();
-            this.displayProcessing();
+        this.tetherPayBtnEthereumPayment?.addEventListener('click', async () => {
+            await this.createWalletTransaction("ethereum");
         });
-        this.tetherPayBtnTronPayment?.addEventListener('click', () => {
-            this.tetherPayOptions?.handleTetherPayWalletButtonClick("tron");
-            this.hideButtons();
-            this.displayProcessing();
+        this.tetherPayBtnTronPayment?.addEventListener('click', async () => {
+            await this.createWalletTransaction("tron");
         });
-        this.tetherPayBtnSolanaPayment?.addEventListener('click', () => {
-            this.tetherPayOptions?.handleTetherPayWalletButtonClick("solana");
-            this.hideButtons();
-            this.displayProcessing();
+        this.tetherPayBtnSolanaPayment?.addEventListener('click', async () => {
+            await this.createWalletTransaction("solana");
         })
-        this.tetherPayBtnTonPayment?.addEventListener('click', () => {
-            this.tetherPayOptions?.handleTetherPayWalletButtonClick("ton");
-            this.hideButtons();
-            this.displayProcessing();
+        this.tetherPayBtnTonPayment?.addEventListener('click', async () => {
+            await this.createWalletTransaction("ton");
         });
-        this.tetherPayBtnAvalanchePayment?.addEventListener('click', () => {
-            this.tetherPayOptions?.handleTetherPayWalletButtonClick("avalanche");
-            this.hideButtons();
-            this.displayProcessing();
+        this.tetherPayBtnAvalanchePayment?.addEventListener('click', async () => {
+            await this.createWalletTransaction("avalanche");
         });
-        this.tetherPayBtnAptosPayment?.addEventListener('click', () => {
-            this.tetherPayOptions?.handleTetherPayWalletButtonClick("aptos");
-            this.hideButtons();
-            this.displayProcessing();
+        this.tetherPayBtnAptosPayment?.addEventListener('click', async () => {
+            await this.createWalletTransaction("aptos");
         });
+    }
+
+    private async createWalletTransaction(chain: string) {
+        this.hideButtons();
+        this.showProcessing();
+        try {
+            if (this.tetherPayOptions && this.tetherPayApi) {
+                this.walletTransaction = await this.tetherPayApi.createWalletTransaction({
+                    publishableKey: this.tetherPayOptions.publishableKey,
+                    descriptor: this.tetherPayOptions.initialTransaction.descriptor,
+                    referenceNumber: this.tetherPayOptions.initialTransaction.referenceNumber,
+                    amount: this.tetherPayOptions.initialTransaction.amount,
+                    currency: this.tetherPayOptions.initialTransaction.currency,
+                    chain: chain,
+                });
+                this.showQRCode(this.walletTransaction.qrData, this.walletTransaction.usdtAmount);
+                this.startListeningWalletTransaction();
+            } else {
+                this.loadInitialState();
+                this.tetherPayOptions?.paymentFailedListener?.("Tether Pay not initialized.");
+            }
+        } catch (e) {
+            this.loadInitialState();
+            this.tetherPayOptions?.paymentFailedListener?.("Unable to create transaction");
+        }
+    }
+
+    private startListeningWalletTransaction() {
+        console.log("TODO: NOT IMPLEMENTED");
+        // TODO: Call the following function once the payment succeeds.
+        // this.tetherPayOptions?.paymentSuccessListener();
     }
 }
