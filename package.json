@@ -1,5 +1,5 @@
 {
-  "name": "tetherpay",
+  "name": "@tetherpay/sdk-js",
   "version": "0.3.0",
   "type": "module",
   "main": "dist/tetherpay.iife.js",
