@@ -35,3 +35,8 @@ export type CreateWalletTransactionResponse = {
     qrData: string;
     usdtAmount: number;
 };
+
+export type GetWalletTransactionResponse = {
+    expiration: string;
+    status: number;
+}

@@ -2,7 +2,7 @@ import tetherPayCSS from './tetherpay.generated.css?inline';
 import checkoutTemplate from './checkout-template.html?raw';
 import {CreateWalletTransactionResponse, currencies, isCurrency, TetherPayOptions, Transaction} from "../types";
 import QrCode from 'qrcode';
-import {QRCodeDefaults} from "../constants";
+import {QRCodeDefaults, WalletTransactionStatusSuccess} from "../constants";
 import {TetherPayApi} from "../network";
 
 export class TetherPayCheckout extends HTMLElement {
@@ -11,6 +11,7 @@ export class TetherPayCheckout extends HTMLElement {
 
     private walletTransaction: CreateWalletTransactionResponse | null = null;
     private tetherPayApi: TetherPayApi | null = null;
+    private getWalletTransactionIntervalID: NodeJS.Timeout | null = null;
 
     private tetherPayUsdtPaymentContainer: HTMLDivElement | null = null;
     private tetherPayPaymentSuccessContainer: HTMLDivElement | null = null;
@@ -65,6 +66,7 @@ export class TetherPayCheckout extends HTMLElement {
         this.hideProcessing();
         this.hideQRCode();
         this.tetherPayUsdtPaymentContainer?.classList.add('hidden');
+        this.clearInterval();
     }
 
     private showPaymentSuccess(): void {
@@ -185,6 +187,7 @@ export class TetherPayCheckout extends HTMLElement {
     }
 
     private async createWalletTransaction(chain: string) {
+        this.clearInterval();
         this.hideButtons();
         this.showProcessing();
         try {
@@ -210,8 +213,22 @@ export class TetherPayCheckout extends HTMLElement {
     }
 
     private startListeningWalletTransaction() {
-        console.log("TODO: NOT IMPLEMENTED");
-        // TODO: Call the following function once the payment succeeds.
-        // this.tetherPayOptions?.paymentSuccessListener();
+        this.clearInterval();
+        this.getWalletTransactionIntervalID = setInterval(async () => {
+            if (this.walletTransaction?.txnID) {
+                const transaction = await this.tetherPayApi?.getWalletTransaction(this.walletTransaction?.txnID);
+                if (transaction?.status === WalletTransactionStatusSuccess) {
+                    this.showPaymentSuccess();
+                    this.clearInterval();
+                }
+            }
+        }, 2000);
+    }
+
+    private clearInterval() {
+        if (this.getWalletTransactionIntervalID) {
+            clearInterval(this.getWalletTransactionIntervalID);
+            this.getWalletTransactionIntervalID = null;
+        }
     }
 }

@@ -1,5 +1,10 @@
 import {Base} from '../base.js';
-import {CreateWalletTransactionRequest, CreateWalletTransactionResponse, TetherPayOptions} from '../../types';
+import {
+    CreateWalletTransactionRequest,
+    CreateWalletTransactionResponse,
+    GetWalletTransactionResponse,
+    TetherPayOptions
+} from '../../types';
 
 const resourceName = 'transaction';
 
@@ -9,5 +14,8 @@ export class Transactions extends Base {
             method: 'POST',
             body: JSON.stringify(newTransaction),
         });
+    }
+    async getWalletTransaction(transactionID: string) {
+        return await this.request<GetWalletTransactionResponse>(`/${resourceName}/${transactionID}`);
     }
 }
