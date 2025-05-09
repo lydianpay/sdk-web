@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>TetherPay SDK Example</title>
+</head>
+<body>
+<h1>TetherPay SDK Example</h1>
+<script src="../dist/tetherpay.iife.js"></script>
+
+<div style="width: 25%">
+    <tetherpay-checkout></tetherpay-checkout>
+</div>
+
+<script>
+    window.TetherPay.init({
+        enableTetherPayAppPayment: true,
+        handleTetherPayAppButtonClick: () => {
+            window.TetherPay.displayProcessing();
+            setTimeout(() => {
+                window.TetherPay.displayQRCode("https://tetherpay.com");
+                setTimeout(() => {
+                    window.TetherPay.displayPaymentSuccess();
+                }, 5000);
+            }, 2000);
+        },
+        handleTetherPayWalletButtonClick: (chain) => {
+            window.TetherPay.displayProcessing();
+            setTimeout(() => {
+                window.TetherPay.displayQRCode("https://tetherpay.com");
+                setTimeout(() => {
+                    window.TetherPay.displayPaymentSuccess();
+                }, 5000);
+            }, 2000);
+        },
+    });
+</script>
+</body>
+</html>

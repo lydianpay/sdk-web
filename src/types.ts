@@ -1,8 +1,5 @@
-export type Session = {
-  uuid: number;
-  userId: number;
-};
-
-export type SessionResponse = {
-  status: 'CONFIRMED' | 'REJECTED' | 'PENDING';
+export type TetherPayOptions = {
+    enableTetherPayAppPayment: boolean;
+    handleTetherPayAppButtonClick: () => void;
+    handleTetherPayWalletButtonClick: (chain: string) => void;
 };

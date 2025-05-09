@@ -1,14 +1,49 @@
-import { Listener } from './listener';
-import { Poller } from './poller';
-import { applyMixins } from './utils';
+import {TetherPayCheckout} from './ui/TetherPayCheckout';
+import {TetherPayOptions} from "./types";
 
-class Session extends Poller {}
-interface Session extends Listener {}
+// Register the custom HTML element
+if (!customElements.get('tetherpay-checkout')) {
+    customElements.define('tetherpay-checkout', TetherPayCheckout);
+}
 
-// TODO: does this need to be refactored to handle
-// sessions and transactions?
+function init(tetherPayOptions: TetherPayOptions) {
+    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+    tetherPayCheckout.setTetherPayOptions(tetherPayOptions);
+}
 
-applyMixins(Session, [Listener]);
+function displayPaymentSuccess(): void {
+    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+    tetherPayCheckout.displayPaymentSuccess();
+}
 
-export { Session };
-export default Session;
+function displayProcessing(): void {
+    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+    tetherPayCheckout.displayProcessing();
+}
+
+function hideProcessing(): void {
+    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+    tetherPayCheckout.hideProcessing();
+}
+
+function displayButtons(): void {
+    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+    tetherPayCheckout.displayButtons();
+}
+
+function hideButtons(): void {
+    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+    tetherPayCheckout.hideButtons();
+}
+
+function displayQRCode(qrData: string): void {
+    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+    tetherPayCheckout.displayQRCode(qrData);
+}
+
+function hideQRCode(): void {
+    const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+    tetherPayCheckout.hideQRCode();
+}
+
+(window as any).TetherPay = { init, displayPaymentSuccess, displayProcessing, hideProcessing, displayButtons, hideButtons, displayQRCode, hideQRCode };

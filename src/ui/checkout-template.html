@@ -1,0 +1,93 @@
+<div class="font-antic mt-6">
+    <div id="tetherPayPaymentSuccessContainer" class="hidden flex flex-col items-center justify-center min-h-[200px]">
+        <p class="mt-4 text-gray-600 text-lg font-medium">Payment Success!</p>
+        <img class="max-w-32 mt-4" src="https://brimspire.com/success-checkmark.png"
+             alt="Payment Success!"/>
+    </div>
+    <div id="tetherPayQRCodeContainer" class="hidden flex flex-col items-center justify-center mt-8">
+        <p class="m-4 text-center">Scan the code below using your app to continue with the payment</p>
+        <div class="border p-2 border-gray-500 h-64 w-64">
+            <canvas id="tetherPayQRCodeCanvas"></canvas>
+        </div>
+        <p class="text-lg text-gray-900 sm:text-xl text-center mt-4">USDT AMOUNT</p>
+    </div>
+    <div id="tetherPayProcessingContainer" class="hidden flex flex-col items-center justify-center min-h-[200px]">
+        <div
+                class="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+        <p class="mt-4 text-gray-600 text-lg font-medium">Processing...</p>
+    </div>
+    <button
+            type="button"
+            id="tetherPayBtnCustomPayment"
+            class="w-full rounded-md border border-transparent bg-tether-green px-4 py-3 text-base font-medium text-white shadow-md"
+    >
+        Pay with the Tether Pay App
+    </button>
+    <button
+            type="button"
+            id="tetherPayBtnWalletPayment"
+            class="w-full rounded-md bg-white shadow px-4 py-3 text-base font-medium shadow-md text-gray-800 mt-4 border border-gray-200"
+    >
+        Pay with USDT (Tether)
+    </button>
+    <div
+            id="tetherPayUsdtPaymentContainer"
+            class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 mt-4 hidden">
+        <div class="flex items-center space-x-2">
+            <img src="https://brimspire.com/tether-logo.svg" alt="USDT" class="h-6"/>
+            <div class="text-lg font-medium">USDT (Tether)</div>
+        </div>
+
+        <div class="text-sm font-medium">Select a Network</div>
+
+        <div class="space-y-2">
+            <button
+                    id="tetherPayBtnEthereumPayment"
+                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                <img src="https://brimspire.com/ethereum-logo.png" alt="Ethereum" class="h-5"/>
+                <span>Ethereum</span>
+            </button>
+            <button
+                    id="tetherPayBtnTronPayment"
+                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                <img src="https://brimspire.com/tron-logo.svg" alt="Tron" class="h-5"/>
+                <span>Tron</span>
+            </button>
+            <button
+                    id="tetherPayBtnSolanaPayment"
+                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                <img src="https://brimspire.com/solana-logo.svg" alt="Tron" class="h-5"/>
+                <span>Solana</span>
+            </button>
+            <button
+                    id="tetherPayBtnTonPayment"
+                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                <img src="https://brimspire.com/ton-logo.svg" alt="Tron" class="h-5"/>
+                <span>Ton</span>
+            </button>
+            <button
+                    id="tetherPayBtnAvalanchePayment"
+                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                <img src="https://brimspire.com/avalanche-logo.png" alt="Tron" class="h-5"/>
+                <span>Avalanche</span>
+            </button>
+            <button
+                    id="tetherPayBtnAptosPayment"
+                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                <img src="https://brimspire.com/aptos-logo.svg" alt="Tron" class="h-5"/>
+                <span>Aptos</span>
+            </button>
+        </div>
+
+        <p class="text-xs text-red-500">
+            Please ensure to select the correct network. Sending funds on the wrong
+            network will result in a loss of your funds.
+        </p>
+
+        <button
+                id="tetherPayBtnCancelWalletPayment"
+                class="text-sm text-gray-500 underline hover:text-gray-700">
+            Cancel and return
+        </button>
+    </div>
+</div>

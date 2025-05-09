@@ -4,13 +4,22 @@
     "declaration": true,
     "removeComments": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
-    "sourceMap": false,
-    "outDir": "./dist",
+    "target": "ES2020",
+    "sourceMap": true,
+    "outDir": "dist",
     "baseUrl": "./",
     "incremental": true,
-    "lib": ["dom", "dom.iterable", "ES2022"]
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "ES2022"
+    ],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "tests", "lib", "**/*spec.ts", "**/*test.ts"]
+  "include": [
+    "src",
+    "global.d.ts"
+  ]
 }
