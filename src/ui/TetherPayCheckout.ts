@@ -4,6 +4,7 @@ import {CreateWalletTransactionResponse, currencies, isCurrency, TetherPayOption
 import QrCode from 'qrcode';
 import {QRCodeDefaults, WalletTransactionStatusSuccess} from "../constants";
 import {TetherPayApi} from "../network";
+import isMobile from "is-mobile";
 
 export class TetherPayCheckout extends HTMLElement {
     private shadow: ShadowRoot;
@@ -205,6 +206,9 @@ export class TetherPayCheckout extends HTMLElement {
                 });
                 this.showQRCode(this.walletTransaction.qrData, this.walletTransaction.usdtAmount);
                 this.startListeningWalletTransaction();
+                if (isMobile()) {
+                    window.location.href = this.walletTransaction.qrData;
+                }
             } else {
                 this.loadInitialState();
                 this.tetherPayOptions?.paymentFailedListener?.("Tether Pay not initialized.");
