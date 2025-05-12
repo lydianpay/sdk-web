@@ -6,3 +6,7 @@
 .bg-tether-green {
     background: #044D57;
 }
+
+.bg-tether-green:hover {
+    background: #033C46;
+}

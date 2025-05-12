@@ -1,10 +1,13 @@
-<div class="font-antic mt-6">
+<div class="font-antic">
     <div id="tetherPayPaymentSuccessContainer" class="hidden flex flex-col items-center justify-center min-h-[200px]">
-        <p class="mt-4 text-gray-600 text-lg font-medium">Payment Success!</p>
+        <p class="text-gray-600 text-lg font-medium">Payment Success!</p>
         <img class="max-w-32 mt-4" src="https://tetherpay.com/images/475982cd-2f7b-4a57-c9b2-13b5014d7100/public"
              alt="Payment Success!"/>
     </div>
-    <div id="tetherPayQRCodeContainer" class="hidden flex flex-col items-center justify-center mt-8">
+    <div id="tetherPayPaymentFailedContainer" class="hidden flex flex-col items-center justify-center">
+        <p class="text-red-500 text-lg font-medium">Transaction Timed Out / Failed!</p>
+    </div>
+    <div id="tetherPayQRCodeContainer" class="hidden flex flex-col items-center justify-center">
         <p class="m-4 text-center">Scan the code below using your app to continue with the payment</p>
         <div class="border p-2 border-gray-500 h-64 w-64">
             <canvas id="tetherPayQRCodeCanvas"></canvas>
@@ -19,20 +22,20 @@
     <button
             type="button"
             id="tetherPayBtnCustomPayment"
-            class="w-full rounded-md border border-transparent bg-tether-green px-4 py-3 text-base font-medium text-white shadow-md"
+            class="w-full rounded-md border border-transparent bg-tether-green px-4 py-3 text-base font-medium mb-4 text-white shadow-md"
     >
         Pay with the Tether Pay App
     </button>
     <button
             type="button"
             id="tetherPayBtnWalletPayment"
-            class="w-full rounded-md bg-white shadow px-4 py-3 text-base font-medium shadow-md text-gray-800 mt-4 border border-gray-200"
+            class="w-full rounded-md bg-white shadow px-4 py-3 text-base font-medium shadow-md text-gray-800 border border-gray-200 hover:bg-gray-100"
     >
         Pay with USDT (Tether)
     </button>
     <div
             id="tetherPayUsdtPaymentContainer"
-            class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 mt-4 hidden">
+            class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 hidden">
         <div class="flex items-center space-x-2">
             <img src="https://tetherpay.com/images/7065960c-8ebd-4d80-f352-8027ff2bb600/public" alt="USDT" class="h-6"/>
             <div class="text-lg font-medium">USDT (Tether)</div>
@@ -44,39 +47,52 @@
             <button
                     id="tetherPayBtnEthereumPayment"
                     class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://tetherpay.com/images/327ef8ac-bc72-46ea-2362-878e91c49300/public" alt="Ethereum" class="h-5"/>
+                <img src="https://tetherpay.com/images/327ef8ac-bc72-46ea-2362-878e91c49300/public" alt="Ethereum"
+                     class="h-5"/>
                 <span>Ethereum</span>
             </button>
             <button
                     id="tetherPayBtnTronPayment"
                     class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://tetherpay.com/images/b51f79ea-c12b-4c01-246d-592c51214000/public" alt="Tron" class="h-5"/>
+                <img src="https://tetherpay.com/images/b51f79ea-c12b-4c01-246d-592c51214000/public" alt="Tron"
+                     class="h-5"/>
                 <span>Tron</span>
             </button>
             <button
-                    id="tetherPayBtnSolanaPayment"
-                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://tetherpay.com/images/5850fc57-4451-4f45-b053-3857b1d54e00/public" alt="Tron" class="h-5"/>
-                <span>Solana</span>
+                    id="tetherPayBtnUsdtAdditionalPayment"
+                    class="text-sm text-gray-500 underline hover:text-gray-700">
+                Additional Chains
             </button>
-            <button
-                    id="tetherPayBtnTonPayment"
-                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://tetherpay.com/images/a741a20b-6124-4c69-e678-4578b81a5f00/public" alt="Tron" class="h-5"/>
-                <span>Ton</span>
-            </button>
-            <button
-                    id="tetherPayBtnAvalanchePayment"
-                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://tetherpay.com/images/ebd47494-9bae-4687-7762-19a4184e5400/public" alt="Tron" class="h-5"/>
-                <span>Avalanche</span>
-            </button>
-            <button
-                    id="tetherPayBtnAptosPayment"
-                    class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
-                <img src="https://tetherpay.com/images/f2b2a145-2c37-4082-5f18-6271081d1500/public" alt="Tron" class="h-5"/>
-                <span>Aptos</span>
-            </button>
+            <div id="tetherPayUsdtAdditionalPaymentContainer" class="space-y-2 hidden">
+                <button
+                        id="tetherPayBtnSolanaPayment"
+                        class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                    <img src="https://tetherpay.com/images/5850fc57-4451-4f45-b053-3857b1d54e00/public" alt="Tron"
+                         class="h-5"/>
+                    <span>Solana</span>
+                </button>
+                <button
+                        id="tetherPayBtnTonPayment"
+                        class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                    <img src="https://tetherpay.com/images/a741a20b-6124-4c69-e678-4578b81a5f00/public" alt="Tron"
+                         class="h-5"/>
+                    <span>Ton</span>
+                </button>
+                <button
+                        id="tetherPayBtnAvalanchePayment"
+                        class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                    <img src="https://tetherpay.com/images/ebd47494-9bae-4687-7762-19a4184e5400/public" alt="Tron"
+                         class="h-5"/>
+                    <span>Avalanche</span>
+                </button>
+                <button
+                        id="tetherPayBtnAptosPayment"
+                        class="w-full flex items-center space-x-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50">
+                    <img src="https://tetherpay.com/images/f2b2a145-2c37-4082-5f18-6271081d1500/public" alt="Tron"
+                         class="h-5"/>
+                    <span>Aptos</span>
+                </button>
+            </div>
         </div>
 
         <p class="text-xs text-red-500">

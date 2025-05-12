@@ -15,7 +15,9 @@ export class TetherPayCheckout extends HTMLElement {
     private getWalletTransactionIntervalID: NodeJS.Timeout | null = null;
 
     private tetherPayUsdtPaymentContainer: HTMLDivElement | null = null;
+    private tetherPayUsdtAdditionalPaymentContainer: HTMLDivElement | null = null;
     private tetherPayPaymentSuccessContainer: HTMLDivElement | null = null;
+    private tetherPayPaymentFailedContainer: HTMLDivElement | null = null;
     private tetherPayQRCodeContainer: HTMLDivElement | null = null;
     private tetherPayProcessingContainer: HTMLDivElement | null = null;
 
@@ -25,6 +27,7 @@ export class TetherPayCheckout extends HTMLElement {
 
     private tetherPayBtnCustomPayment: HTMLButtonElement | null = null;
     private tetherPayBtnWalletPayment: HTMLButtonElement | null = null;
+    private tetherPayBtnUsdtAdditionalPayment: HTMLButtonElement | null = null;
     private tetherPayBtnCancelWalletPayment: HTMLButtonElement | null = null;
     private tetherPayBtnEthereumPayment: HTMLButtonElement | null = null;
     private tetherPayBtnTronPayment: HTMLButtonElement | null = null;
@@ -68,10 +71,19 @@ export class TetherPayCheckout extends HTMLElement {
         this.hideQRCode();
         this.tetherPayUsdtPaymentContainer?.classList.add('hidden');
         this.clearInterval();
+        this.tetherPayUsdtAdditionalPaymentContainer?.classList.add('hidden');
+        this.tetherPayBtnUsdtAdditionalPayment?.classList.remove('hidden');
     }
 
     private showPaymentSuccess(): void {
         this.tetherPayPaymentSuccessContainer?.classList.remove('hidden');
+        this.hideProcessing();
+        this.hideButtons();
+        this.hideQRCode();
+    }
+
+    private showPaymentFailure(): void {
+        this.tetherPayPaymentFailedContainer?.classList.remove('hidden');
         this.hideProcessing();
         this.hideButtons();
         this.hideQRCode();
@@ -130,7 +142,9 @@ export class TetherPayCheckout extends HTMLElement {
 
     private initializeComponents(): void {
         this.tetherPayUsdtPaymentContainer = this.shadowRoot?.getElementById('tetherPayUsdtPaymentContainer') as HTMLDivElement;
+        this.tetherPayUsdtAdditionalPaymentContainer = this.shadowRoot?.getElementById('tetherPayUsdtAdditionalPaymentContainer') as HTMLDivElement;
         this.tetherPayPaymentSuccessContainer = this.shadowRoot?.getElementById('tetherPayPaymentSuccessContainer') as HTMLDivElement;
+        this.tetherPayPaymentFailedContainer = this.shadowRoot?.getElementById('tetherPayPaymentFailedContainer') as HTMLDivElement;
         this.tetherPayQRCodeContainer = this.shadowRoot?.getElementById('tetherPayQRCodeContainer') as HTMLDivElement;
         this.tetherPayProcessingContainer = this.shadowRoot?.getElementById('tetherPayProcessingContainer') as HTMLDivElement;
 
@@ -140,6 +154,7 @@ export class TetherPayCheckout extends HTMLElement {
 
         this.tetherPayBtnCustomPayment = this.shadowRoot?.getElementById('tetherPayBtnCustomPayment') as HTMLButtonElement;
         this.tetherPayBtnWalletPayment = this.shadowRoot?.getElementById('tetherPayBtnWalletPayment') as HTMLButtonElement;
+        this.tetherPayBtnUsdtAdditionalPayment = this.shadowRoot?.getElementById('tetherPayBtnUsdtAdditionalPayment') as HTMLButtonElement;
         this.tetherPayBtnCancelWalletPayment = this.shadowRoot?.getElementById('tetherPayBtnCancelWalletPayment') as HTMLButtonElement;
         this.tetherPayBtnEthereumPayment = this.shadowRoot?.getElementById('tetherPayBtnEthereumPayment') as HTMLButtonElement;
         this.tetherPayBtnTronPayment = this.shadowRoot?.getElementById('tetherPayBtnTronPayment') as HTMLButtonElement;
@@ -165,9 +180,13 @@ export class TetherPayCheckout extends HTMLElement {
             this.tetherPayUsdtPaymentContainer?.classList.toggle('hidden');
         });
 
+        this.tetherPayBtnUsdtAdditionalPayment?.addEventListener('click', () => {
+            this.tetherPayUsdtAdditionalPaymentContainer?.classList.toggle('hidden');
+            this.tetherPayBtnUsdtAdditionalPayment?.classList.toggle('hidden');
+        });
+
         this.tetherPayBtnCancelWalletPayment?.addEventListener('click', () => {
-            this.tetherPayBtnWalletPayment?.classList.toggle('hidden');
-            this.tetherPayUsdtPaymentContainer?.classList.toggle('hidden');
+            this.loadInitialState();
         });
 
         this.tetherPayBtnEthereumPayment?.addEventListener('click', async () => {
@@ -224,9 +243,18 @@ export class TetherPayCheckout extends HTMLElement {
         this.getWalletTransactionIntervalID = setInterval(async () => {
             if (this.walletTransaction?.txnID) {
                 const transaction = await this.tetherPayApi?.getWalletTransaction(this.walletTransaction?.txnID);
-                if (transaction?.status === WalletTransactionStatusSuccess) {
-                    this.showPaymentSuccess();
-                    this.clearInterval();
+                if (transaction) {
+                    if (transaction.status === WalletTransactionStatusSuccess) {
+                        this.showPaymentSuccess();
+                        this.clearInterval();
+                    }
+                    const expirationDateTime = Date.parse(transaction.expiration);
+                    const currentDateTime = Date.now();
+                    if (expirationDateTime < currentDateTime) {
+                        this.showPaymentFailure();
+                        this.clearInterval();
+                        this.tetherPayOptions?.paymentFailedListener?.("Transaction Timed Out / Failed!");
+                    }
                 }
             }
         }, 2000);
