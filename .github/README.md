@@ -66,10 +66,10 @@ try {
     console.error(e);
 }
 
-// At anytime before the user presses the pay button, the initial transaction can be updated using the following function. It also resets the UI back to initial state.
+// At anytime before the user presses the pay button, the initial cryptotransaction can be updated using the following function. It also resets the UI back to initial state.
 try {
     window.TetherPay.updateTransaction({
-        amount: 1.45, // New transaction amount
+        amount: 1.45, // New cryptotransaction amount
         currency: "USD", // New currency or existing one for the provided amount
         descriptor: 'YOUR_DESCRIPTOR',
         referenceNumber: 'YOUR_REFERENCE_NUMBER',

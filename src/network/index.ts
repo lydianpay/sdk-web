@@ -1,13 +1,21 @@
-import {Base} from "./base";
-import {Transactions} from "./transaction";
-import {applyMixins} from "./utils";
+import { Base } from './base';
+import { CryptoTransactions } from './cryptotransaction';
+import { applyMixins } from './utils';
+import { Config } from './config';
+import { ClusterTransactions } from './clustertransaction';
 
 class TetherPayApi extends Base {
 }
 
-interface TetherPayApi extends Transactions {
+interface TetherPayApi extends Config {
 }
 
-applyMixins(TetherPayApi, [Transactions]);
+interface TetherPayApi extends CryptoTransactions {
+}
 
-export {TetherPayApi};
+interface TetherPayApi extends ClusterTransactions {
+}
+
+applyMixins(TetherPayApi, [Config, CryptoTransactions, ClusterTransactions]);
+
+export { TetherPayApi };
