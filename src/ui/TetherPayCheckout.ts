@@ -47,6 +47,7 @@ export class TetherPayCheckout extends HTMLElement {
 
   private tetherPayBtnClusterPayment: HTMLButtonElement | null = null;
   private tetherPayBtnCryptoPayment: HTMLButtonElement | null = null;
+  private tetherPayBtnUsdtPayment: HTMLButtonElement | null = null;
   private tetherPayBtnUsdtAdditionalPayment: HTMLButtonElement | null = null;
   private tetherPayBtnCancelCryptoPayment: HTMLButtonElement | null = null;
   private tetherPayBtnEthereumPayment: HTMLButtonElement | null = null;
@@ -69,7 +70,6 @@ export class TetherPayCheckout extends HTMLElement {
     this.initializeComponents();
     this.attachListeners();
     this.updateUI();
-    await this.createCryptoTransaction();
   }
 
   public async updateTransaction(transaction: CryptoTransaction) {
@@ -84,7 +84,6 @@ export class TetherPayCheckout extends HTMLElement {
     }
     this.tetherPayOptions.initialTransaction = transaction;
     this.loadInitialState();
-    await this.createCryptoTransaction();
   }
 
   private loadInitialState(): void {
@@ -136,6 +135,7 @@ export class TetherPayCheckout extends HTMLElement {
   private hideButtons(): void {
     this.tetherPayBtnClusterPayment?.classList.add('hidden');
     this.tetherPayBtnCryptoPayment?.classList.add('hidden');
+    this.tetherPayBtnUsdtPayment?.classList.add('hidden');
     this.tetherPayUsdtPaymentContainer?.classList.add('hidden');
   }
 
@@ -182,6 +182,7 @@ export class TetherPayCheckout extends HTMLElement {
 
     this.tetherPayBtnClusterPayment = this.shadowRoot?.getElementById('tetherPayBtnClusterPayment') as HTMLButtonElement;
     this.tetherPayBtnCryptoPayment = this.shadowRoot?.getElementById('tetherPayBtnCryptoPayment') as HTMLButtonElement;
+    this.tetherPayBtnUsdtPayment = this.shadowRoot?.getElementById('tetherPayBtnUsdtPayment') as HTMLButtonElement;
     this.tetherPayBtnUsdtAdditionalPayment = this.shadowRoot?.getElementById('tetherPayBtnUsdtAdditionalPayment') as HTMLButtonElement;
     this.tetherPayBtnCancelCryptoPayment = this.shadowRoot?.getElementById('tetherPayBtnCancelCryptoPayment') as HTMLButtonElement;
   }
@@ -200,8 +201,19 @@ export class TetherPayCheckout extends HTMLElement {
       console.log('TODO: NOT IMPLEMENTED');
     });
 
-    this.tetherPayBtnCryptoPayment?.addEventListener('click', () => {
-      this.tetherPayBtnCryptoPayment?.classList.toggle('hidden');
+    this.tetherPayBtnCryptoPayment?.addEventListener('click', async (e) => {
+      if (this.sdkConfig?.tetherPayEnabled) {
+        this.tetherPayBtnClusterPayment?.classList.add('hidden');
+      }
+      this.tetherPayBtnCryptoPayment?.classList.add('hidden');
+      this.showProcessing();
+      await this.createCryptoTransaction();
+      this.hideProcessing();
+      this.tetherPayBtnUsdtPayment?.classList.remove('hidden');
+    });
+
+    this.tetherPayBtnUsdtPayment?.addEventListener('click', () => {
+      this.tetherPayBtnUsdtPayment?.classList.toggle('hidden');
       this.tetherPayUsdtPaymentContainer?.classList.toggle('hidden');
     });
 
@@ -249,7 +261,7 @@ export class TetherPayCheckout extends HTMLElement {
         }
       } catch (e) {
         this.loadInitialState();
-        this.tetherPayOptions?.paymentFailedListener?.('Unable to create cryptotransaction.');
+        this.tetherPayOptions?.paymentFailedListener?.('Unable to create crypto transaction.');
       }
     } else {
       this.loadInitialState();
