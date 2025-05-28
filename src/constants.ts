@@ -12,7 +12,8 @@ export const QRCodeDefaults: QRCodeToDataURLOptions = {
 export const CryptoTransactionStatusPending = 0;
 export const CryptoTransactionStatusSuccess = 1;
 
-export const BaseUrlSandbox = 'https://fence.dev.tetherpayments.group';
+// export const BaseUrlSandbox = 'https://fence.dev.tetherpayments.group';
+export const BaseUrlSandbox = 'http://localhost:8004';
 export const BaseUrlProduction = 'https://fence.tetherpayments.group';
 
 export const CryptoPaymentChainEthereum = 'ethereum';
@@ -21,3 +22,8 @@ export const CryptoPaymentChainSolana = 'solana';
 export const CryptoPaymentChainTon = 'ton';
 export const CryptoPaymentChainAvalanche = 'avalanche';
 export const CryptoPaymentChainAptos = 'aptos';
+
+export const AllowedAssetBitcoin = 'BTC';
+export const AllowedAssetEthereum = 'ETH';
+export const AllowedAssetUSDT = 'USDT';
+export const AllowedAssetUSDC = 'USDC';

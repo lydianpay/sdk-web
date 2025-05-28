@@ -16,7 +16,9 @@
     ],
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "jsx": "react",
+    "jsxFactory": "h"
   },
   "include": [
     "src",

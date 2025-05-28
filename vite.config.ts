@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+// import tailwindcss from "tailwindcss";
 
 export default defineConfig({
   build: {
@@ -9,4 +10,13 @@ export default defineConfig({
       formats: ['iife'],
     },
   },
+  esbuild: {
+    jsxFactory: 'h',
+    jsxFragment: 'Fragment',
+  },
+  // css: {
+  //   postcss: {
+  //     plugins: [tailwindcss()],
+  //   },
+  // },
 });
