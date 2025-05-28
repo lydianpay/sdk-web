@@ -31,8 +31,42 @@
     id="tetherPayBtnCryptoPayment"
     class="w-full rounded-md bg-white shadow px-4 py-3 text-base font-medium shadow-md text-gray-800 border border-gray-200 hover:bg-gray-100"
   >
-    Pay with USDT (Tether)
+    Pay with Crypto
   </button>
+
+  <div
+    id="tetherPayCryptoPaymentContainer"
+    class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 hidden">
+    <div class="flex items-center space-x-2">
+      <div class="text-lg font-medium">Pay with Crypto</div>
+    </div>
+
+    <div class="text-sm font-medium">Select an asset</div>
+
+    <div class="space-y-2">
+      <div id="tetherPayCryptoAssetsContainer" class="space-y-2">
+      </div>
+      <button
+        id="tetherPayBtnCryptoAssetsAdditionalPayment"
+        class="text-sm text-gray-500 underline hover:text-gray-700">
+        Additional Chains
+      </button>
+      <div id="tetherPayCryptoAssetsAdditionalContainer" class="space-y-2 hidden">
+      </div>
+    </div>
+
+    <p class="text-xs text-red-500">
+      Please ensure to select the correct network. Sending funds on the wrong
+      network will result in a loss of your funds.
+    </p>
+
+    <button
+      id="tetherPayBtnCancelCryptoPayment"
+      class="text-sm text-gray-500 underline hover:text-gray-700">
+      Cancel and return
+    </button>
+  </div>
+
   <div
     id="tetherPayUsdtPaymentContainer"
     class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 hidden">
@@ -61,7 +95,7 @@
     </p>
 
     <button
-      id="tetherPayBtnCancelCryptoPayment"
+      id="tetherPayBtnCancelUsdtPayment"
       class="text-sm text-gray-500 underline hover:text-gray-700">
       Cancel and return
     </button>

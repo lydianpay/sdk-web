@@ -24,12 +24,15 @@ export type CreateCryptoTransactionRequest = {
   descriptor?: string;
   referenceNumber?: string;
   amount: number;
-  currency: string;
+  amountCurrency: string;
+  asset: string;
+  network: string;
 };
 
 export type CreateCryptoTransactionResponse = {
   transactionId: string;
-  chains: string[];
+  qrData: string;
+  assetAmount: number;
 };
 
 export type UpdateCryptoTransactionRequest = {
@@ -46,8 +49,16 @@ export type GetCryptoTransactionResponse = {
   status: number;
 }
 
+export type Asset = {
+  code: string;
+  type: string;
+  networks: string[];
+}
+
 export type GetSDKConfigResponse = {
+  appPayEnabled: boolean;
   tetherPayEnabled: boolean;
   cryptoPayEnabled: boolean;
   tetherPayCluster: string;
+  allowedAssets: Asset[];
 }
