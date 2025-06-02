@@ -1,24 +1,24 @@
 import { TetherPayCheckout } from './ui/TetherPayCheckout';
-import { currencies, isCurrency, TetherPayOptions, CryptoTransaction } from './types';
+import { currencies, isCurrency, InitOptions, Transaction } from './types';
 
 // Register the custom HTML element
 if (!customElements.get('tetherpay-checkout')) {
   customElements.define('tetherpay-checkout', TetherPayCheckout);
 }
 
-async function init(tetherPayOptions: TetherPayOptions) {
+async function init(initOptions: InitOptions) {
   const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
-  if (!tetherPayOptions.publishableKey ||
-    !tetherPayOptions.initialTransaction.amount || !tetherPayOptions.initialTransaction.currency) {
-    throw new Error('Tether Pay initialization requires a baseUri, publishableKey, and initial cryptotransaction');
+  if (!initOptions.publishableKey ||
+    !initOptions.transaction.amount || !initOptions.transaction.currency) {
+    throw new Error('SDK initialization requires a baseURI, publishableKey, and transaction');
   }
-  if (!isCurrency(tetherPayOptions.initialTransaction.currency)) {
+  if (!isCurrency(initOptions.transaction.currency)) {
     throw new Error('Invalid value for currency, valid values are: ' + currencies.join(', '));
   }
-  await tetherPayCheckout.setTetherPayOptions(tetherPayOptions);
+  await tetherPayCheckout.getMerchantConfiguration(initOptions);
 }
 
-async function updateTransaction(transaction: CryptoTransaction) {
+async function updateTransaction(transaction: Transaction) {
   const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
   await tetherPayCheckout.updateTransaction(transaction);
 }

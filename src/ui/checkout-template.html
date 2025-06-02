@@ -1,41 +1,45 @@
 <div class="font-antic">
-  <div id="tetherPayPaymentSuccessContainer" class="hidden flex flex-col items-center justify-center min-h-[200px]">
+  <div id="containerPaymentSuccess" class="hidden flex flex-col items-center justify-center min-h-[200px]">
     <p class="text-gray-600 text-lg font-medium">Payment Success!</p>
     <img class="max-w-32 mt-4" src="https://tetherpay.com/images/475982cd-2f7b-4a57-c9b2-13b5014d7100/public"
          alt="Payment Success!" />
   </div>
-  <div id="tetherPayPaymentFailedContainer" class="hidden flex flex-col items-center justify-center">
+
+  <div id="containerPaymentFailure" class="hidden flex flex-col items-center justify-center">
     <p class="text-red-500 text-lg font-medium">Transaction Timed Out / Failed!</p>
   </div>
-  <div id="tetherPayQRCodeContainer" class="hidden flex flex-col items-center justify-center">
+
+  <div id="containerQRCode" class="hidden flex flex-col items-center justify-center">
     <p class="m-4 text-center">Scan the code below using your app to continue with the payment</p>
     <div class="border p-2 border-gray-500 h-64 w-64">
-      <canvas id="tetherPayQRCodeCanvas"></canvas>
+      <canvas id="canvasQRCode"></canvas>
     </div>
-    <p id="tetherPayUSDTAmount" class="text-lg text-gray-900 sm:text-xl text-center mt-4"></p>
+    <p id="qrCodeAmount" class="text-lg text-gray-900 sm:text-xl text-center mt-4"></p>
   </div>
-  <div id="tetherPayProcessingContainer" class="hidden flex flex-col items-center justify-center min-h-[200px]">
+
+  <div id="containerProcessing" class="hidden flex flex-col items-center justify-center min-h-[200px]">
     <div
       class="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
     <p class="mt-4 text-gray-600 text-lg font-medium">Processing...</p>
   </div>
+
   <button
     type="button"
-    id="tetherPayBtnClusterPayment"
+    id="btnAppPayment"
     class="w-full rounded-md border border-transparent bg-tether-green px-4 py-3 text-base font-medium mb-4 text-white shadow-md"
   >
-    Pay with the Tether Pay App
+    Pay with the App
   </button>
   <button
     type="button"
-    id="tetherPayBtnCryptoPayment"
+    id="btnCryptoPayment"
     class="w-full rounded-md bg-white shadow px-4 py-3 text-base font-medium shadow-md text-gray-800 border border-gray-200 hover:bg-gray-100"
   >
-    Pay with Crypto
+    Pay With Crypto
   </button>
 
   <div
-    id="tetherPayCryptoPaymentContainer"
+    id="containerCryptoPayment"
     class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 hidden">
     <div class="flex items-center space-x-2">
       <div class="text-lg font-medium">Pay with Crypto</div>
@@ -44,14 +48,14 @@
     <div class="text-sm font-medium">Select an asset</div>
 
     <div class="space-y-2">
-      <div id="tetherPayCryptoAssetsContainer" class="space-y-2">
+      <div id="containerAssets" class="space-y-2">
       </div>
       <button
-        id="tetherPayBtnCryptoAssetsAdditionalPayment"
+        id="btnMoreAssets"
         class="text-sm text-gray-500 underline hover:text-gray-700">
-        Additional Chains
+        More Assets
       </button>
-      <div id="tetherPayCryptoAssetsAdditionalContainer" class="space-y-2 hidden">
+      <div id="containerAssetsMore" class="space-y-2 hidden">
       </div>
     </div>
 
@@ -61,31 +65,31 @@
     </p>
 
     <button
-      id="tetherPayBtnCancelCryptoPayment"
+      id="btnCancelCryptoPayment"
       class="text-sm text-gray-500 underline hover:text-gray-700">
       Cancel and return
     </button>
   </div>
 
   <div
-    id="tetherPayUsdtPaymentContainer"
+    id="containerNetworks"
     class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 hidden">
     <div class="flex items-center space-x-2">
-      <img src="https://tetherpay.com/images/7065960c-8ebd-4d80-f352-8027ff2bb600/public" alt="USDT" class="h-6" />
-      <div class="text-lg font-medium">USDT (Tether)</div>
+      <img id="assetImg" src="" class="h-6" />
+      <div id="assetTitle" class="text-lg font-medium">USDT (Tether)</div>
     </div>
 
     <div class="text-sm font-medium">Select a Network</div>
 
     <div class="space-y-2">
-      <div id="tetherPayChainsContainer" class="space-y-2">
+      <div id="containerNetworkList" class="space-y-2">
       </div>
       <button
-        id="tetherPayBtnUsdtAdditionalPayment"
+        id="btnMoreNetworks"
         class="text-sm text-gray-500 underline hover:text-gray-700">
-        Additional Chains
+        More Networks
       </button>
-      <div id="tetherPayUsdtAdditionalPaymentContainer" class="space-y-2 hidden">
+      <div id="containerMoreNetworks" class="space-y-2 hidden">
       </div>
     </div>
 
