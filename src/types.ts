@@ -5,22 +5,22 @@ export function isCurrency(value: any): value is Currency {
   return currencies.includes(value);
 }
 
-export type CryptoTransaction = {
+export type Transaction = {
   amount: number;
   currency: Currency;
   descriptor?: string;
   referenceNumber?: string;
 }
 
-export type TetherPayOptions = {
+export type InitOptions = {
   sandbox: boolean;
   publishableKey: string;
-  initialTransaction: CryptoTransaction;
+  transaction: Transaction;
   paymentFailedListener: (failureMessage: string) => void;
   paymentSuccessListener: () => void;
 };
 
-export type CreateCryptoTransactionRequest = {
+export type CreateTransactionRequest = {
   descriptor?: string;
   referenceNumber?: string;
   amount: number;
@@ -29,22 +29,13 @@ export type CreateCryptoTransactionRequest = {
   network: string;
 };
 
-export type CreateCryptoTransactionResponse = {
+export type CreateTransactionResponse = {
   transactionId: string;
   qrData: string;
   assetAmount: number;
 };
 
-export type UpdateCryptoTransactionRequest = {
-  chain: string;
-};
-
-export type UpdateCryptoTransactionResponse = {
-  qrData: string;
-  usdtAmount: number;
-}
-
-export type GetCryptoTransactionResponse = {
+export type GetTransactionResponse = {
   expiration: string;
   status: number;
 }
@@ -52,12 +43,19 @@ export type GetCryptoTransactionResponse = {
 export type Asset = {
   code: string;
   type: string;
+  title: string;
+  img: string;
   networks: string[];
+}
+
+export type Network = {
+  code: string;
+  name: string;
+  img: string;
 }
 
 export type GetSDKConfigResponse = {
   appPayEnabled: boolean;
-  tetherPayEnabled: boolean;
   cryptoPayEnabled: boolean;
   tetherPayCluster: string;
   allowedAssets: Asset[];
