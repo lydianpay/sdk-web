@@ -61,7 +61,6 @@ export class TetherPayCheckout extends HTMLElement {
   private containerPaymentSuccess: HTMLDivElement | null = null;
   private containerPaymentFailure: HTMLDivElement | null = null;
   private containerQRCode: HTMLDivElement | null = null;
-  private containerProcessing: HTMLDivElement | null = null;
 
   private tetherPayUsdtPaymentContainer: HTMLDivElement | null = null;
   private containerMoreNetworks: HTMLDivElement | null = null;
@@ -132,11 +131,9 @@ export class TetherPayCheckout extends HTMLElement {
     this.setSelectedNetwork(null);
     this.clearInterval();
     this.hideQRCode();
-    this.hideProcessing();
     this.hidePaymentSuccess();
 
     this.showButtons();
-
 
     this.btnAppPayment?.classList.add('hidden');
     if (this.sdkConfig?.appPayEnabled) {
@@ -186,28 +183,18 @@ export class TetherPayCheckout extends HTMLElement {
 
   private showPaymentSuccess(): void {
     this.containerPaymentSuccess?.classList.remove('hidden');
-    this.hideProcessing();
     this.hideButtons();
     this.hideQRCode();
   }
 
   private showPaymentFailure(): void {
     this.containerPaymentFailure?.classList.remove('hidden');
-    this.hideProcessing();
     this.hideButtons();
     this.hideQRCode();
   }
 
   private hidePaymentSuccess(): void {
     this.containerPaymentSuccess?.classList.add('hidden');
-  }
-
-  private showProcessing(): void {
-    this.containerProcessing?.classList.remove('hidden');
-  }
-
-  private hideProcessing(): void {
-    this.containerProcessing?.classList.add('hidden');
   }
 
   private showButtons(): void {
@@ -266,7 +253,7 @@ export class TetherPayCheckout extends HTMLElement {
     this.containerPaymentSuccess = this.shadowRoot?.getElementById('containerPaymentSuccess') as HTMLDivElement;
     this.containerPaymentFailure = this.shadowRoot?.getElementById('containerPaymentFailure') as HTMLDivElement;
     this.containerQRCode = this.shadowRoot?.getElementById('containerQRCode') as HTMLDivElement;
-    this.containerProcessing = this.shadowRoot?.getElementById('containerProcessing') as HTMLDivElement;
+
 
     this.assetImg = this.shadowRoot?.getElementById("assetImg") as HTMLImageElement;
     this.assetTitle = this.shadowRoot?.getElementById('assetTitle') as HTMLDivElement;
@@ -285,10 +272,6 @@ export class TetherPayCheckout extends HTMLElement {
     this.btnMoreAssets = this.shadowRoot?.getElementById('btnMoreAssets') as HTMLButtonElement;
 
     this.connectWalletButtonsContainer = this.shadowRoot?.getElementById('connectWalletContainer') as HTMLDivElement;
-  }
-
-  private updateUI(): void {
-
   }
 
   private attachListeners(): void {
@@ -327,7 +310,6 @@ export class TetherPayCheckout extends HTMLElement {
     if (this.initOptions && this.API) {
       this.clearInterval();
       this.hideButtons();
-      this.showProcessing();
       try {
         this.cryptoTransaction = await this.API.createCryptoTransaction({
           descriptor: this.initOptions.transaction.descriptor,
@@ -424,9 +406,12 @@ export class TetherPayCheckout extends HTMLElement {
         this.setSelectedAsset(asset.code)
 
         this.containerCryptoPayment?.classList.add('hidden');
-        // TODO: if type is a coin, don't do the network thing
+
         if (asset.type == 'token') {
           this.setNetworkButtons();
+        } else {
+          this.setSelectedNetwork(asset.networks[0])
+          await this.createCryptoTransaction();
         }
       });
     });

@@ -2,7 +2,7 @@
   <div id="containerPaymentSuccess" class="hidden flex flex-col items-center justify-center min-h-[200px]">
     <p class="text-gray-600 text-lg font-medium">Payment Success!</p>
     <img class="max-w-32 mt-4" src="https://tetherpay.com/images/475982cd-2f7b-4a57-c9b2-13b5014d7100/public"
-         alt="Payment Success!" />
+         alt="Payment Approved!" />
   </div>
 
   <div id="containerPaymentFailure" class="hidden flex flex-col items-center justify-center">
@@ -10,17 +10,17 @@
   </div>
 
   <div id="containerQRCode" class="hidden flex flex-col items-center justify-center">
-    <p class="m-4 text-center">Scan the code below using your app to continue with the payment</p>
+    <p class="m-4 text-center">
+      <ol>
+        <li>1. Scan the code below using your CAMERA, CRYPTO WALLET, or QR READER</li>
+        <li>2. Send the funds from your wallet</li>
+        <li>3. Wait for approval to be shown below</li>
+      </ol>
+    </p>
     <div class="border p-2 border-gray-500 h-64 w-64">
       <canvas id="canvasQRCode"></canvas>
     </div>
     <p id="qrCodeAmount" class="text-lg text-gray-900 sm:text-xl text-center mt-4"></p>
-  </div>
-
-  <div id="containerProcessing" class="hidden flex flex-col items-center justify-center min-h-[200px]">
-    <div
-      class="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-    <p class="mt-4 text-gray-600 text-lg font-medium">Processing...</p>
   </div>
 
   <button
@@ -28,7 +28,7 @@
     id="btnAppPayment"
     class="w-full rounded-md border border-transparent bg-tether-green px-4 py-3 text-base font-medium mb-4 text-white shadow-md"
   >
-    Pay with the App
+    Pay with Lydian
   </button>
   <button
     type="button"
