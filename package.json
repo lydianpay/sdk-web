@@ -20,5 +20,9 @@
     "tsx-dom": "^3.1.0",
     "typescript": "^5.0.0",
     "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "@meshconnect/web-link-sdk": "^3.2.1",
+    "viem": "^2.30.6"
   }
 }
