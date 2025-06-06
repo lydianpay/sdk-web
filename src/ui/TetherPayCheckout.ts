@@ -40,6 +40,15 @@ import isMobile from 'is-mobile';
 import AssetButton from './buttons/assetButton';
 import NetworkButton from './buttons/networkButton';
 
+import { listProviders } from '../integrations/metamask'; 
+
+// import {
+//   Link,
+//   LinkPayload,
+//   TransferFinishedPayload,
+//   createLink,
+// } from "@meshconnect/web-link-sdk";
+
 export class TetherPayCheckout extends HTMLElement {
   private shadow: ShadowRoot;
   private initOptions: InitOptions | null = null;
@@ -81,6 +90,8 @@ export class TetherPayCheckout extends HTMLElement {
   private selectedAsset: Asset | null = null;
   private selectedAssetNetworks: string[] | null = null;
   private selectedNetwork: string | null = null;
+
+  private connectWalletButtonsContainer: HTMLDivElement | null = null;
 
   constructor() {
     super();
@@ -259,6 +270,8 @@ export class TetherPayCheckout extends HTMLElement {
     this.btnMoreNetworks = this.shadowRoot?.getElementById('btnMoreNetworks') as HTMLButtonElement;
     this.tetherPayBtnCancelCryptoPayment = this.shadowRoot?.getElementById('tetherPayBtnCancelCryptoPayment') as HTMLButtonElement;
     this.btnMoreAssets = this.shadowRoot?.getElementById('btnMoreAssets') as HTMLButtonElement;
+
+    this.connectWalletButtonsContainer = this.shadowRoot?.getElementById('connectWalletContainer') as HTMLDivElement;
   }
 
   private attachListeners(): void {
@@ -292,6 +305,8 @@ export class TetherPayCheckout extends HTMLElement {
       return;
     }
 
+    // this.initMeshLink();
+
     if (this.initOptions && this.API) {
       this.clearInterval();
       this.hideButtons();
@@ -305,6 +320,7 @@ export class TetherPayCheckout extends HTMLElement {
           network: this.selectedNetwork,
         });
         this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount);
+        this.initWalletButtons(this.cryptoTransaction);
         this.startListeningCryptoTransaction();
         if (isMobile()) {
           window.location.href = this.cryptoTransaction.qrData;
@@ -385,7 +401,7 @@ export class TetherPayCheckout extends HTMLElement {
 
   private attachListenersOnAssets() {
     this.sdkConfig?.allowedAssets.forEach((asset) => {
-      const assetBtn = this.shadowRoot?.getElementById('btnAsset'+asset.code) as HTMLButtonElement;
+      const assetBtn = this.shadowRoot?.getElementById('btnAsset' + asset.code) as HTMLButtonElement;
       assetBtn?.addEventListener('click', async () => {
         this.setSelectedAsset(asset.code)
 
@@ -465,8 +481,8 @@ export class TetherPayCheckout extends HTMLElement {
   }
 
   private attachListenerOnNetworks(networks: string[]) {
-    networks.forEach((networkCode)=> {
-      const networkBtn = this.shadowRoot?.getElementById('btnNetwork'+networkCode) as HTMLButtonElement;
+    networks.forEach((networkCode) => {
+      const networkBtn = this.shadowRoot?.getElementById('btnNetwork' + networkCode) as HTMLButtonElement;
       networkBtn?.addEventListener('click', async () => {
         this.setSelectedNetwork(networkCode)
         await this.createCryptoTransaction();
@@ -490,4 +506,49 @@ export class TetherPayCheckout extends HTMLElement {
       this.initOptions?.paymentFailedListener?.('SDK not initialized.');
     }
   }
+
+  private async initWalletButtons(txn?: CreateTransactionResponse) {
+    if (!this.connectWalletButtonsContainer) {
+      return;
+    }
+
+    listProviders(this.connectWalletButtonsContainer, txn);
+  }
+
+  // private async initMeshLink() {
+  //   console.log('meshLink initializing');
+  //   const meshLink = createLink({
+  //     clientId: '64979f80-625c-4dd9-0017-08dcfdc5c8d3',
+  //     onIntegrationConnected: (payload) => { 
+  //       console.log('meshLink connected');
+  //     },
+  //     onExit: (error) => {
+  //       console.log('meshLink exited', error);
+  //     },
+  //     onTransferFinished: (transferData) => { },
+  //     onEvent: (ev) => { 
+  //       console.log('meshLink event:', ev);
+  //     },
+  //     accessTokens: [],
+  //     transferDestinationTokens: []
+  //   });
+
+  //   if (!this.API) {
+  //     console.log('api not initialized')
+  //     return;
+  //   }
+
+  //   const linkToken = await this.API.createLinkToken({userId: '123'});
+
+  //   // TODO: fix issues
+  //   // - Refused to frame 'https://web.meshconnect.com/' because an ancestor violates the
+  //   //   following Content Security Policy directive: "frame-ancestors 'self' *.getfront.com 
+  //   //   *.meshconnect.com getfront.com meshconnect.com".
+  //   //
+  //   //   https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/frame-ancestors
+  //   meshLink.openLink(
+  //     linkToken,
+  //     'meshConnectFrame'
+  //   );
+  // }
 }
