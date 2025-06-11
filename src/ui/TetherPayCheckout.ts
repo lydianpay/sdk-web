@@ -59,6 +59,8 @@ export class TetherPayCheckout extends HTMLElement {
   private containerPaymentSuccess: HTMLDivElement | null = null;
   private containerPaymentFailure: HTMLDivElement | null = null;
   private containerQRCode: HTMLDivElement | null = null;
+  private tetherPayProcessingContainer: HTMLDivElement | null = null;
+  private tetherPayProcessingText: HTMLParagraphElement | null = null;
 
   private tetherPayUsdtPaymentContainer: HTMLDivElement | null = null;
   private containerMoreNetworks: HTMLDivElement | null = null;
@@ -198,6 +200,20 @@ export class TetherPayCheckout extends HTMLElement {
     this.containerPaymentSuccess?.classList.add('hidden');
   }
 
+  private showProcessing(message: string = 'Processing...'): void {
+    if (this.tetherPayProcessingText) {
+      this.tetherPayProcessingText.innerHTML = message;
+    }
+    this.tetherPayProcessingContainer?.classList.remove('hidden');
+  }
+
+  private hideProcessing(): void {
+    if (this.tetherPayProcessingText) {
+      this.tetherPayProcessingText.innerHTML = '';
+    }
+    this.tetherPayProcessingContainer?.classList.add('hidden');
+  }
+
   private showButtons(): void {
     if (this.sdkConfig?.appPayEnabled) {
       this.btnAppPayment?.classList.remove('hidden');
@@ -254,6 +270,8 @@ export class TetherPayCheckout extends HTMLElement {
     this.containerPaymentSuccess = this.shadowRoot?.getElementById('containerPaymentSuccess') as HTMLDivElement;
     this.containerPaymentFailure = this.shadowRoot?.getElementById('containerPaymentFailure') as HTMLDivElement;
     this.containerQRCode = this.shadowRoot?.getElementById('containerQRCode') as HTMLDivElement;
+    this.tetherPayProcessingContainer = this.shadowRoot?.getElementById('tetherPayProcessingContainer') as HTMLDivElement;
+    this.tetherPayProcessingText = this.shadowRoot?.getElementById('tetherPayProcessingText') as HTMLParagraphElement;
 
 
     this.assetImg = this.shadowRoot?.getElementById("assetImg") as HTMLImageElement;
@@ -305,8 +323,6 @@ export class TetherPayCheckout extends HTMLElement {
       this.initOptions?.paymentFailedListener?.('Asset and network selection required.');
       return;
     }
-
-    // this.initMeshLink();
 
     if (this.initOptions && this.API) {
       this.clearInterval();
@@ -360,8 +376,20 @@ export class TetherPayCheckout extends HTMLElement {
             uint256: parseInt(params.uint256)
           })
 
-          const transferResp = await this.walletConnectService.sendEthTransaction(usdtTransfer);
-          // TODO: do something with this response
+          try {
+            this.showProcessing(`Waiting for transaction approval from ${this.walletConnectService.currentSession.peer.metadata.name}...`)
+            const transferResp = await this.walletConnectService.sendEthTransaction(usdtTransfer);
+            // TODO: do something with this response
+
+            this.hideProcessing();
+            this.showPaymentSuccess();
+            this.clearInterval();
+          } catch (error) {
+            this.hideProcessing();
+            this.showPaymentFailure();
+            this.clearInterval();
+          }
+
         }
 
         this.startListeningCryptoTransaction();

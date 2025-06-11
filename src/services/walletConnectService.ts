@@ -1,7 +1,7 @@
 import Client, { SignClient } from "@walletconnect/sign-client";
 import { SessionTypes } from "@walletconnect/types";
-import { walletConnectProjectId } from "src/constants";
-import { EthereumTransactionParams } from "src/types/ethereum";
+import { walletConnectProjectId } from "../constants";
+import { EthereumTransactionParams } from "../types/ethereum";
 
 export interface WalletConnectServiceProps {
     shadow: ShadowRoot;
