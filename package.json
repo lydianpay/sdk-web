@@ -22,7 +22,12 @@
     "vite": "^5.0.0"
   },
   "dependencies": {
-    "@meshconnect/web-link-sdk": "^3.2.1",
-    "viem": "^2.30.6"
+    "@reown/appkit": "^1.7.8",
+    "@reown/appkit-adapter-wagmi": "^1.7.8",
+    "@reown/walletkit": "^1.2.6",
+    "@walletconnect/core": "^2.21.2",
+    "@walletconnect/utils": "^2.21.2",
+    "viem": "^2.30.6",
+    "wagmi": "^2.15.6"
   }
 }
