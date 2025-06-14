@@ -69,9 +69,9 @@ const connectWithProvider = async (
                             from: res[0], // The user's active address.
                             to: USDT_ERC20_MAIN.contractAddress, // Address of the recipient. Not used in contract creation transactions.
                             // value: "0x1e6", // Value transferred, in wei. Only required to send ether to the recipient from the initiating external account.
-                            gasLimit: "0x5028", // Customizable by the user during MetaMask confirmation.
-                            maxPriorityFeePerGas: "0x3b9aca00", // Customizable by the user during MetaMask confirmation.
-                            maxFeePerGas: "0x2540be400", // Customizable by the user during MetaMask confirmation.
+                            // gasLimit: "0x5028", // Customizable by the user during MetaMask confirmation.
+                            // maxPriorityFeePerGas: "0x3b9aca00", // Customizable by the user during MetaMask confirmation.
+                            // maxFeePerGas: "0x2540be400", // Customizable by the user during MetaMask confirmation.
                             data: encodeFunctionData({
                                 abi: USDT_ERC20_MAIN.abi,
                                 functionName: 'transfer',

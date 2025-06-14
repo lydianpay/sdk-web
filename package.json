@@ -7,7 +7,7 @@
     "build:css": "npx tailwindcss -i src/ui/tetherpay.css -o ./src/ui/tetherpay.generated.css --minify",
     "build": "npm run build:css && vite build",
     "build:watch": "npm run build:css && vite build --watch",
-    "live-server": "live-server --cors --no-browser --port=9999 dist",
+    "serve": "live-server --cors --no-browser --port=9999 dist",
     "dev": "vite"
   },
   "devDependencies": {
