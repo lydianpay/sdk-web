@@ -2,6 +2,7 @@ import Client, { SignClient } from "@walletconnect/sign-client";
 import { SessionTypes } from "@walletconnect/types";
 import { walletConnectProjectId } from "../constants";
 import { EthereumTransactionParams } from "../types/ethereum";
+import { WalletConnectWallet } from "src/types";
 
 export interface WalletConnectServiceProps {
     shadow: ShadowRoot;
@@ -35,6 +36,14 @@ export class WalletConnectService {
         console.log('lastSession', lastSession);
 
         return lastSession;
+    }
+
+    public findSession(wallet: WalletConnectWallet) {
+        if (!this.client) {
+            throw new Error('wallet connect client not initialized');
+        }
+        console.log('walletConnect findSession, all sessions:', this.client.session.getAll())
+        return this.client.session.getAll().find((session) => session.peer.metadata.name === wallet.name)
     }
 
     public async init() {

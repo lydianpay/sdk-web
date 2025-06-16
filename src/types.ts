@@ -54,6 +54,11 @@ export type Network = {
   img: string;
 }
 
+export type WalletConnectWallet = {
+  name: string;
+  img: string;
+}
+
 export type GetSDKConfigResponse = {
   appPayEnabled: boolean;
   cryptoPayEnabled: boolean;
