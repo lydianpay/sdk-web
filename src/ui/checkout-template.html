@@ -10,13 +10,13 @@
   </div>
 
   <div id="containerQRCode" class="hidden flex flex-col items-center justify-center">
-    <p class="m-4 text-center">
-    <ol>
-      <li>1. Scan the code below using your CAMERA, CRYPTO WALLET, or QR READER</li>
-      <li>2. Send the funds from your wallet</li>
-      <li>3. Wait for approval to be shown below</li>
-    </ol>
-    </p>
+    <div class="m-4 text-center">
+      <ol>
+        <li>1. Scan the code below using your <br /> CAMERA, CRYPTO WALLET, or QR READER</li>
+        <li>2. Send the funds from your wallet</li>
+        <li>3. Wait for approval to be shown below</li>
+      </ol>
+    </div>
     <div class="border p-2 border-gray-500 h-64 w-64">
       <canvas id="canvasQRCode"></canvas>
     </div>
@@ -39,10 +39,8 @@
 
   <div id="containerCryptoPayment" class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 hidden">
     <div class="flex items-center space-x-2">
-      <div class="text-lg font-medium">Pay with Crypto</div>
+      <div class="text-lg font-medium">Select An Asset</div>
     </div>
-
-    <div class="text-sm font-medium">Select an asset</div>
 
     <div class="space-y-2">
       <div id="containerAssets" class="space-y-2">
@@ -70,7 +68,7 @@
       <div id="assetTitle" class="text-lg font-medium">USDT (Tether)</div>
     </div>
 
-    <div class="text-sm font-medium">Select a Network</div>
+    <div class="text-sm font-medium">Select A Network</div>
 
     <div class="space-y-2">
       <div id="containerNetworkList" class="space-y-2">
@@ -95,10 +93,8 @@
   <!-- TODO: clear this container when going back or using loadInitialState -->
   <div id="connectWalletContainer" class="w-full bg-white rounded-xl shadow p-6 space-y-4 text-gray-800 hidden">
     <div class="flex items-center space-x-2">
-      <div class="text-lg font-medium">Connect a Wallet</div>
+      <div class="text-lg font-medium">Connect A Wallet</div>
     </div>
-
-    <div class="text-sm font-medium">Select an asset</div>
 
     <div class="space-y-2">
       <div id="containerWalletList" class="space-y-2">
