@@ -51,10 +51,12 @@ export class TetherPayCheckout extends HTMLElement {
   private shadow: ShadowRoot;
   private initOptions: InitOptions | null = null;
 
+  private API: API | null = null;
   private sdkConfig: GetSDKConfigResponse | null = null;
   private cryptoTransaction: CreateTransactionResponse | null = null;
-  private API: API | null = null;
   private getCryptoTransactionIntervalID: NodeJS.Timeout | null = null;
+  private lydianTransaction: CreateTransactionResponse | null = null;
+  private getLydianTransactionIntervalID: NodeJS.Timeout | null = null;
 
   private walletConnectService: WalletConnectService | null = null;
 
@@ -97,6 +99,7 @@ export class TetherPayCheckout extends HTMLElement {
   private containerMoreWallets: HTMLDivElement | null = null;
   private containerWalletList: HTMLDivElement | null = null;
   private btnMoreWallets: HTMLButtonElement | null = null;
+  private containerWalletManual: HTMLDivElement | null = null;
 
   constructor() {
     super();
@@ -166,6 +169,8 @@ export class TetherPayCheckout extends HTMLElement {
 
     this.containerMoreWallets?.classList.add('hidden');
     this.btnMoreWallets?.classList.remove('hidden');
+
+    this.connectWalletButtonsContainer?.classList.add('hidden');
   }
 
   private setSelectedAsset(code: string | null) {
@@ -242,6 +247,7 @@ export class TetherPayCheckout extends HTMLElement {
     this.containerCryptoPayment?.classList.add('hidden');
     this.containerNetworks?.classList.add('hidden');
     this.connectWalletButtonsContainer?.classList.add('hidden');
+    this.containerWalletManual?.classList.add('hidden');
   }
 
   private showQRCode(qrData: string, amount: number): void {
@@ -302,10 +308,12 @@ export class TetherPayCheckout extends HTMLElement {
     this.btnMoreNetworks = this.shadowRoot?.getElementById('btnMoreNetworks') as HTMLButtonElement;
     this.tetherPayBtnCancelCryptoPayment = this.shadowRoot?.getElementById('tetherPayBtnCancelCryptoPayment') as HTMLButtonElement;
     this.btnMoreAssets = this.shadowRoot?.getElementById('btnMoreAssets') as HTMLButtonElement;
+    this.btnMoreWallets = this.shadowRoot?.getElementById('btnMoreWallets') as HTMLButtonElement;
 
     this.connectWalletButtonsContainer = this.shadowRoot?.getElementById('connectWalletContainer') as HTMLDivElement;
     this.containerMoreWallets = this.shadowRoot?.getElementById('containerMoreWallets') as HTMLDivElement;
     this.containerWalletList = this.shadowRoot?.getElementById('containerWalletList') as HTMLDivElement;
+    this.containerWalletManual = this.shadowRoot?.getElementById('containerWalletManual') as HTMLDivElement;
   }
 
   private attachListeners(): void {
@@ -326,6 +334,11 @@ export class TetherPayCheckout extends HTMLElement {
     this.btnMoreAssets?.addEventListener('click', () => {
       this.containerAssetsMore?.classList.toggle('hidden');
       this.btnMoreAssets?.classList.toggle('hidden');
+    });
+
+    this.btnMoreWallets?.addEventListener('click', () => {
+      this.containerMoreWallets?.classList.toggle('hidden');
+      this.btnMoreWallets?.classList.toggle('hidden');
     });
 
     this.tetherPayBtnCancelCryptoPayment?.addEventListener('click', () => {
@@ -383,10 +396,36 @@ export class TetherPayCheckout extends HTMLElement {
     }, 2000);
   }
 
+  private startListeningLydianTransaction() {
+    this.clearInterval();
+    this.getLydianTransactionIntervalID = setInterval(async () => {
+      if (this.lydianTransaction?.transactionId) {
+        const transaction = await this.API?.getClusterTransaction(this.lydianTransaction?.transactionId);
+        if (transaction) {
+          if (transaction.status === CryptoTransactionStatusSuccess) {
+            this.showPaymentSuccess();
+            this.clearInterval();
+          }
+          const expirationDateTime = Date.parse(transaction.expiration);
+          const currentDateTime = Date.now();
+          if (expirationDateTime < currentDateTime) {
+            this.showPaymentFailure();
+            this.clearInterval();
+            this.initOptions?.paymentFailedListener?.('Transaction Timed Out / Failed!');
+          }
+        }
+      }
+    }, 2000);
+  }
+
   private clearInterval() {
     if (this.getCryptoTransactionIntervalID) {
       clearInterval(this.getCryptoTransactionIntervalID);
       this.getCryptoTransactionIntervalID = null;
+    }
+    if (this.getLydianTransactionIntervalID) {
+      clearInterval(this.getLydianTransactionIntervalID);
+      this.getLydianTransactionIntervalID = null;
     }
   }
 
@@ -540,28 +579,38 @@ export class TetherPayCheckout extends HTMLElement {
       return;
     }
 
+    this.containerWalletList.innerHTML = '';
+    this.containerMoreWallets.innerHTML = '';
+
     this.containerNetworks?.classList.add('hidden');
 
     this.connectWalletButtonsContainer.classList.remove('hidden');
-    console.log('clicked')
 
+    const manualQrButton = {
+      id: 'manual',
+      name: 'Manual QR Code',
+      img: 'https://tetherpay.com/images/95de9fd2-da4f-4415-3ec7-bb1befdbc500/public'
+    }
+
+    if (this.containerWalletManual) {
+      this.containerWalletManual.innerHTML = '';
+      this.containerWalletManual.innerHTML += WalletButton(manualQrButton);
+    }
 
     // TODO: extract this to constants
+    // TODO: add dynamic indicator if linked
     const wallets: WalletConnectWallet[] = [
-      {
-        id: 'manual',
-        name: 'Manual QR Code',
-        img: 'https://tetherpay.com/images/95de9fd2-da4f-4415-3ec7-bb1befdbc500/public'
-      },
       {
         id: 'metamask',
         name: 'MetaMask',
         img: 'https://tetherpay.com/images/a0ddd685-4a84-4f5c-ab6d-9796994cf500/public',
+        wcPeerName: 'MetaMask Wallet'
       },
       {
         id: 'trustwallet',
         name: 'Trust Wallet',
         img: 'https://logowik.com/content/uploads/images/trust-wallet-shield4830.logowik.com.webp',
+        wcPeerName: 'Trust Wallet'
       },
     ];
 
@@ -580,7 +629,7 @@ export class TetherPayCheckout extends HTMLElement {
 
     this.containerWalletList?.classList.remove('hidden');
 
-    this.attachListenerOnWallets(wallets);
+    this.attachListenerOnWallets([...wallets, manualQrButton]);
   }
 
   private attachListenerOnWallets(wallets: WalletConnectWallet[]) {
@@ -592,10 +641,9 @@ export class TetherPayCheckout extends HTMLElement {
       });
     });
 
-    // TODO: reset state button listener
-    // this.tetherPayBtnCancelUsdtPayment?.addEventListener('click', async () => {
-    //   this.loadInitialState();
-    // });
+    this.tetherPayBtnCancelCryptoPayment?.addEventListener('click', async () => {
+      this.loadInitialState();
+    });
   }
 
   private async beginWalletConnectTransaction() {
@@ -611,14 +659,6 @@ export class TetherPayCheckout extends HTMLElement {
       this.initOptions?.paymentFailedListener?.('Wallet Connect not initialized.');
       return;
     }
-    // TODO: hold off on generating the transaction until a wallet option is chosen
-
-    // TODO: call beginWalletConnectTransaction()
-
-    // If this.cryptoTransaction == null create it
-    // else, re-use it
-
-    // Offer qr code connection to selected wallet or kick off sendEthTransaction if already linked
 
     this.connectWalletButtonsContainer?.classList.add('hidden');
 
@@ -677,7 +717,7 @@ export class TetherPayCheckout extends HTMLElement {
 
         try {
           this.showProcessing(`Waiting for transaction approval from ${walletSession.peer.metadata.name}...`)
-          const transferResp = await this.walletConnectService.sendEthTransaction(usdtTransfer);
+          const transferResp = await this.walletConnectService.sendEthTransaction(usdtTransfer, walletSession);
           // TODO: do something with this response
 
           this.hideProcessing();
