@@ -615,7 +615,7 @@ export class TetherPayCheckout extends HTMLElement {
     ];
 
     wallets.forEach((wallet, index) => {
-      const button = WalletButton(wallet);
+      const button = WalletButton(wallet, !!this.walletConnectService?.findSession(wallet));
       if (index >= 3 && this.containerMoreWallets) {
         this.containerMoreWallets.innerHTML += button;
       } else if (this.containerWalletList) {
