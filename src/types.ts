@@ -58,6 +58,7 @@ export type WalletConnectWallet = {
   id: string;
   name: string;
   img: string;
+  wcPeerName?: string;
 }
 
 export type GetSDKConfigResponse = {

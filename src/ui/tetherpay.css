@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.text-tether-green {
+    color: #044D57;
+}
+
 .bg-tether-green {
     background: #044D57;
 }

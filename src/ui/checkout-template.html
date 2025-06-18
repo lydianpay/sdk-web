@@ -17,10 +17,10 @@
     <div class="border p-2 border-gray-500 h-64 w-64 rounded-xl">
       <div id="canvasQRCode"></div>
     </div>
+
     <div class="m-4 text-center">
       Approval will be shown above when complete
     </div>
-
 
     <table class="table-fixed w-full bg-gray-50 p-2 rounded-xl border-separate mt-5">
       <tbody>
@@ -42,6 +42,12 @@
       </tr>
       </tbody>
     </table>
+
+    <p id="qrCodeAmount" class="text-lg text-gray-900 sm:text-xl text-center mt-4"></p>
+    <button id="tetherPayBtnCancelCryptoPayment" class="text-sm text-gray-500 underline hover:text-gray-700">
+      Cancel and return
+    </button>
+
   </div>
 
   <div id="tetherPayProcessingContainer" class="hidden flex flex-col items-center justify-center min-h-[200px]">
@@ -127,13 +133,18 @@
       </div>
     </div>
 
+    <div class="flex items-center justify-center space-x-2">
+      <div class="text-lg font-medium text-center text">Or</div>
+    </div>
+
+    <div class="space-y-2">
+      <div id="containerWalletManual" class="space-y-2"></div>
+    </div>
+
     <p class="text-xs text-red-500">
       Please ensure to select the correct network. Sending funds on the wrong
       network will result in a loss of your funds.
     </p>
 
-    <button id="btnCancelCryptoPayment" class="text-sm text-gray-500 underline hover:text-gray-700">
-      Cancel and return
-    </button>
   </div>
 </div>

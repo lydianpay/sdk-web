@@ -43,7 +43,7 @@ export class WalletConnectService {
             throw new Error('wallet connect client not initialized');
         }
         console.log('walletConnect findSession, all sessions:', this.client.session.getAll())
-        return this.client.session.getAll().find((session) => session.peer.metadata.name === wallet.name)
+        return this.client.session.getAll().find((session) => session.peer.metadata.name === wallet.wcPeerName)
     }
 
     public async init() {
@@ -98,11 +98,13 @@ export class WalletConnectService {
         return { uri, approval };
     }
 
-    public async sendEthTransaction(transaction: EthereumTransactionParams) {
+    public async sendEthTransaction(transaction: EthereumTransactionParams, session?: SessionTypes.Struct) {
         if (!this.client) {
             throw new Error('wallet connect client not initialized');
         }
-        if (!this.session) {
+
+        session = session || this.session;
+        if (!session) {
             throw new Error('wallet connect session not initialized');
         }
 
@@ -110,7 +112,7 @@ export class WalletConnectService {
 
         const result = await this.client.request({
             chainId: "eip155:1",
-            topic: this.session.topic,
+            topic: session.topic,
             request: {
                 method: "eth_sendTransaction",
                 params: [transaction],
