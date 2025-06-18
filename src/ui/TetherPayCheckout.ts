@@ -46,6 +46,7 @@ import { parseQrCodeData } from '../utils';
 import { encodeEthereumUsdtTransfer } from '../types/tether';
 import { Address } from '../types/ethereum';
 import WalletButton from './buttons/walletButton';
+import QRCodeStyling from '@solana/qr-code-styling';
 
 export class TetherPayCheckout extends HTMLElement {
   private shadow: ShadowRoot;
@@ -78,9 +79,13 @@ export class TetherPayCheckout extends HTMLElement {
   private btnMoreAssets: HTMLButtonElement | null = null;
   private tetherPayBtnCancelCryptoPayment: HTMLButtonElement | null = null;
 
-  private canvasQRCode: HTMLCanvasElement | null = null;
+  private canvasQRCode: HTMLDivElement | null = null;
 
-  private qrCodeAmount: HTMLParagraphElement | null = null;
+  private displayTotalAmount: HTMLTableCellElement | null = null;
+  private displayTransactionID: HTMLTableCellElement | null = null;
+  private displayAssetTotal: HTMLTableCellElement | null = null;
+  private displayScanText: HTMLSpanElement | null = null;
+  private displayExpirationLeft: HTMLTableCellElement | null = null;
 
   private btnAppPayment: HTMLButtonElement | null = null;
   private btnCryptoPayment: HTMLButtonElement | null = null;
@@ -120,7 +125,6 @@ export class TetherPayCheckout extends HTMLElement {
   }
 
   public async updateTransaction(transaction: Transaction) {
-    console.log("here")
     if (!this.initOptions) {
       throw new Error('Tether Pay not initialized.');
     }
@@ -249,25 +253,94 @@ export class TetherPayCheckout extends HTMLElement {
       return;
     }
     this.containerQRCode?.classList.remove('hidden');
-    if (this.qrCodeAmount) {
-      this.qrCodeAmount.innerText = amount + " " + this.selectedAsset.code.toUpperCase();
+    if (this.displayAssetTotal) {
+      this.displayAssetTotal.innerText = amount + " " + this.selectedAsset.code.toUpperCase();
     }
+    if (this.displayTransactionID) {
+      this.displayTransactionID.innerText = <string>this.initOptions?.transaction.referenceNumber;
+    }
+    if (this.displayTotalAmount) {
+      this.displayTotalAmount.innerText = <string>this.initOptions?.transaction.amount.toLocaleString('en-US', {
+        style: 'currency',
+        currency: this.initOptions?.transaction.currency
+      })
+    }
+
+    if (this.displayExpirationLeft) {
+      const clock = this.displayExpirationLeft;
+      const expirationTime = new Date().getTime() + 15 * 60 * 1000;
+
+      const timeInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = expirationTime - now;
+
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        clock.innerHTML = minutes + ":" + seconds;
+        if (distance <= 0) {
+          clearInterval(timeInterval)
+        }
+      }, 1000);
+
+    }
+
+    if (this.displayScanText && this.selectedWallet.code == 'manual') {
+      this.displayScanText.innerHTML = 'Scan the code below using your <br />CAMERA, CRYPTO WALLET, or QR READER';
+    }
+
+    let centerImg = '';
+    switch (this.selectedWallet.code) {
+      case 'manual':
+        // TODO: change this based on asset selected
+        centerImg = 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/7065960c-8ebd-4d80-f352-8027ff2bb600/public';
+        break;
+      case 'metamask':
+        centerImg = 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/a0ddd685-4a84-4f5c-ab6d-9796994cf500/public';
+        break;
+      case 'trustwallet':
+        centerImg = 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/327c5e87-ea96-4b84-aa1f-8f99c2c70f00/public';
+        break;
+    }
+
     if (this.canvasQRCode) {
+      const qrCode = new QRCodeStyling({
+        width: 238,
+        height: 238,
+        type: 'canvas',
+        data: qrData,
+        image: centerImg,
+        dotsOptions: {
+          color: '#000000',
+          type: 'extra-rounded'
+        },
+        backgroundOptions: {
+          color: '#ffffff'
+        }
+      });
+
+
+
+      qrCode.append(this.canvasQRCode);
+
+      /*
       if (this.canvasQRCode?.parentElement) {
+
         let qrCodeWidth = this.canvasQRCode.parentElement.clientWidth;
         const computedStyle = window.getComputedStyle(this.canvasQRCode.parentElement, null);
         qrCodeWidth -= parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight);
         QRCodeDefaults.width = qrCodeWidth;
       }
       QrCode.toDataURL(this.canvasQRCode, qrData, QRCodeDefaults);
+      */
+
     }
   }
 
   private hideQRCode(): void {
     this.containerQRCode?.classList.add('hidden');
     if (this.canvasQRCode) {
-      const ctx = this.canvasQRCode.getContext('2d');
-      ctx?.clearRect(0, 0, this.canvasQRCode.width, this.canvasQRCode.height);
+      this.canvasQRCode.innerHTML = '';
     }
   }
 
@@ -294,8 +367,13 @@ export class TetherPayCheckout extends HTMLElement {
     this.containerAssets = this.shadowRoot?.getElementById('containerAssets') as HTMLDivElement;
     this.containerAssetsMore = this.shadowRoot?.getElementById('containerAssetsMore') as HTMLDivElement;
 
-    this.canvasQRCode = this.shadowRoot?.getElementById('canvasQRCode') as HTMLCanvasElement;
-    this.qrCodeAmount = this.shadowRoot?.getElementById('qrCodeAmount') as HTMLParagraphElement;
+    this.canvasQRCode = this.shadowRoot?.getElementById('canvasQRCode') as HTMLDivElement;
+
+    this.displayTotalAmount = this.shadowRoot?.getElementById('displayTotalAmount') as HTMLTableCellElement;
+    this.displayTransactionID = this.shadowRoot?.getElementById('displayTransactionID') as HTMLTableCellElement;
+    this.displayAssetTotal = this.shadowRoot?.getElementById('displayAssetTotal') as HTMLTableCellElement;
+    this.displayScanText = this.shadowRoot?.getElementById('displayScanText') as HTMLSpanElement;
+    this.displayExpirationLeft = this.shadowRoot?.getElementById('displayExpirationLeft') as HTMLTableCellElement;
 
     this.btnAppPayment = this.shadowRoot?.getElementById('btnAppPayment') as HTMLButtonElement;
     this.btnCryptoPayment = this.shadowRoot?.getElementById('btnCryptoPayment') as HTMLButtonElement;
@@ -543,8 +621,6 @@ export class TetherPayCheckout extends HTMLElement {
     this.containerNetworks?.classList.add('hidden');
 
     this.connectWalletButtonsContainer.classList.remove('hidden');
-    console.log('clicked')
-
 
     // TODO: extract this to constants
     const wallets: WalletConnectWallet[] = [
