@@ -9,7 +9,7 @@ export type Transaction = {
   amount: number;
   currency: Currency;
   descriptor?: string;
-  referenceNumber?: string;
+  referenceNumber: string;
 }
 
 export type InitOptions = {
