@@ -672,7 +672,6 @@ export class Checkout extends HTMLElement {
     }
 
     // TODO: extract this to constants
-    // TODO: add dynamic indicator if linked
     const wallets: WalletConnectWallet[] = [
       {
         id: 'metamask',
@@ -747,7 +746,6 @@ export class Checkout extends HTMLElement {
       });
       console.log('transaction', this.cryptoTransaction);
 
-      // Hijack connection if someone selects manual
       if (this.selectedWallet.id == 'manual') {
         this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount);
       } else {
@@ -768,16 +766,12 @@ export class Checkout extends HTMLElement {
           walletSession = await approval();
 
           console.log("Session established:", walletSession);
-          // TODO: do we need to assign this again or just use this.walletConnectService.currentSession
           this.walletConnectService.currentSession = walletSession;
           this.hideQRCode();
         }
 
-        // TODO: update this to pick the correct address if multiple options
-        // this.walletConnectService.getWalletAddress("ETH")
-        // OR
-        // this.walletConnectService.getSelectedAddress();
-        const fromAddress = walletSession.namespaces.eip155.accounts[0].split(':').pop();
+
+        const fromAddress = this.walletConnectService.getSessionAddress(walletSession, 'eip155:1');
         if (!fromAddress) {
           throw new Error('failed to find wallet address from current session');
         }
@@ -792,7 +786,7 @@ export class Checkout extends HTMLElement {
         try {
           this.showProcessing(`Waiting for transaction approval from ${walletSession.peer.metadata.name}...`)
           const transferResp = await this.walletConnectService.sendEthTransaction(usdtTransfer, walletSession);
-          // TODO: do something with this response
+          // TODO: do something with this response?
 
           this.hideProcessing();
           this.showPaymentSuccess();

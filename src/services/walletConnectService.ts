@@ -122,4 +122,8 @@ export class WalletConnectService {
 
         return result;
     }
+
+    public getSessionAddress(session: SessionTypes.Struct, chainId: string) {
+        return session.namespaces.eip155.accounts.find((account) => account.startsWith(chainId))?.split(':').pop();
+    }
 }
