@@ -1,10 +1,10 @@
 {
-  "name": "@tetherpay/sdk-js",
+  "name": "@lydian/sdk-js",
   "version": "0.3.0",
   "type": "module",
-  "main": "dist/tetherpay.iife.js",
+  "main": "dist/lydian.iife.js",
   "scripts": {
-    "build:css": "npx tailwindcss -i src/ui/tetherpay.css -o ./src/ui/tetherpay.generated.css --minify",
+    "build:css": "npx tailwindcss -i src/ui/lydian.css -o ./src/ui/lydian.generated.css --minify",
     "build": "npm run build:css && vite build",
     "build:watch": "npm run build:css && vite build --watch",
     "serve": "live-server --cors --no-browser --port=9999 dist",
