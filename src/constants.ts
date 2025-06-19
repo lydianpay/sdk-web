@@ -1,14 +1,6 @@
 import { QRCodeToDataURLOptions } from 'qrcode';
 import { Asset, Network } from './types';
 
-export const QRCodeDefaults: QRCodeToDataURLOptions = {
-  width: 200,
-  color: {
-    dark: '#000000',
-    light: '#ffffff',
-  },
-  errorCorrectionLevel: 'H',
-};
 
 export const walletConnectProjectId = 'cbc90b58aec5c9ab2085a2d691461868';
 

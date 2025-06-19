@@ -1,6 +1,6 @@
-# TetherPay Web SDK
+# Lydian Web SDK
 
-A web SDK for Tether Pay transactions
+A web SDK for Lydian Pay transactions
 
 ## Setting started
 
@@ -41,12 +41,12 @@ npm run release
 <script src="http://cdn.tgp.com/js/tpg.min.js"></script>
 
 // Include the checkout UI in your HTML document
-<tetherpay-checkout></tetherpay-checkout>
+<lydian-checkout></lydian-checkout>
 
 // Initialize the SDK after placing the checkout UI
 try {
-    window.TetherPay.init({
-        enableTetherPayAppPayment: false, // enable this to show the options to pay with tether pay app
+    window.Lydian.init({
+        enableLydianAppPayment: false, // enable this to show the options to pay with tether pay app
         baseUri: 'YOUR_BASE_URL',
         publishableKey: 'YOUR_PUBLISHABLE_KEY',
         initialTransaction: {
@@ -68,7 +68,7 @@ try {
 
 // At anytime before the user presses the pay button, the initial cryptotransaction can be updated using the following function. It also resets the UI back to initial state.
 try {
-    window.TetherPay.updateTransaction({
+    window.Lydian.updateTransaction({
         amount: 1.45, // New cryptotransaction amount
         currency: "USD", // New currency or existing one for the provided amount
         descriptor: 'YOUR_DESCRIPTOR',

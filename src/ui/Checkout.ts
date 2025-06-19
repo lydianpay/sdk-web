@@ -1,4 +1,4 @@
-import tetherPayCSS from './tetherpay.generated.css?inline';
+import lydianCSS from './lydian.generated.css?inline';
 import checkoutTemplate from './checkout-template.html?raw';
 import {
   CreateTransactionResponse,
@@ -10,7 +10,6 @@ import {
   Asset,
   WalletConnectWallet,
 } from '../types';
-import QrCode from 'qrcode';
 import {
   AllowedAssetBitcoin,
   AllowedAssetEthereum,
@@ -25,7 +24,6 @@ import {
   NetworkTon,
   NetworkTron,
   CryptoTransactionStatusSuccess,
-  QRCodeDefaults,
   AssetBitcoin,
   AssetEthereum,
   AssetUSDT,
@@ -48,7 +46,7 @@ import { Address } from '../types/ethereum';
 import WalletButton from './buttons/walletButton';
 import QRCodeStyling from '@solana/qr-code-styling';
 
-export class TetherPayCheckout extends HTMLElement {
+export class Checkout extends HTMLElement {
   private shadow: ShadowRoot;
   private initOptions: InitOptions | null = null;
 
@@ -325,20 +323,7 @@ export class TetherPayCheckout extends HTMLElement {
         }
       });
 
-
-
       qrCode.append(this.canvasQRCode);
-
-      /*
-      if (this.canvasQRCode?.parentElement) {
-
-        let qrCodeWidth = this.canvasQRCode.parentElement.clientWidth;
-        const computedStyle = window.getComputedStyle(this.canvasQRCode.parentElement, null);
-        qrCodeWidth -= parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight);
-        QRCodeDefaults.width = qrCodeWidth;
-      }
-      QrCode.toDataURL(this.canvasQRCode, qrData, QRCodeDefaults);
-      */
 
     }
   }
@@ -351,7 +336,7 @@ export class TetherPayCheckout extends HTMLElement {
   }
 
   private render(): void {
-    this.shadow.innerHTML = `<style>${tetherPayCSS}</style>${checkoutTemplate}`;
+    this.shadow.innerHTML = `<style>${lydianCSS}</style>${checkoutTemplate}`;
   }
 
   private initializeComponents(): void {
@@ -448,7 +433,7 @@ export class TetherPayCheckout extends HTMLElement {
       }
 
     } else {
-      this.initOptions?.paymentFailedListener?.('Tether Pay not initialized.');
+      this.initOptions?.paymentFailedListener?.('Lydian not initialized.');
     }
   }
 
@@ -730,7 +715,7 @@ export class TetherPayCheckout extends HTMLElement {
       return;
     }
     if (!this.initOptions || !this.API) {
-      this.initOptions?.paymentFailedListener?.('Tether Pay not initialized.');
+      this.initOptions?.paymentFailedListener?.('Lydian not initialized.');
       return;
     }
     if (!this.walletConnectService) {

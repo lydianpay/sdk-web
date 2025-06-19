@@ -1,13 +1,13 @@
-import { TetherPayCheckout } from './ui/TetherPayCheckout';
+import { Checkout } from './ui/Checkout';
 import { currencies, isCurrency, InitOptions, Transaction } from './types';
 
 // Register the custom HTML element
-if (!customElements.get('tetherpay-checkout')) {
-  customElements.define('tetherpay-checkout', TetherPayCheckout);
+if (!customElements.get('lydian-checkout')) {
+  customElements.define('lydian-checkout', Checkout);
 }
 
 async function init(initOptions: InitOptions) {
-  const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
+  const lydianCheckout = document.querySelector('lydian-checkout') as Checkout;
   if (!initOptions.publishableKey ||
     !initOptions.transaction.amount || !initOptions.transaction.currency) {
     throw new Error('SDK initialization requires a baseURI, publishableKey, and transaction');
@@ -15,12 +15,12 @@ async function init(initOptions: InitOptions) {
   if (!isCurrency(initOptions.transaction.currency)) {
     throw new Error('Invalid value for currency, valid values are: ' + currencies.join(', '));
   }
-  await tetherPayCheckout.getMerchantConfiguration(initOptions);
+  await lydianCheckout.getMerchantConfiguration(initOptions);
 }
 
 async function updateTransaction(transaction: Transaction) {
-  const tetherPayCheckout = document.querySelector('tetherpay-checkout') as TetherPayCheckout;
-  await tetherPayCheckout.updateTransaction(transaction);
+  const lydianCheckout = document.querySelector('lydian-checkout') as Checkout;
+  await lydianCheckout.updateTransaction(transaction);
 }
 
-(window as any).TetherPay = { init, updateTransaction };
+(window as any).Lydian = { init, updateTransaction };

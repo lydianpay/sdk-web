@@ -5,8 +5,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: './src/index.ts',
-      name: 'TetherPay',
-      fileName: 'tetherpay',
+      name: 'Lydian',
+      fileName: 'lydian',
       formats: ['iife'],
     },
   },
