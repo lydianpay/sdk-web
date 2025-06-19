@@ -45,6 +45,7 @@ import { encodeEthereumUsdtTransfer } from '../types/tether';
 import { Address } from '../types/ethereum';
 import WalletButton from './buttons/walletButton';
 import QRCodeStyling from '@solana/qr-code-styling';
+import { encodeEthereumUsdcTransfer, USDC_ERC20_MAIN } from '../types/usdc';
 
 export class Checkout extends HTMLElement {
   private shadow: ShadowRoot;
@@ -713,7 +714,7 @@ export class Checkout extends HTMLElement {
         this.beginWalletConnectTransaction()
       });
     });
-    
+
     this.lydianBtnCancelWalletConnect?.addEventListener('click', async () => {
       this.loadInitialState();
     });
@@ -777,15 +778,29 @@ export class Checkout extends HTMLElement {
         }
 
         const params = parseQrCodeData(this.cryptoTransaction.qrData);
-        const usdtTransfer = encodeEthereumUsdtTransfer({
-          fromAddress: fromAddress as Address,
-          toAddress: params.address,
-          uint256: parseInt(params.uint256)
-        });
+        console.log('parsedQrCodeData', params)
+
+        let transferData;
+        if (this.selectedAsset.code === 'USDT') {
+          transferData = encodeEthereumUsdtTransfer({
+            fromAddress: fromAddress as Address,
+            toAddress: params.address,
+            uint256: parseInt(params.uint256)
+          });
+        } else if (this.selectedAsset.code === 'USDC') {
+          transferData = encodeEthereumUsdcTransfer({
+            fromAddress: fromAddress as Address,
+            toAddress: params.address,
+            // TODO: remove once uint256 value is corrected for USDC
+            uint256: parseFloat(params.uint256) * USDC_ERC20_MAIN.multiplier,
+          });
+        } else {
+          throw new Error(`unable to encode unkown asset code "${this.selectedAsset.code}"`);
+        }
 
         try {
           this.showProcessing(`Waiting for transaction approval from ${walletSession.peer.metadata.name}...`)
-          const transferResp = await this.walletConnectService.sendEthTransaction(usdtTransfer, walletSession);
+          const transferResp = await this.walletConnectService.sendEthTransaction(transferData, walletSession);
           // TODO: do something with this response?
 
           this.hideProcessing();
