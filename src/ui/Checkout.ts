@@ -45,6 +45,7 @@ import { encodeEthereumUsdtTransfer } from '../types/tether';
 import { Address } from '../types/ethereum';
 import WalletButton from './buttons/walletButton';
 import QRCodeStyling from '@solana/qr-code-styling';
+import { encodeEthereumUsdcTransfer, USDC_ERC20_MAIN } from '../types/usdc';
 
 export class Checkout extends HTMLElement {
   private shadow: ShadowRoot;
@@ -62,10 +63,10 @@ export class Checkout extends HTMLElement {
   private containerPaymentSuccess: HTMLDivElement | null = null;
   private containerPaymentFailure: HTMLDivElement | null = null;
   private containerQRCode: HTMLDivElement | null = null;
-  private tetherPayProcessingContainer: HTMLDivElement | null = null;
-  private tetherPayProcessingText: HTMLParagraphElement | null = null;
+  private lydianProcessingContainer: HTMLDivElement | null = null;
+  private lydianProcessingText: HTMLParagraphElement | null = null;
 
-  private tetherPayUsdtPaymentContainer: HTMLDivElement | null = null;
+  private lydianUsdtPaymentContainer: HTMLDivElement | null = null;
   private containerMoreNetworks: HTMLDivElement | null = null;
   private containerNetworks: HTMLDivElement | null = null;
   private containerNetworkList: HTMLDivElement | null = null;
@@ -77,7 +78,6 @@ export class Checkout extends HTMLElement {
   private containerAssets: HTMLDivElement | null = null;
   private containerAssetsMore: HTMLDivElement | null = null;
   private btnMoreAssets: HTMLButtonElement | null = null;
-  private tetherPayBtnCancelCryptoPayment: HTMLButtonElement | null = null;
 
   private canvasQRCode: HTMLDivElement | null = null;
 
@@ -91,7 +91,10 @@ export class Checkout extends HTMLElement {
   private btnCryptoPayment: HTMLButtonElement | null = null;
   private btnMoreNetworks: HTMLButtonElement | null = null;
 
-  private tetherPayBtnCancelUsdtPayment: HTMLButtonElement | null = null;
+  private btnCancelCryptoPayment: HTMLButtonElement | null = null;
+  private lydianBtnCancelCryptoPayment: HTMLButtonElement | null = null;
+  private lydianBtnCancelUsdtPayment: HTMLButtonElement | null = null;
+  private lydianBtnCancelWalletConnect: HTMLButtonElement | null = null;
 
   private selectedAsset: Asset | null = null;
   private selectedAssetNetworks: string[] | null = null;
@@ -158,7 +161,7 @@ export class Checkout extends HTMLElement {
       this.btnCryptoPayment?.classList.remove('hidden');
     }
 
-    this.tetherPayUsdtPaymentContainer?.classList.add('hidden');
+    this.lydianUsdtPaymentContainer?.classList.add('hidden');
 
     // Pay with crypto container initial state
     this.containerCryptoPayment?.classList.add('hidden');
@@ -166,6 +169,7 @@ export class Checkout extends HTMLElement {
     this.btnMoreAssets?.classList.remove('hidden');
 
     // Pay with USDT container initial state
+    this.containerNetworks?.classList.add('hidden');
     this.containerMoreNetworks?.classList.add('hidden');
     this.btnMoreNetworks?.classList.remove('hidden');
 
@@ -220,17 +224,17 @@ export class Checkout extends HTMLElement {
   }
 
   private showProcessing(message: string = 'Processing...'): void {
-    if (this.tetherPayProcessingText) {
-      this.tetherPayProcessingText.innerHTML = message;
+    if (this.lydianProcessingText) {
+      this.lydianProcessingText.innerHTML = message;
     }
-    this.tetherPayProcessingContainer?.classList.remove('hidden');
+    this.lydianProcessingContainer?.classList.remove('hidden');
   }
 
   private hideProcessing(): void {
-    if (this.tetherPayProcessingText) {
-      this.tetherPayProcessingText.innerHTML = '';
+    if (this.lydianProcessingText) {
+      this.lydianProcessingText.innerHTML = '';
     }
-    this.tetherPayProcessingContainer?.classList.add('hidden');
+    this.lydianProcessingContainer?.classList.add('hidden');
   }
 
   private showButtons(): void {
@@ -245,7 +249,7 @@ export class Checkout extends HTMLElement {
   private hideButtons(): void {
     this.btnAppPayment?.classList.add('hidden');
     this.btnCryptoPayment?.classList.add('hidden');
-    this.tetherPayUsdtPaymentContainer?.classList.add('hidden');
+    this.lydianUsdtPaymentContainer?.classList.add('hidden');
     this.containerCryptoPayment?.classList.add('hidden');
     this.containerNetworks?.classList.add('hidden');
     this.connectWalletButtonsContainer?.classList.add('hidden');
@@ -340,15 +344,15 @@ export class Checkout extends HTMLElement {
   }
 
   private initializeComponents(): void {
-    this.tetherPayUsdtPaymentContainer = this.shadowRoot?.getElementById('tetherPayUsdtPaymentContainer') as HTMLDivElement;
+    this.lydianUsdtPaymentContainer = this.shadowRoot?.getElementById('lydianUsdtPaymentContainer') as HTMLDivElement;
     this.containerMoreNetworks = this.shadowRoot?.getElementById('containerMoreNetworks') as HTMLDivElement;
     this.containerNetworks = this.shadowRoot?.getElementById('containerNetworks') as HTMLDivElement;
     this.containerNetworkList = this.shadowRoot?.getElementById('containerNetworkList') as HTMLDivElement;
     this.containerPaymentSuccess = this.shadowRoot?.getElementById('containerPaymentSuccess') as HTMLDivElement;
     this.containerPaymentFailure = this.shadowRoot?.getElementById('containerPaymentFailure') as HTMLDivElement;
     this.containerQRCode = this.shadowRoot?.getElementById('containerQRCode') as HTMLDivElement;
-    this.tetherPayProcessingContainer = this.shadowRoot?.getElementById('tetherPayProcessingContainer') as HTMLDivElement;
-    this.tetherPayProcessingText = this.shadowRoot?.getElementById('tetherPayProcessingText') as HTMLParagraphElement;
+    this.lydianProcessingContainer = this.shadowRoot?.getElementById('lydianProcessingContainer') as HTMLDivElement;
+    this.lydianProcessingText = this.shadowRoot?.getElementById('lydianProcessingText') as HTMLParagraphElement;
 
 
     this.assetImg = this.shadowRoot?.getElementById("assetImg") as HTMLImageElement;
@@ -369,9 +373,13 @@ export class Checkout extends HTMLElement {
     this.btnAppPayment = this.shadowRoot?.getElementById('btnAppPayment') as HTMLButtonElement;
     this.btnCryptoPayment = this.shadowRoot?.getElementById('btnCryptoPayment') as HTMLButtonElement;
     this.btnMoreNetworks = this.shadowRoot?.getElementById('btnMoreNetworks') as HTMLButtonElement;
-    this.tetherPayBtnCancelCryptoPayment = this.shadowRoot?.getElementById('tetherPayBtnCancelCryptoPayment') as HTMLButtonElement;
     this.btnMoreAssets = this.shadowRoot?.getElementById('btnMoreAssets') as HTMLButtonElement;
     this.btnMoreWallets = this.shadowRoot?.getElementById('btnMoreWallets') as HTMLButtonElement;
+
+    this.btnCancelCryptoPayment = this.shadowRoot?.getElementById('btnCancelCryptoPayment') as HTMLButtonElement;
+    this.lydianBtnCancelCryptoPayment = this.shadowRoot?.getElementById('lydianBtnCancelCryptoPayment') as HTMLButtonElement;
+    this.lydianBtnCancelUsdtPayment = this.shadowRoot?.getElementById('lydianBtnCancelUsdtPayment') as HTMLButtonElement;
+    this.lydianBtnCancelWalletConnect = this.shadowRoot?.getElementById('lydianBtnCancelWalletConnect') as HTMLButtonElement;
 
     this.connectWalletButtonsContainer = this.shadowRoot?.getElementById('connectWalletContainer') as HTMLDivElement;
     this.containerMoreWallets = this.shadowRoot?.getElementById('containerMoreWallets') as HTMLDivElement;
@@ -404,7 +412,10 @@ export class Checkout extends HTMLElement {
       this.btnMoreWallets?.classList.toggle('hidden');
     });
 
-    this.tetherPayBtnCancelCryptoPayment?.addEventListener('click', () => {
+    this.btnCancelCryptoPayment?.addEventListener('click', () => {
+      this.loadInitialState();
+    });
+    this.lydianBtnCancelCryptoPayment?.addEventListener('click', () => {
       this.loadInitialState();
     });
   }
@@ -619,7 +630,7 @@ export class Checkout extends HTMLElement {
       });
     });
 
-    this.tetherPayBtnCancelUsdtPayment?.addEventListener('click', async () => {
+    this.lydianBtnCancelUsdtPayment?.addEventListener('click', async () => {
       this.loadInitialState();
     });
   }
@@ -628,6 +639,7 @@ export class Checkout extends HTMLElement {
     if (this.API) {
       try {
         this.sdkConfig = await this.API.getSDKConfig();
+        // TODO: update this after backend updated
         this.API.setClusterBaseUri(this.sdkConfig.tetherPayCluster);
       } catch (error) {
         this.initOptions?.paymentFailedListener?.('Unable to load SDK configuration.');
@@ -661,7 +673,6 @@ export class Checkout extends HTMLElement {
     }
 
     // TODO: extract this to constants
-    // TODO: add dynamic indicator if linked
     const wallets: WalletConnectWallet[] = [
       {
         id: 'metamask',
@@ -704,7 +715,7 @@ export class Checkout extends HTMLElement {
       });
     });
 
-    this.tetherPayBtnCancelCryptoPayment?.addEventListener('click', async () => {
+    this.lydianBtnCancelWalletConnect?.addEventListener('click', async () => {
       this.loadInitialState();
     });
   }
@@ -736,7 +747,6 @@ export class Checkout extends HTMLElement {
       });
       console.log('transaction', this.cryptoTransaction);
 
-      // Hijack connection if someone selects manual
       if (this.selectedWallet.id == 'manual') {
         this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount);
       } else {
@@ -757,31 +767,41 @@ export class Checkout extends HTMLElement {
           walletSession = await approval();
 
           console.log("Session established:", walletSession);
-          // TODO: do we need to assign this again or just use this.walletConnectService.currentSession
           this.walletConnectService.currentSession = walletSession;
           this.hideQRCode();
         }
 
-        // TODO: update this to pick the correct address if multiple options
-        // this.walletConnectService.getWalletAddress("ETH")
-        // OR
-        // this.walletConnectService.getSelectedAddress();
-        const fromAddress = walletSession.namespaces.eip155.accounts[0].split(':').pop();
+
+        const fromAddress = this.walletConnectService.getSessionAddress(walletSession, 'eip155:1');
         if (!fromAddress) {
           throw new Error('failed to find wallet address from current session');
         }
 
         const params = parseQrCodeData(this.cryptoTransaction.qrData);
-        const usdtTransfer = encodeEthereumUsdtTransfer({
-          fromAddress: fromAddress as Address,
-          toAddress: params.address,
-          uint256: parseInt(params.uint256)
-        });
+        console.log('parsedQrCodeData', params)
+
+        let transferData;
+        if (this.selectedAsset.code === 'USDT') {
+          transferData = encodeEthereumUsdtTransfer({
+            fromAddress: fromAddress as Address,
+            toAddress: params.address,
+            uint256: parseInt(params.uint256)
+          });
+        } else if (this.selectedAsset.code === 'USDC') {
+          transferData = encodeEthereumUsdcTransfer({
+            fromAddress: fromAddress as Address,
+            toAddress: params.address,
+            // TODO: remove once uint256 value is corrected for USDC
+            uint256: parseFloat(params.uint256) * USDC_ERC20_MAIN.multiplier,
+          });
+        } else {
+          throw new Error(`unable to encode unkown asset code "${this.selectedAsset.code}"`);
+        }
 
         try {
           this.showProcessing(`Waiting for transaction approval from ${walletSession.peer.metadata.name}...`)
-          const transferResp = await this.walletConnectService.sendEthTransaction(usdtTransfer, walletSession);
-          // TODO: do something with this response
+          const transferResp = await this.walletConnectService.sendEthTransaction(transferData, walletSession);
+          // TODO: do something with this response?
 
           this.hideProcessing();
           this.showPaymentSuccess();
