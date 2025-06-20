@@ -640,7 +640,7 @@ export class Checkout extends HTMLElement {
       try {
         this.sdkConfig = await this.API.getSDKConfig();
         // TODO: update this after backend updated
-        this.API.setClusterBaseUri(this.sdkConfig.tetherPayCluster);
+        this.API.setClusterBaseUri(this.sdkConfig.lydianPayCluster);
       } catch (error) {
         this.initOptions?.paymentFailedListener?.('Unable to load SDK configuration.');
       }

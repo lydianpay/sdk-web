@@ -64,6 +64,6 @@ export type WalletConnectWallet = {
 export type GetSDKConfigResponse = {
   appPayEnabled: boolean;
   cryptoPayEnabled: boolean;
-  tetherPayCluster: string;
+  lydianPayCluster: string;
   allowedAssets: Asset[];
 }
