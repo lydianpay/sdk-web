@@ -639,7 +639,6 @@ export class Checkout extends HTMLElement {
     if (this.API) {
       try {
         this.sdkConfig = await this.API.getSDKConfig();
-        // TODO: update this after backend updated
         this.API.setClusterBaseUri(this.sdkConfig.lydianPayCluster);
       } catch (error) {
         this.initOptions?.paymentFailedListener?.('Unable to load SDK configuration.');
@@ -665,6 +664,14 @@ export class Checkout extends HTMLElement {
       id: 'manual',
       name: 'Manual QR Code',
       img: 'https://tetherpay.com/images/95de9fd2-da4f-4415-3ec7-bb1befdbc500/public'
+    }
+
+    if (!this.sdkConfig?.walletConnectEnabled) {
+      this.setSelectedWallet(manualQrButton);
+      this.beginWalletConnectTransaction()
+      this.lydianBtnCancelWalletConnect?.addEventListener('click', async () => {
+        this.loadInitialState();
+      });
     }
 
     if (this.containerWalletManual) {
