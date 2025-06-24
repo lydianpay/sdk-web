@@ -118,8 +118,8 @@ export class Checkout extends HTMLElement {
     this.initOptions = options;
 
     this.API = new API(options.sandbox ? BaseUrlSandbox : BaseUrlProduction, this.initOptions.publishableKey);
-    await this.getSDKConfig();
     this.render();
+    await this.getSDKConfig();
     this.initializeComponents(); // TODO: update this section
     this.setAssetButtons();
     this.attachListeners();
@@ -743,6 +743,8 @@ export class Checkout extends HTMLElement {
 
     this.connectWalletButtonsContainer?.classList.add('hidden');
 
+    this.showProcessing('Generating QR Code');
+
     try {
       this.cryptoTransaction = await this.API.createCryptoTransaction({
         descriptor: this.initOptions.transaction.descriptor,
@@ -753,6 +755,8 @@ export class Checkout extends HTMLElement {
         network: this.selectedNetwork,
       });
       console.log('transaction', this.cryptoTransaction);
+
+      this.hideProcessing();
 
       if (this.selectedWallet.id == 'manual') {
         this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount);
@@ -824,6 +828,7 @@ export class Checkout extends HTMLElement {
         window.location.href = this.cryptoTransaction.qrData;
       }
     } catch (error) {
+      this.hideProcessing();
       this.initOptions?.paymentFailedListener?.('Unable to create cryptotransaction.');
     }
   }
