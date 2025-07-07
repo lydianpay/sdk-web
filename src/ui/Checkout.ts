@@ -11,27 +11,23 @@ import {
   WalletConnectWallet,
 } from '../types';
 import {
-  AllowedAssetBitcoin,
-  AllowedAssetEthereum,
-  AllowedAssetUSDC,
-  AllowedAssetUSDT,
-  BaseUrlProduction,
-  BaseUrlSandbox,
-  NetworkAptos,
-  NetworkAvalanche,
-  NetworkEthereum,
-  NetworkSolana,
-  NetworkTon,
-  NetworkTron,
+
+  BaseUrlProduction, BaseUrlSandbox,
   CryptoTransactionStatusSuccess,
-  AssetBitcoin,
-  AssetEthereum,
-  AssetUSDT,
-  AssetUSDC,
-  AllowedNetworkEthereum,
-  AllowedNetworkTron,
-  NetworkBitcoin,
-  AllowedNetworkBitcoin, AllowedNetworkSolana, AllowedNetworkTon, AllowedNetworkAvalanche, AllowedNetworkAptos,
+  AllowedAssetBitcoin, AllowedAssetEthereum, AllowedAssetUSDC, AllowedAssetUSDT,
+  AllowedAssetArbitrum, AllowedAssetBase, AllowedAssetCelo, AllowedAssetLinea,
+  AllowedAssetOPMainnet, AllowedAssetPolygon, AllowedAssetSonic, AllowedAssetUnichain,
+  AllowedAssetZKsync, AllowedAssetSolana,
+  AssetBitcoin, AssetEthereum, AssetUSDT, AssetUSDC, AssetArbitrum, AssetBase, AssetCelo,
+  AssetLinea, AssetOPMainnet, AssetPolygon, AssetSonic, AssetUnichain, AssetZKsync,
+  AssetSolana,
+  AllowedNetworkBitcoin, AllowedNetworkSolana, AllowedNetworkTon, AllowedNetworkAvalanche,
+  AllowedNetworkAptos, AllowedNetworkArbitrum, AllowedNetworkBase, AllowedNetworkCelo,
+  AllowedNetworkLinea, AllowedNetworkOPMainnet, AllowedNetworkPolygon, AllowedNetworkSonic,
+  AllowedNetworkUnichain, AllowedNetworkZKsync, AllowedNetworkEthereum, AllowedNetworkTron,
+  NetworkAptos, NetworkAvalanche, NetworkEthereum, NetworkSolana, NetworkTon, NetworkTron,
+  NetworkArbitrum, NetworkBase, NetworkCelo, NetworkLinea, NetworkOPMainnet, NetworkPolygon,
+  NetworkSonic, NetworkUnichain, NetworkZKsync, NetworkBitcoin,
 } from '../constants';
 import { API } from '../network';
 import isMobile from 'is-mobile';
@@ -192,6 +188,33 @@ export class Checkout extends HTMLElement {
         break;
       case AllowedAssetUSDC:
         this.selectedAsset = AssetUSDC;
+        break;
+      case AllowedAssetArbitrum:
+        this.selectedAsset = AssetArbitrum;
+        break;
+      case AllowedAssetBase:
+        this.selectedAsset = AssetBase;
+        break;
+      case AllowedAssetCelo:
+        this.selectedAsset = AssetCelo;
+        break;
+      case AllowedAssetLinea:
+        this.selectedAsset = AssetLinea;
+        break;
+      case AllowedAssetOPMainnet:
+        this.selectedAsset = AssetOPMainnet;
+        break;
+      case AllowedAssetPolygon:
+        this.selectedAsset = AssetPolygon;
+        break;
+      case AllowedAssetSonic:
+        this.selectedAsset = AssetSonic;
+        break;
+      case AllowedAssetUnichain:
+        this.selectedAsset = AssetUnichain;
+        break;
+      case AllowedAssetZKsync:
+        this.selectedAsset = AssetZKsync;
         break;
       default:
         this.selectedAsset = null;
@@ -521,6 +544,8 @@ export class Checkout extends HTMLElement {
           return AssetButton(AssetUSDT);
         case AllowedAssetUSDC:
           return AssetButton(AssetUSDC);
+        case AllowedAssetSolana:
+          return AssetButton(AssetSolana);
       }
     });
 
@@ -603,6 +628,33 @@ export class Checkout extends HTMLElement {
 
         case AllowedNetworkAptos:
           button = NetworkButton(NetworkAptos);
+          break;
+        case AllowedNetworkArbitrum:
+          button = NetworkButton(NetworkArbitrum);
+          break;
+        case AllowedNetworkBase:
+          button = NetworkButton(NetworkBase);
+          break;
+        case AllowedNetworkCelo:
+          button = NetworkButton(NetworkCelo);
+          break;
+        case AllowedNetworkLinea:
+          button = NetworkButton(NetworkLinea);
+          break;
+        case AllowedNetworkOPMainnet:
+          button = NetworkButton(NetworkOPMainnet);
+          break;
+        case AllowedNetworkPolygon:
+          button = NetworkButton(NetworkPolygon);
+          break;
+        case AllowedNetworkSonic:
+          button = NetworkButton(NetworkSonic);
+          break;
+        case AllowedNetworkUnichain:
+          button = NetworkButton(NetworkUnichain);
+          break;
+        case AllowedNetworkZKsync:
+          button = NetworkButton(NetworkZKsync);
           break;
       }
       if (index >= 4 && this.containerMoreNetworks) {
