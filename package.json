@@ -1,5 +1,5 @@
 {
-  "name": "@lydian/sdk-js",
+  "name": "@lydianpay/sdk-js",
   "version": "0.3.0",
   "type": "module",
   "main": "dist/lydian.iife.js",
