@@ -7,10 +7,8 @@ export const walletConnectProjectId = 'cbc90b58aec5c9ab2085a2d691461868';
 export const CryptoTransactionStatusPending = 0;
 export const CryptoTransactionStatusSuccess = 1;
 
-export const BaseUrlSandbox = 'https://fence.dev.tetherpayments.group';
-// export const BaseUrlSandbox = 'http://localhost:8004';
-// export const BaseUrlProduction = 'https://fence.tetherpayments.group';
-export const BaseUrlProduction = 'https://fence.dev.tetherpayments.group'
+export const BaseUrlSandbox = 'https://gateway.lydian.dev';
+export const BaseUrlProduction = 'https://gateway.lydian.com'
 
 export const AllowedNetworkBitcoin = 'bitcoin';
 export const AllowedNetworkEthereum = 'ethereum';
