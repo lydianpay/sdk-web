@@ -480,6 +480,7 @@ export class Checkout extends HTMLElement {
           if (transaction.status === CryptoTransactionStatusSuccess) {
             this.showPaymentSuccess();
             this.clearInterval();
+            this.initOptions?.paymentSuccessListener?.();
           }
           const expirationDateTime = Date.parse(transaction.expiration);
           const currentDateTime = Date.now();
@@ -502,6 +503,7 @@ export class Checkout extends HTMLElement {
           if (transaction.status === CryptoTransactionStatusSuccess) {
             this.showPaymentSuccess();
             this.clearInterval();
+            this.initOptions?.paymentSuccessListener?.();
           }
           const expirationDateTime = Date.parse(transaction.expiration);
           const currentDateTime = Date.now();
@@ -869,6 +871,7 @@ export class Checkout extends HTMLElement {
           this.hideProcessing();
           this.showPaymentSuccess();
           this.clearInterval();
+          this.initOptions?.paymentSuccessListener?.();
         } catch (error) {
           this.hideProcessing();
           this.showPaymentFailure();
