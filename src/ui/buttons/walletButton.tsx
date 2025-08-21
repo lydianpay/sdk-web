@@ -11,7 +11,7 @@ export default function WalletButton(wallet: WalletConnectWallet, isLinked?: boo
             </div>
             <div class="flex w-full" style="justify-content: space-between;">
                 <span>{wallet.name}</span>
-                <span class="text-tether-green">{isLinked ? 'Linked' : ''}</span>
+                <span class="text-lydian-green">{isLinked ? 'Linked' : ''}</span>
             </div>
         </button>
     ).outerHTML;
