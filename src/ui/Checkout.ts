@@ -12,22 +12,95 @@ import {
 } from '../types';
 import {
 
-  BaseUrlProduction, BaseUrlSandbox,
+  BaseUrlProduction,
+  BaseUrlSandbox,
   CryptoTransactionStatusSuccess,
-  AllowedAssetBitcoin, AllowedAssetEthereum, AllowedAssetUSDC, AllowedAssetUSDT,
-  AllowedAssetArbitrum, AllowedAssetBase, AllowedAssetCelo, AllowedAssetLinea,
-  AllowedAssetOPMainnet, AllowedAssetPolygon, AllowedAssetSonic, AllowedAssetUnichain,
-  AllowedAssetZKsync, AllowedAssetSolana,
-  AssetBitcoin, AssetEthereum, AssetUSDT, AssetUSDC, AssetArbitrum, AssetBase, AssetCelo,
-  AssetLinea, AssetOPMainnet, AssetPolygon, AssetSonic, AssetUnichain, AssetZKsync,
+  AllowedAssetBitcoin,
+  AllowedAssetEthereum,
+  AllowedAssetUSDC,
+  AllowedAssetUSDT,
+  AllowedAssetArbitrum,
+  AllowedAssetBase,
+  AllowedAssetCelo,
+  AllowedAssetLinea,
+  AllowedAssetOPMainnet,
+  AllowedAssetPolygon,
+  AllowedAssetSonic,
+  AllowedAssetUnichain,
+  AllowedAssetZKsync,
+  AllowedAssetSolana,
+  AssetBitcoin,
+  AssetEthereum,
+  AssetUSDT,
+  AssetUSDC,
+  AssetArbitrum,
+  AssetBase,
+  AssetCelo,
+  AssetLinea,
+  AssetOPMainnet,
+  AssetPolygon,
+  AssetSonic,
+  AssetUnichain,
+  AssetZKsync,
   AssetSolana,
-  AllowedNetworkBitcoin, AllowedNetworkSolana, AllowedNetworkTon, AllowedNetworkAvalanche,
-  AllowedNetworkAptos, AllowedNetworkArbitrum, AllowedNetworkBase, AllowedNetworkCelo,
-  AllowedNetworkLinea, AllowedNetworkOPMainnet, AllowedNetworkPolygon, AllowedNetworkSonic,
-  AllowedNetworkUnichain, AllowedNetworkZKsync, AllowedNetworkEthereum, AllowedNetworkTron,
-  NetworkAptos, NetworkAvalanche, NetworkEthereum, NetworkSolana, NetworkTon, NetworkTron,
-  NetworkArbitrum, NetworkBase, NetworkCelo, NetworkLinea, NetworkOPMainnet, NetworkPolygon,
-  NetworkSonic, NetworkUnichain, NetworkZKsync, NetworkBitcoin,
+  AllowedNetworkBitcoin,
+  AllowedNetworkSolana,
+  AllowedNetworkTon,
+  AllowedNetworkAvalanche,
+  AllowedNetworkAptos,
+  AllowedNetworkArbitrum,
+  AllowedNetworkBase,
+  AllowedNetworkCelo,
+  AllowedNetworkLinea,
+  AllowedNetworkOPMainnet,
+  AllowedNetworkPolygon,
+  AllowedNetworkSonic,
+  AllowedNetworkUnichain,
+  AllowedNetworkZKsync,
+  AllowedNetworkEthereum,
+  AllowedNetworkTron,
+  NetworkAptos,
+  NetworkAvalanche,
+  NetworkEthereum,
+  NetworkSolana,
+  NetworkTon,
+  NetworkTron,
+  NetworkArbitrum,
+  NetworkBase,
+  NetworkCelo,
+  NetworkLinea,
+  NetworkOPMainnet,
+  NetworkPolygon,
+  NetworkSonic,
+  NetworkUnichain,
+  NetworkZKsync,
+  NetworkBitcoin,
+  AllowedAssetRLUSD,
+  AssetRLUSD,
+  AllowedAssetPYUSD,
+  AssetUSDe,
+  AssetPYUSD,
+  AllowedAssetUSDe,
+  AllowedAssetUSDS,
+  AssetUSDS,
+  AllowedAssetDai,
+  AssetDAI,
+  AllowedAssetUSDP,
+  AssetUSDP,
+  NetworkSui,
+  NetworkEos,
+  AllowedNetworkUniswap,
+  NetworkUniswap,
+  AllowedNetworkHedara,
+  AllowedNetworkNear,
+  NetworkNear,
+  NetworkHedara,
+  AllowedNetworkEos,
+  NetworkKaia,
+  AllowedNetworkKaia,
+  NetworkTezos,
+  AllowedNetworkTezos,
+  AllowedNetworkSui,
 } from '../constants';
 import { API } from '../network';
 import isMobile from 'is-mobile';
@@ -215,6 +288,24 @@ export class Checkout extends HTMLElement {
         break;
       case AllowedAssetZKsync:
         this.selectedAsset = AssetZKsync;
+        break;
+      case AllowedAssetRLUSD:
+        this.selectedAsset = AssetRLUSD;
+        break;
+      case AllowedAssetPYUSD:
+        this.selectedAsset = AssetPYUSD;
+        break;
+      case AllowedAssetUSDe:
+        this.selectedAsset = AssetUSDe;
+        break;
+      case AllowedAssetUSDS:
+        this.selectedAsset = AssetUSDS;
+        break;
+      case AllowedAssetDai:
+        this.selectedAsset = AssetDAI;
+        break;
+      case AllowedAssetUSDP:
+        this.selectedAsset = AssetUSDP;
         break;
       default:
         this.selectedAsset = null;
@@ -548,6 +639,18 @@ export class Checkout extends HTMLElement {
           return AssetButton(AssetUSDC);
         case AllowedAssetSolana:
           return AssetButton(AssetSolana);
+        case AllowedAssetRLUSD:
+          return AssetButton(AssetRLUSD);
+        case AllowedAssetPYUSD:
+          return AssetButton(AssetPYUSD);
+        case AllowedAssetUSDe:
+          return AssetButton(AssetUSDe);
+        case AllowedAssetUSDS:
+          return AssetButton(AssetUSDS);
+        case AllowedAssetDai:
+          return AssetButton(AssetDAI);
+        case AllowedAssetUSDP:
+          return AssetButton(AssetUSDP);
       }
     });
 
@@ -611,23 +714,18 @@ export class Checkout extends HTMLElement {
         case AllowedNetworkEthereum:
           button = NetworkButton(NetworkEthereum);
           break;
-
         case AllowedNetworkTron:
           button = NetworkButton(NetworkTron);
           break;
-
         case AllowedNetworkSolana:
           button = NetworkButton(NetworkSolana);
           break;
-
         case AllowedNetworkTon:
           button = NetworkButton(NetworkTon);
           break;
-
         case AllowedNetworkAvalanche:
           button = NetworkButton(NetworkAvalanche);
           break;
-
         case AllowedNetworkAptos:
           button = NetworkButton(NetworkAptos);
           break;
@@ -657,6 +755,27 @@ export class Checkout extends HTMLElement {
           break;
         case AllowedNetworkZKsync:
           button = NetworkButton(NetworkZKsync);
+          break;
+        case AllowedNetworkSui:
+          button = NetworkButton(NetworkSui);
+          break;
+        case AllowedNetworkTezos:
+          button = NetworkButton(NetworkTezos);
+          break;
+        case AllowedNetworkKaia:
+          button = NetworkButton(NetworkKaia);
+          break;
+        case AllowedNetworkEos:
+          button = NetworkButton(NetworkEos);
+          break;
+        case AllowedNetworkUniswap:
+          button = NetworkButton(NetworkUniswap);
+          break;
+        case AllowedNetworkHedara:
+          button = NetworkButton(NetworkHedara);
+          break;
+        case AllowedNetworkNear:
+          button = NetworkButton(NetworkNear);
           break;
       }
       if (index >= 4 && this.containerMoreNetworks) {

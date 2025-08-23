@@ -10,37 +10,51 @@ export const CryptoTransactionStatusSuccess = 1;
 export const BaseUrlSandbox = 'https://gateway.sandbox.lydian.com';
 export const BaseUrlProduction = 'https://gateway.lydian.com'
 
-export const AllowedNetworkBitcoin = 'bitcoin';
-export const AllowedNetworkEthereum = 'ethereum';
-export const AllowedNetworkTron = 'tron';
-export const AllowedNetworkSolana = 'solana';
-export const AllowedNetworkTon = 'ton';
-export const AllowedNetworkAvalanche = 'avalanche';
 export const AllowedNetworkAptos = 'aptos';
 export const AllowedNetworkArbitrum = 'arbitrum';
+export const AllowedNetworkAvalanche = 'avalanche';
 export const AllowedNetworkBase = 'base';
+export const AllowedNetworkBitcoin = 'bitcoin';
 export const AllowedNetworkCelo = 'celo';
+export const AllowedNetworkEos = 'eos';
+export const AllowedNetworkEthereum = 'ethereum';
+export const AllowedNetworkHedara = 'hedara';
+export const AllowedNetworkKaia = 'kaia';
 export const AllowedNetworkLinea = 'linea';
+export const AllowedNetworkNear = 'near';
 export const AllowedNetworkOPMainnet = 'opmainnet';
 export const AllowedNetworkPolygon = 'polygon';
+export const AllowedNetworkSolana = 'solana';
 export const AllowedNetworkSonic = 'sonic';
+export const AllowedNetworkSui = 'sui';
+export const AllowedNetworkTezos = 'tezos';
+export const AllowedNetworkTon = 'ton';
+export const AllowedNetworkTron = 'tron';
 export const AllowedNetworkUnichain = 'unichain';
+export const AllowedNetworkUniswap = 'uniswap';
 export const AllowedNetworkZKsync = 'zksync';
 
 
-export const AllowedAssetBitcoin = 'BTC';
-export const AllowedAssetEthereum = 'ETH';
-export const AllowedAssetUSDT = 'USDT';
-export const AllowedAssetUSDC = 'USDC';
+
 export const AllowedAssetArbitrum = 'ARB';
 export const AllowedAssetBase = 'BASE';
+export const AllowedAssetBitcoin = 'BTC';
 export const AllowedAssetCelo = 'CELO';
+export const AllowedAssetDai = 'DAI';
+export const AllowedAssetEthereum = 'ETH';
 export const AllowedAssetLinea = 'LINEA';
 export const AllowedAssetOPMainnet = 'OPMAINNET';
 export const AllowedAssetPolygon = 'POLY';
+export const AllowedAssetPYUSD = 'PYUSD';
+export const AllowedAssetRLUSD = 'RLUSD';
 export const AllowedAssetSolana = 'SOL'
 export const AllowedAssetSonic = 'SONIC';
 export const AllowedAssetUnichain = 'UNICHAIN';
+export const AllowedAssetUSDC = 'USDC';
+export const AllowedAssetUSDe = 'USDe';
+export const AllowedAssetUSDP = 'USDP';
+export const AllowedAssetUSDS = 'USDS';
+export const AllowedAssetUSDT = 'USDT';
 export const AllowedAssetZKsync = 'ZKSYNC';
 
 export const AssetUSDT : Asset = {
@@ -155,6 +169,54 @@ export const AssetZKsync : Asset = {
   'networks': [],
 }
 
+export const AssetRLUSD : Asset = {
+  'code': "RLUSD",
+  'title': "RLUSD (Ripple USD)",
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/b71545a6-eab8-4fa2-5888-f26c22ce7f00/public',
+  'type': 'token',
+  'networks': [],
+}
+
+export const AssetPYUSD : Asset = {
+  'code': "PYUSD",
+  'title': "PYUSD (PayPal USD)",
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/3897aafa-0fd9-4914-ef54-e6312aea9a00/public',
+  'type': 'token',
+  'networks': [],
+}
+
+export const AssetUSDe : Asset = {
+  'code': "USDe",
+  'title': "USDe (Ethena USDe)",
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/76760e01-ce5a-482b-88e0-842f18370d00/public',
+  'type': 'token',
+  'networks': [],
+}
+
+export const AssetUSDS : Asset = {
+  'code': "USDS",
+  'title': "USDS (Sky Dollar)",
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/ee62374d-99a1-46c7-9fc6-eb5907a32600/public',
+  'type': 'token',
+  'networks': [],
+}
+
+export const AssetDAI : Asset = {
+  'code': "DAI",
+  'title': "DAI",
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/970875a7-3ae3-4171-4afe-cc1340bf9500/public',
+  'type': 'token',
+  'networks': [],
+}
+
+export const AssetUSDP : Asset = {
+  'code': "USDP",
+  'title': "USDP (Pax Dollar)",
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/970875a7-3ae3-4171-4afe-cc1340bf9500/public',
+  'type': 'token',
+  'networks': [],
+}
+
 
 
 export const NetworkBitcoin: Network = {
@@ -250,4 +312,40 @@ export const NetworkZKsync: Network = {
   'code': 'zksync',
   'name': 'ZKSync',
   'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/540fbd94-e1d0-4dda-c6d1-426181f37e00/public'
+}
+
+export const NetworkSui: Network = {
+  'code': 'sui',
+  'name': 'Sui',
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/b9ea70f3-4850-49de-ea4b-e1c4b1ae8700/public'
+}
+export const NetworkTezos: Network = {
+  'code': 'tezos',
+  'name': 'Tezos',
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/77878400-8af3-45c2-d1e9-2f159c206b00/public'
+}
+export const NetworkKaia: Network = {
+  'code': 'kaia',
+  'name': 'Kaia',
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/ab53d357-f47b-4285-7ef7-dd9a912cf500/public'
+}
+export const NetworkEos: Network = {
+  'code': 'eos',
+  'name': 'Eos',
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/49e27a4b-2bd4-4911-5c24-f1f99cd41700/public'
+}
+export const NetworkUniswap: Network = {
+  'code': 'uniswap',
+  'name': 'Uniswap',
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/b88526db-ae1a-4b67-e6f5-7d7e74c8ed00/public'
+}
+export const NetworkHedara: Network = {
+  'code': 'hedara',
+  'name': 'Hedara',
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/f6195004-ce8e-4a19-9fbc-46394952a200/public'
+}
+export const NetworkNear: Network = {
+  'code': 'near',
+  'name': 'Near',
+  'img': 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/4f35d901-0541-440a-7e55-2f06c0dd4300/public'
 }
