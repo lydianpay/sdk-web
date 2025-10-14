@@ -7,7 +7,8 @@ export const walletConnectProjectId = 'cbc90b58aec5c9ab2085a2d691461868';
 export const CryptoTransactionStatusPending = 0;
 export const CryptoTransactionStatusSuccess = 1;
 
-export const BaseUrlSandbox = 'https://gateway.sandbox.lydian.com';
+export const BaseUrlSandbox = 'https://gateway.lydian.dev';
+// export const BaseUrlSandbox = 'https://gateway.sandbox.lydian.com';
 export const BaseUrlProduction = 'https://gateway.lydian.com'
 
 export const AllowedNetworkAptos = 'aptos';

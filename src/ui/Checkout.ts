@@ -1,106 +1,105 @@
 import lydianCSS from './lydian.generated.css?inline';
 import checkoutTemplate from './checkout-template.html?raw';
 import {
+  Asset,
   CreateTransactionResponse,
-  Transaction,
   currencies,
   GetSDKConfigResponse,
-  isCurrency,
   InitOptions,
-  Asset,
+  isCurrency,
+  Transaction,
   WalletConnectWallet,
 } from '../types';
 import {
-
-  BaseUrlProduction,
-  BaseUrlSandbox,
-  CryptoTransactionStatusSuccess,
-  AllowedAssetBitcoin,
-  AllowedAssetEthereum,
-  AllowedAssetUSDC,
-  AllowedAssetUSDT,
   AllowedAssetArbitrum,
   AllowedAssetBase,
+  AllowedAssetBitcoin,
   AllowedAssetCelo,
+  AllowedAssetDai,
+  AllowedAssetEthereum,
   AllowedAssetLinea,
   AllowedAssetOPMainnet,
   AllowedAssetPolygon,
+  AllowedAssetPYUSD,
+  AllowedAssetRLUSD,
+  AllowedAssetSolana,
   AllowedAssetSonic,
   AllowedAssetUnichain,
+  AllowedAssetUSDC,
+  AllowedAssetUSDe,
+  AllowedAssetUSDP,
+  AllowedAssetUSDS,
+  AllowedAssetUSDT,
   AllowedAssetZKsync,
-  AllowedAssetSolana,
-  AssetBitcoin,
-  AssetEthereum,
-  AssetUSDT,
-  AssetUSDC,
+  AllowedNetworkAptos,
+  AllowedNetworkArbitrum,
+  AllowedNetworkAvalanche,
+  AllowedNetworkBase,
+  AllowedNetworkBitcoin,
+  AllowedNetworkCelo,
+  AllowedNetworkEos,
+  AllowedNetworkEthereum,
+  AllowedNetworkHedara,
+  AllowedNetworkKaia,
+  AllowedNetworkLinea,
+  AllowedNetworkNear,
+  AllowedNetworkOPMainnet,
+  AllowedNetworkPolygon,
+  AllowedNetworkSolana,
+  AllowedNetworkSonic,
+  AllowedNetworkSui,
+  AllowedNetworkTezos,
+  AllowedNetworkTon,
+  AllowedNetworkTron,
+  AllowedNetworkUnichain,
+  AllowedNetworkUniswap,
+  AllowedNetworkZKsync,
   AssetArbitrum,
   AssetBase,
+  AssetBitcoin,
   AssetCelo,
+  AssetDAI,
+  AssetEthereum,
   AssetLinea,
   AssetOPMainnet,
   AssetPolygon,
+  AssetPYUSD,
+  AssetRLUSD,
+  AssetSolana,
   AssetSonic,
   AssetUnichain,
+  AssetUSDC,
+  AssetUSDe,
+  AssetUSDP,
+  AssetUSDS,
+  AssetUSDT,
   AssetZKsync,
-  AssetSolana,
-  AllowedNetworkBitcoin,
-  AllowedNetworkSolana,
-  AllowedNetworkTon,
-  AllowedNetworkAvalanche,
-  AllowedNetworkAptos,
-  AllowedNetworkArbitrum,
-  AllowedNetworkBase,
-  AllowedNetworkCelo,
-  AllowedNetworkLinea,
-  AllowedNetworkOPMainnet,
-  AllowedNetworkPolygon,
-  AllowedNetworkSonic,
-  AllowedNetworkUnichain,
-  AllowedNetworkZKsync,
-  AllowedNetworkEthereum,
-  AllowedNetworkTron,
+  BaseUrlProduction,
+  BaseUrlSandbox,
+  CryptoTransactionStatusSuccess,
   NetworkAptos,
-  NetworkAvalanche,
-  NetworkEthereum,
-  NetworkSolana,
-  NetworkTon,
-  NetworkTron,
   NetworkArbitrum,
+  NetworkAvalanche,
   NetworkBase,
+  NetworkBitcoin,
   NetworkCelo,
+  NetworkEos,
+  NetworkEthereum,
+  NetworkHedara,
+  NetworkKaia,
   NetworkLinea,
+  NetworkNear,
   NetworkOPMainnet,
   NetworkPolygon,
+  NetworkSolana,
   NetworkSonic,
-  NetworkUnichain,
-  NetworkZKsync,
-  NetworkBitcoin,
-  AllowedAssetRLUSD,
-  AssetRLUSD,
-  AllowedAssetPYUSD,
-  AssetUSDe,
-  AssetPYUSD,
-  AllowedAssetUSDe,
-  AllowedAssetUSDS,
-  AssetUSDS,
-  AllowedAssetDai,
-  AssetDAI,
-  AllowedAssetUSDP,
-  AssetUSDP,
   NetworkSui,
-  NetworkEos,
-  AllowedNetworkUniswap,
-  NetworkUniswap,
-  AllowedNetworkHedara,
-  AllowedNetworkNear,
-  NetworkNear,
-  NetworkHedara,
-  AllowedNetworkEos,
-  NetworkKaia,
-  AllowedNetworkKaia,
   NetworkTezos,
-  AllowedNetworkTezos,
-  AllowedNetworkSui,
+  NetworkTon,
+  NetworkTron,
+  NetworkUnichain,
+  NetworkUniswap,
+  NetworkZKsync,
 } from '../constants';
 import { API } from '../network';
 import isMobile from 'is-mobile';
@@ -109,7 +108,7 @@ import AssetButton from './buttons/assetButton';
 import NetworkButton from './buttons/networkButton';
 
 import { WalletConnectService } from '../services/walletConnectService';
-import { parseQrCodeData } from '../utils';
+import { capitalizeFirstLetter, parseQrCodeData } from '../utils';
 import { encodeEthereumUsdtTransfer } from '../types/tether';
 import { Address } from '../types/ethereum';
 import WalletButton from './buttons/walletButton';
@@ -175,6 +174,46 @@ export class Checkout extends HTMLElement {
   private containerWalletList: HTMLDivElement | null = null;
   private btnMoreWallets: HTMLButtonElement | null = null;
   private containerWalletManual: HTMLDivElement | null = null;
+
+  private modal: HTMLDialogElement | null = null;
+  private modalBtnBack: HTMLButtonElement | null = null;
+
+  private modalContainerPaymentSuccess: HTMLDivElement | null = null;
+  private modalContainerPaymentFailure: HTMLDivElement | null = null;
+  private modalContainerQRCode: HTMLDivElement | null = null;
+  private modalLydianProcessingContainer: HTMLDivElement | null = null;
+  private modalLydianProcessingText: HTMLParagraphElement | null = null;
+
+  private modalContainerMoreNetworks: HTMLDivElement | null = null;
+  private modalContainerNetworks: HTMLDivElement | null = null;
+  private modalContainerNetworkList: HTMLDivElement | null = null;
+  private modalBtnMoreNetworks: HTMLButtonElement | null = null;
+
+  private modalAssetImg: HTMLImageElement | null = null;
+  private modalAssetTitle: HTMLDivElement | null = null;
+
+  private modalContainerCryptoPayment: HTMLDivElement | null = null;
+  private modalContainerAssets: HTMLDivElement | null = null;
+
+  private modalCanvasQRCode: HTMLDivElement | null = null;
+
+  // private modalDisplayTotalAmount: HTMLTableCellElement | null = null;
+  // private modalDisplayTransactionID: HTMLTableCellElement | null = null;
+  // private modalDisplayTransactionID: HTMLTableCellElement | null = null;
+  // private modalDisplayAssetTotal: HTMLTableCellElement | null = null;
+  private modalDisplayAssetTotal: HTMLParagraphElement | null = null;
+  private modalDisplayScanText: HTMLSpanElement | null = null;
+  // private modalDisplayExpirationLeft: HTMLTableCellElement | null = null;
+  private modalDisplayExpirationLeft: HTMLSpanElement | null = null;
+
+  private modalTitle: HTMLDivElement | null = null;
+
+  private modalDisplayNetwork: HTMLSpanElement | null = null;
+  private modalDisplayWalletAddress: HTMLParagraphElement | null = null;
+  private modalButtonCopyAssetTotal: HTMLButtonElement | null = null;
+  private modalButtonCopyWalletAddress: HTMLButtonElement | null = null;
+
+  private timeInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     super();
@@ -246,6 +285,24 @@ export class Checkout extends HTMLElement {
     this.btnMoreWallets?.classList.remove('hidden');
 
     this.connectWalletButtonsContainer?.classList.add('hidden');
+
+    // Modal
+    this.modalContainerNetworks?.classList.add('hidden');
+    this.modalContainerMoreNetworks?.classList.add('hidden');
+    this.modalBtnMoreNetworks?.classList.remove('hidden');
+
+    this.modalContainerCryptoPayment?.classList.add('hidden');
+
+    if (this.modalTitle) {
+      this.modalTitle.innerText = 'Select an Asset';
+    }
+
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+      this.timeInterval = null;
+      if (this.displayExpirationLeft?.innerHTML) this.displayExpirationLeft.innerHTML = '15:00';
+      if (this.modalDisplayExpirationLeft?.innerHTML) this.modalDisplayExpirationLeft.innerHTML = '15:00';
+    }
   }
 
   private setSelectedAsset(code: string | null) {
@@ -322,33 +379,57 @@ export class Checkout extends HTMLElement {
   }
 
   private showPaymentSuccess(): void {
-    this.containerPaymentSuccess?.classList.remove('hidden');
+    if (this.initOptions?.isEmbedded) {
+      this.containerPaymentSuccess?.classList.remove('hidden');
+    } else {
+      this.modalContainerPaymentSuccess?.classList.remove('hidden');
+    }
     this.hideButtons();
     this.hideQRCode();
   }
 
   private showPaymentFailure(): void {
-    this.containerPaymentFailure?.classList.remove('hidden');
+    if (this.initOptions?.isEmbedded) {
+      this.containerPaymentFailure?.classList.remove('hidden');
+    } else {
+      this.modalContainerPaymentFailure?.classList.remove('hidden');
+    }
     this.hideButtons();
     this.hideQRCode();
   }
 
   private hidePaymentSuccess(): void {
-    this.containerPaymentSuccess?.classList.add('hidden');
+    if (this.initOptions?.isEmbedded) {
+      this.containerPaymentSuccess?.classList.add('hidden');
+    } else {
+      this.modalContainerPaymentSuccess?.classList.add('hidden');
+    }
   }
 
   private showProcessing(message: string = 'Processing...'): void {
-    if (this.lydianProcessingText) {
+    if (this.initOptions?.isEmbedded && this.lydianProcessingText) {
       this.lydianProcessingText.innerHTML = message;
+    } else if (this.modalLydianProcessingText) {
+      this.modalLydianProcessingText.innerHTML = message;
     }
-    this.lydianProcessingContainer?.classList.remove('hidden');
+    if (this.initOptions?.isEmbedded) {
+      this.lydianProcessingContainer?.classList.remove('hidden');
+    } else {
+      this.modalLydianProcessingContainer?.classList.remove('hidden');
+    }
   }
 
   private hideProcessing(): void {
-    if (this.lydianProcessingText) {
+    if (this.initOptions?.isEmbedded && this.lydianProcessingText) {
       this.lydianProcessingText.innerHTML = '';
+    } else if (this.modalLydianProcessingText) {
+      this.modalLydianProcessingText.innerHTML = '';
     }
-    this.lydianProcessingContainer?.classList.add('hidden');
+    if (this.initOptions?.isEmbedded) {
+      this.lydianProcessingContainer?.classList.add('hidden');
+    } else {
+      this.modalLydianProcessingContainer?.classList.add('hidden');
+    }
   }
 
   private showButtons(): void {
@@ -368,47 +449,85 @@ export class Checkout extends HTMLElement {
     this.containerNetworks?.classList.add('hidden');
     this.connectWalletButtonsContainer?.classList.add('hidden');
     this.containerWalletManual?.classList.add('hidden');
+    this.modalContainerCryptoPayment?.classList.add('hidden');
+    this.modalContainerNetworks?.classList.add('hidden');
   }
 
-  private showQRCode(qrData: string, amount: number): void {
+  private showQRCode(qrData: string, amount: number, address: string): void {
     if (!this.selectedAsset) {
       return;
     }
-    this.containerQRCode?.classList.remove('hidden');
-    if (this.displayAssetTotal) {
-      this.displayAssetTotal.innerText = amount + " " + this.selectedAsset.code.toUpperCase();
-    }
-    if (this.displayTransactionID) {
-      this.displayTransactionID.innerText = <string>this.initOptions?.transaction.referenceNumber;
-    }
-    if (this.displayTotalAmount) {
-      this.displayTotalAmount.innerText = <string>this.initOptions?.transaction.amount.toLocaleString('en-US', {
-        style: 'currency',
-        currency: this.initOptions?.transaction.currency
-      })
+    const assetTotal = amount + ' ' + this.selectedAsset.code.toUpperCase();
+    const network = this.selectedNetwork ? capitalizeFirstLetter(this.selectedNetwork) : this.selectedAsset.networks[0];
+    const transactionID = <string>this.initOptions?.transaction.referenceNumber;
+    const totalAmount = <string>this.initOptions?.transaction.amount.toLocaleString('en-US', {
+      style: 'currency',
+      currency: this.initOptions?.transaction.currency,
+    });
+
+    if (this.initOptions?.isEmbedded) {
+      this.containerQRCode?.classList.remove('hidden');
+      if (this.displayAssetTotal) {
+        this.displayAssetTotal.innerText = assetTotal;
+      }
+      if (this.displayTransactionID) {
+        this.displayTransactionID.innerText = transactionID;
+      }
+      if (this.displayTotalAmount) {
+        this.displayTotalAmount.innerText = totalAmount;
+      }
+    } else {
+      this.modalContainerQRCode?.classList.remove('hidden');
+      if (this.modalDisplayAssetTotal) {
+        this.modalDisplayAssetTotal.innerText = assetTotal;
+      }
+      // if (this.modalDisplayTransactionID) {
+      //   this.modalDisplayTransactionID.innerText = transactionID;
+      // }
+      // if (this.modalDisplayTotalAmount) {
+      //   this.modalDisplayTotalAmount.innerText = totalAmount;
+      // }
+      if (this.modalTitle) {
+        this.modalTitle.innerText = 'Scan with Your Wallet';
+      }
+      if (this.modalDisplayNetwork) {
+        this.modalDisplayNetwork.innerText = network;
+      }
+      if (this.modalDisplayWalletAddress) {
+        this.modalDisplayWalletAddress.innerText = address;
+      }
     }
 
-    if (this.displayExpirationLeft) {
-      const clock = this.displayExpirationLeft;
+    let clock = null;
+    if (this.initOptions?.isEmbedded && this.displayExpirationLeft) {
+      clock = this.displayExpirationLeft;
+    } else if (this.modalDisplayExpirationLeft) {
+      clock = this.modalDisplayExpirationLeft;
+    }
+
+    if (clock) {
       const expirationTime = new Date().getTime() + 15 * 60 * 1000;
 
-      const timeInterval = setInterval(() => {
+      this.timeInterval = setInterval(() => {
         const now = new Date().getTime();
         const distance = expirationTime - now;
 
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        clock.innerHTML = minutes + ":" + seconds;
-        if (distance <= 0) {
-          clearInterval(timeInterval)
+        clock.innerHTML = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        if (distance <= 0 && this.timeInterval) {
+          clearInterval(this.timeInterval);
         }
       }, 1000);
-
     }
 
-    if (this.displayScanText && this.selectedWallet.code == 'manual') {
-      this.displayScanText.innerHTML = 'Scan the code below using your <br />CAMERA, CRYPTO WALLET, or QR READER';
+
+    const scanText = 'Scan the code below using your <br />CAMERA, CRYPTO WALLET, or QR READER';
+    if (this.initOptions?.isEmbedded && this.displayScanText && this.selectedWallet.code == 'manual') {
+      this.displayScanText.innerHTML = scanText;
+    } else if (this.modalDisplayScanText && this.selectedWallet.code == 'manual') {
+      this.modalDisplayScanText.innerHTML = scanText;
     }
 
     let centerImg = '';
@@ -425,31 +544,39 @@ export class Checkout extends HTMLElement {
         break;
     }
 
-    if (this.canvasQRCode) {
-      const qrCode = new QRCodeStyling({
-        width: 238,
-        height: 238,
-        type: 'canvas',
-        data: qrData,
-        image: centerImg,
-        dotsOptions: {
-          color: '#000000',
-          type: 'extra-rounded'
-        },
-        backgroundOptions: {
-          color: '#ffffff'
-        }
-      });
+    const qrCode = new QRCodeStyling({
+      width: 238,
+      height: 238,
+      type: 'canvas',
+      data: qrData,
+      image: centerImg,
+      dotsOptions: {
+        color: '#000000',
+        type: 'extra-rounded',
+      },
+      backgroundOptions: {
+        color: '#ffffff',
+      },
+    });
 
+    if (this.initOptions?.isEmbedded && this.canvasQRCode) {
       qrCode.append(this.canvasQRCode);
-
+    } else if (this.modalCanvasQRCode) {
+      qrCode.append(this.modalCanvasQRCode);
     }
   }
 
   private hideQRCode(): void {
-    this.containerQRCode?.classList.add('hidden');
-    if (this.canvasQRCode) {
-      this.canvasQRCode.innerHTML = '';
+    if (this.initOptions?.isEmbedded) {
+      this.containerQRCode?.classList.add('hidden');
+      if (this.canvasQRCode) {
+        this.canvasQRCode.innerHTML = '';
+      }
+    } else {
+      this.modalContainerQRCode?.classList.add('hidden');
+      if (this.modalCanvasQRCode) {
+        this.modalCanvasQRCode.innerHTML = '';
+      }
     }
   }
 
@@ -469,7 +596,7 @@ export class Checkout extends HTMLElement {
     this.lydianProcessingText = this.shadowRoot?.getElementById('lydianProcessingText') as HTMLParagraphElement;
 
 
-    this.assetImg = this.shadowRoot?.getElementById("assetImg") as HTMLImageElement;
+    this.assetImg = this.shadowRoot?.getElementById('assetImg') as HTMLImageElement;
     this.assetTitle = this.shadowRoot?.getElementById('assetTitle') as HTMLDivElement;
 
     this.containerCryptoPayment = this.shadowRoot?.getElementById('containerCryptoPayment') as HTMLDivElement;
@@ -499,6 +626,45 @@ export class Checkout extends HTMLElement {
     this.containerMoreWallets = this.shadowRoot?.getElementById('containerMoreWallets') as HTMLDivElement;
     this.containerWalletList = this.shadowRoot?.getElementById('containerWalletList') as HTMLDivElement;
     this.containerWalletManual = this.shadowRoot?.getElementById('containerWalletManual') as HTMLDivElement;
+
+    this.modal = this.shadowRoot?.getElementById('modal') as HTMLDialogElement;
+    this.modalBtnBack = this.shadowRoot?.getElementById('modalBtnBack') as HTMLButtonElement;
+
+    this.modalContainerNetworks = this.shadowRoot?.getElementById('modalContainerNetworks') as HTMLDivElement;
+
+    this.modalContainerMoreNetworks = this.shadowRoot?.getElementById('modalContainerMoreNetworks') as HTMLDivElement;
+    this.modalContainerNetworks = this.shadowRoot?.getElementById('modalContainerNetworks') as HTMLDivElement;
+    this.modalContainerNetworkList = this.shadowRoot?.getElementById('modalContainerNetworkList') as HTMLDivElement;
+    this.modalBtnMoreNetworks = this.shadowRoot?.getElementById('modalBtnMoreNetworks') as HTMLButtonElement;
+
+    this.modalContainerPaymentSuccess = this.shadowRoot?.getElementById('modalContainerPaymentSuccess') as HTMLDivElement;
+    this.modalContainerPaymentFailure = this.shadowRoot?.getElementById('modalContainerPaymentFailure') as HTMLDivElement;
+    this.modalContainerQRCode = this.shadowRoot?.getElementById('modalContainerQRCode') as HTMLDivElement;
+    this.modalLydianProcessingContainer = this.shadowRoot?.getElementById('modalLydianProcessingContainer') as HTMLDivElement;
+    this.modalLydianProcessingText = this.shadowRoot?.getElementById('modalLydianProcessingText') as HTMLParagraphElement;
+
+    this.modalContainerCryptoPayment = this.shadowRoot?.getElementById('modalContainerCryptoPayment') as HTMLDivElement;
+    this.modalContainerAssets = this.shadowRoot?.getElementById('modalContainerAssets') as HTMLDivElement;
+
+    this.modalCanvasQRCode = this.shadowRoot?.getElementById('modalCanvasQRCode') as HTMLDivElement;
+
+    // this.modalDisplayTotalAmount = this.shadowRoot?.getElementById('modalDisplayTotalAmount') as HTMLTableCellElement;
+    // this.modalDisplayTransactionID = this.shadowRoot?.getElementById('modalDisplayTransactionID') as HTMLTableCellElement;
+    // this.modalDisplayAssetTotal = this.shadowRoot?.getElementById('modalDisplayAssetTotal') as HTMLTableCellElement;
+    this.modalDisplayAssetTotal = this.shadowRoot?.getElementById('modalDisplayAssetTotal') as HTMLParagraphElement;
+    this.modalDisplayScanText = this.shadowRoot?.getElementById('modalDisplayScanText') as HTMLSpanElement;
+    // this.modalDisplayExpirationLeft = this.shadowRoot?.getElementById('modalDisplayExpirationLeft') as HTMLTableCellElement;
+    this.modalDisplayExpirationLeft = this.shadowRoot?.getElementById('modalDisplayExpirationLeft') as HTMLSpanElement;
+
+    this.modalAssetImg = this.shadowRoot?.getElementById('modalAssetImg') as HTMLImageElement;
+    this.modalAssetTitle = this.shadowRoot?.getElementById('modalAssetTitle') as HTMLDivElement;
+
+    this.modalTitle = this.shadowRoot?.getElementById('modalTitle') as HTMLDivElement;
+
+    this.modalDisplayNetwork = this.shadowRoot?.getElementById('modalDisplayNetwork') as HTMLSpanElement;
+    this.modalDisplayWalletAddress = this.shadowRoot?.getElementById('modalDisplayWalletAddress') as HTMLParagraphElement;
+    this.modalButtonCopyAssetTotal = this.shadowRoot?.getElementById('modalButtonCopyAssetTotal') as HTMLButtonElement;
+    this.modalButtonCopyWalletAddress = this.shadowRoot?.getElementById('modalButtonCopyWalletAddress') as HTMLButtonElement;
   }
 
   private attachListeners(): void {
@@ -508,12 +674,44 @@ export class Checkout extends HTMLElement {
 
     this.btnCryptoPayment?.addEventListener('click', () => {
       this.btnCryptoPayment?.classList.toggle('hidden');
-      this.containerCryptoPayment?.classList.toggle('hidden');
+      if (this.initOptions?.isEmbedded) {
+        this.containerCryptoPayment?.classList.toggle('hidden');
+      } else {
+        this.modal?.showModal();
+        this.modalContainerCryptoPayment?.classList.toggle('hidden');
+      }
+    });
+
+    this.modalBtnBack?.addEventListener('click', () => {
+      this.modal?.close();
+      this.loadInitialState();
+    });
+
+    // Optional: click outside the dialog box to close (when not full-screen)
+    this.modal?.addEventListener('click', (e) => {
+      const r = this.modal?.getBoundingClientRect();
+      let inDialog = null;
+      if (r != null) {
+        inDialog =
+          e.clientX >= r.left &&
+          e.clientX <= r.right &&
+          e.clientY >= r.top &&
+          e.clientY <= r.bottom;
+      }
+      if (!inDialog) {
+        this.modal?.close();
+        this.loadInitialState();
+      }
     });
 
     this.btnMoreNetworks?.addEventListener('click', () => {
       this.containerMoreNetworks?.classList.toggle('hidden');
       this.btnMoreNetworks?.classList.toggle('hidden');
+    });
+
+    this.modalBtnMoreNetworks?.addEventListener('click', () => {
+      this.modalContainerMoreNetworks?.classList.toggle('hidden');
+      this.modalBtnMoreNetworks?.classList.toggle('hidden');
     });
 
     this.btnMoreAssets?.addEventListener('click', () => {
@@ -531,6 +729,15 @@ export class Checkout extends HTMLElement {
     });
     this.lydianBtnCancelCryptoPayment?.addEventListener('click', () => {
       this.loadInitialState();
+    });
+
+    this.modalButtonCopyAssetTotal?.addEventListener('click', (event) => {
+      const asset = this.modalDisplayAssetTotal?.innerText ?? '';
+      navigator.clipboard.writeText(asset);
+    });
+    this.modalButtonCopyWalletAddress?.addEventListener('click', () => {
+      const asset = this.modalDisplayWalletAddress?.innerText ?? '';
+      navigator.clipboard.writeText(asset);
     });
   }
 
@@ -620,12 +827,11 @@ export class Checkout extends HTMLElement {
   }
 
   private setAssetButtons() {
-    if (!this.containerAssets || !this.containerAssetsMore) {
+    if (this.initOptions?.isEmbedded && (!this.containerAssets || !this.containerAssetsMore)) {
+      return;
+    } else if (!this.modalContainerAssets) {
       return;
     }
-
-    this.containerAssets.innerHTML = '';
-    this.containerAssetsMore.innerHTML = '';
 
     const buttons = this.sdkConfig?.allowedAssets?.map((asset, index) => {
       switch (asset.code) {
@@ -654,13 +860,28 @@ export class Checkout extends HTMLElement {
       }
     });
 
-    buttons?.filter(v => v).forEach((button, index) => {
-      if (index >= 2 && this.containerAssetsMore) {
-        this.containerAssetsMore.innerHTML += button;
-      } else if (this.containerAssets) {
-        this.containerAssets.innerHTML += button;
-      }
-    })
+    if (this.initOptions?.isEmbedded) {
+      this.containerAssets!.innerHTML = '';
+      this.containerAssetsMore!.innerHTML = '';
+
+      buttons?.filter(v => v).forEach((button, index) => {
+        if (index >= 2 && this.containerAssetsMore) {
+          this.containerAssetsMore.innerHTML += button;
+        } else if (this.containerAssets) {
+          this.containerAssets.innerHTML += button;
+        }
+      });
+
+    } else {
+      this.modalContainerAssets!.innerHTML = '';
+
+      buttons?.filter(v => v).forEach((button, index) => {
+        if (this.modalContainerAssets) {
+          this.modalContainerAssets.innerHTML += button;
+        }
+      });
+
+    }
 
     if (this.sdkConfig?.allowedAssets && this.sdkConfig.allowedAssets.length <= 2) {
       this.btnMoreAssets?.classList.add('hidden');
@@ -674,14 +895,21 @@ export class Checkout extends HTMLElement {
     this.sdkConfig?.allowedAssets?.forEach((asset) => {
       const assetBtn = this.shadowRoot?.getElementById('btnAsset' + asset.code) as HTMLButtonElement;
       assetBtn?.addEventListener('click', async () => {
-        this.setSelectedAsset(asset.code)
+        this.setSelectedAsset(asset.code);
 
-        this.containerCryptoPayment?.classList.add('hidden');
+        if (this.initOptions?.isEmbedded) {
+          this.containerCryptoPayment?.classList.add('hidden');
+        } else {
+          this.modalContainerCryptoPayment?.classList.add('hidden');
+        }
 
         if (asset.type == 'token') {
           this.setNetworkButtons();
+          if (this.modalTitle) {
+            this.modalTitle.innerText = 'Select a Network';
+          }
         } else {
-          this.setSelectedNetwork(asset.networks[0])
+          this.setSelectedNetwork(asset.networks[0]);
           this.showWalletConnectButtons();
         }
       });
@@ -689,18 +917,36 @@ export class Checkout extends HTMLElement {
   }
 
   private setNetworkButtons() {
-    if (!this.containerNetworkList || !this.containerMoreNetworks || !this.assetImg || !this.assetTitle) {
+    if (this.initOptions?.isEmbedded && (!this.containerNetworkList || !this.containerMoreNetworks || !this.assetTitle)) {
       return;
     }
-    this.containerNetworkList.innerHTML = '';
-    this.containerMoreNetworks.innerHTML = '';
+    if (!this.initOptions?.isEmbedded && (!this.modalContainerNetworkList || !this.modalContainerMoreNetworks || !this.modalAssetTitle)) {
+      return;
+    }
+    if (this.initOptions?.isEmbedded && !this.assetImg) {
+      return;
+    }
+    if (!this.initOptions?.isEmbedded && !this.modalAssetImg) {
+      return;
+    }
+    if (this.initOptions?.isEmbedded) {
+      this.containerNetworkList!.innerHTML = '';
+      this.containerMoreNetworks!.innerHTML = '';
 
-    this.assetTitle.innerHTML = <string>this.selectedAsset?.title;
-    this.assetImg.src = <string>this.selectedAsset?.img;
+      this.assetTitle!.innerHTML = <string>this.selectedAsset?.title;
+      this.assetImg!.src = <string>this.selectedAsset?.img;
+    } else {
+      this.modalContainerNetworkList!.innerHTML = '';
+      this.modalContainerMoreNetworks!.innerHTML = '';
 
-    const asset = this.sdkConfig?.allowedAssets.find(a => a.code === this.selectedAsset?.code);
+      this.modalAssetTitle!.innerHTML = <string>this.selectedAsset?.title;
+      this.modalAssetImg!.src = <string>this.selectedAsset?.img;
+    }
+
+    let allowedAssets = this.sdkConfig?.allowedAssets;
+    const asset = allowedAssets?.find(a => a.code === this.selectedAsset?.code);
     if (asset == undefined) {
-      console.log("Unknown asset: ", this.selectedAsset?.code);
+      console.log('Unknown asset: ', this.selectedAsset?.code);
       return;
     }
     console.log('asset', asset);
@@ -709,7 +955,7 @@ export class Checkout extends HTMLElement {
       let button;
       switch (chain) {
         case AllowedNetworkBitcoin:
-          button = NetworkButton(NetworkBitcoin)
+          button = NetworkButton(NetworkBitcoin);
           break;
         case AllowedNetworkEthereum:
           button = NetworkButton(NetworkEthereum);
@@ -778,18 +1024,28 @@ export class Checkout extends HTMLElement {
           button = NetworkButton(NetworkNear);
           break;
       }
-      if (index >= 4 && this.containerMoreNetworks) {
+
+      if (index >= 4 && this.initOptions?.isEmbedded && this.containerMoreNetworks) {
         this.containerMoreNetworks.innerHTML += button;
-      } else if (this.containerNetworkList) {
+      } else if (index >= 4 && !this.initOptions?.isEmbedded && this.modalContainerMoreNetworks) {
+        this.modalContainerMoreNetworks.innerHTML += button;
+      } else if (this.initOptions?.isEmbedded && this.containerNetworkList) {
         this.containerNetworkList.innerHTML += button;
+      } else if (this.modalContainerNetworkList) {
+        this.modalContainerNetworkList.innerHTML += button;
       }
     });
 
     if (asset?.networks && asset?.networks.length <= 2) {
       this.btnMoreNetworks?.classList.add('hidden');
+      this.modalBtnMoreNetworks?.classList.add('hidden');
     }
 
-    this.containerNetworks?.classList.remove('hidden');
+    if (this.initOptions?.isEmbedded) {
+      this.containerNetworks?.classList.remove('hidden');
+    } else {
+      this.modalContainerNetworks?.classList.remove('hidden');
+    }
 
     this.attachListenerOnNetworks(asset.networks);
   }
@@ -829,19 +1085,23 @@ export class Checkout extends HTMLElement {
     this.containerWalletList.innerHTML = '';
     this.containerMoreWallets.innerHTML = '';
 
-    this.containerNetworks?.classList.add('hidden');
+    if (this.initOptions?.isEmbedded) {
+      this.containerNetworks?.classList.add('hidden');
+    } else {
+      this.modalContainerNetworks?.classList.add('hidden');
+    }
 
     this.connectWalletButtonsContainer.classList.remove('hidden');
 
     const manualQrButton = {
       id: 'manual',
       name: 'Manual QR Code',
-      img: 'https://tetherpay.com/images/95de9fd2-da4f-4415-3ec7-bb1befdbc500/public'
-    }
+      img: 'https://tetherpay.com/images/95de9fd2-da4f-4415-3ec7-bb1befdbc500/public',
+    };
 
     if (!this.sdkConfig?.walletConnectEnabled) {
       this.setSelectedWallet(manualQrButton);
-      this.beginWalletConnectTransaction()
+      this.beginWalletConnectTransaction();
       this.lydianBtnCancelWalletConnect?.addEventListener('click', async () => {
         this.loadInitialState();
       });
@@ -858,13 +1118,13 @@ export class Checkout extends HTMLElement {
         id: 'metamask',
         name: 'MetaMask',
         img: 'https://tetherpay.com/images/a0ddd685-4a84-4f5c-ab6d-9796994cf500/public',
-        wcPeerName: 'MetaMask Wallet'
+        wcPeerName: 'MetaMask Wallet',
       },
       {
         id: 'trustwallet',
         name: 'Trust Wallet',
         img: 'https://logowik.com/content/uploads/images/trust-wallet-shield4830.logowik.com.webp',
-        wcPeerName: 'Trust Wallet'
+        wcPeerName: 'Trust Wallet',
       },
     ];
 
@@ -891,7 +1151,7 @@ export class Checkout extends HTMLElement {
       const walletBtn = this.shadowRoot?.getElementById('btnWallet' + wallet.id) as HTMLButtonElement;
       walletBtn?.addEventListener('click', async () => {
         this.setSelectedWallet(wallet);
-        this.beginWalletConnectTransaction()
+        this.beginWalletConnectTransaction();
       });
     });
 
@@ -932,7 +1192,7 @@ export class Checkout extends HTMLElement {
       this.hideProcessing();
 
       if (this.selectedWallet.id == 'manual') {
-        this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount);
+        this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address);
       } else {
 
         let walletSession = this.walletConnectService?.findSession(this.selectedWallet);
@@ -945,12 +1205,12 @@ export class Checkout extends HTMLElement {
           const { uri, approval } = await this.walletConnectService?.connectWalletWithQrCode();
 
           if (uri) {
-            this.showQRCode(uri, this.cryptoTransaction.assetAmount);
+            this.showQRCode(uri, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address);
           }
 
           walletSession = await approval();
 
-          console.log("Session established:", walletSession);
+          console.log('Session established:', walletSession);
           this.walletConnectService.currentSession = walletSession;
           this.hideQRCode();
         }
@@ -962,14 +1222,14 @@ export class Checkout extends HTMLElement {
         }
 
         const params = parseQrCodeData(this.cryptoTransaction.qrData);
-        console.log('parsedQrCodeData', params)
+        console.log('parsedQrCodeData', params);
 
         let transferData;
         if (this.selectedAsset.code === 'USDT') {
           transferData = encodeEthereumUsdtTransfer({
             fromAddress: fromAddress as Address,
             toAddress: params.address,
-            uint256: parseInt(params.uint256)
+            uint256: parseInt(params.uint256),
           });
         } else if (this.selectedAsset.code === 'USDC') {
           transferData = encodeEthereumUsdcTransfer({
@@ -983,7 +1243,7 @@ export class Checkout extends HTMLElement {
         }
 
         try {
-          this.showProcessing(`Waiting for transaction approval from ${walletSession.peer.metadata.name}...`)
+          this.showProcessing(`Waiting for transaction approval from ${walletSession.peer.metadata.name}...`);
           const transferResp = await this.walletConnectService.sendEthTransaction(transferData, walletSession);
           // TODO: do something with this response?
 
