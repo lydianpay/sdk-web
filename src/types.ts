@@ -18,6 +18,7 @@ export type InitOptions = {
   transaction: Transaction;
   paymentFailedListener: (failureMessage: string) => void;
   paymentSuccessListener: () => void;
+  isEmbedded?: boolean;
 };
 
 export type CreateTransactionRequest = {
@@ -33,6 +34,7 @@ export type CreateTransactionResponse = {
   transactionId: string;
   qrData: string;
   assetAmount: number;
+  address: string;
 };
 
 export type GetTransactionResponse = {
