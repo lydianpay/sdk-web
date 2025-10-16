@@ -34,6 +34,7 @@ export type CreateTransactionResponse = {
   transactionId: string;
   qrData: string;
   assetAmount: number;
+  additionalCustomerFee: number;
   address: string;
 };
 

@@ -152,6 +152,7 @@ export class Checkout extends HTMLElement {
   private displayTotalAmount: HTMLTableCellElement | null = null;
   private displayTransactionID: HTMLTableCellElement | null = null;
   private displayAssetTotal: HTMLTableCellElement | null = null;
+  private displayAdditionalCustomerFee: HTMLTableCellElement | null = null;
   private displayScanText: HTMLSpanElement | null = null;
   private displayExpirationLeft: HTMLTableCellElement | null = null;
 
@@ -453,7 +454,7 @@ export class Checkout extends HTMLElement {
     this.modalContainerNetworks?.classList.add('hidden');
   }
 
-  private showQRCode(qrData: string, amount: number, address: string): void {
+  private showQRCode(qrData: string, amount: number, address: string, additionalCustomerFee: number): void {
     if (!this.selectedAsset) {
       return;
     }
@@ -464,11 +465,18 @@ export class Checkout extends HTMLElement {
       style: 'currency',
       currency: this.initOptions?.transaction.currency,
     });
+    const additionalCustomerFeeString = <string>additionalCustomerFee.toLocaleString('en-US', {
+      style: 'currency',
+      currency: this.initOptions?.transaction.currency,
+    });
 
     if (this.initOptions?.isEmbedded) {
       this.containerQRCode?.classList.remove('hidden');
       if (this.displayAssetTotal) {
         this.displayAssetTotal.innerText = assetTotal;
+      }
+      if (this.displayAdditionalCustomerFee && additionalCustomerFee > 0) {
+        this.displayAdditionalCustomerFee.innerText = additionalCustomerFeeString
       }
       if (this.displayTransactionID) {
         this.displayTransactionID.innerText = transactionID;
@@ -608,6 +616,7 @@ export class Checkout extends HTMLElement {
     this.displayTotalAmount = this.shadowRoot?.getElementById('displayTotalAmount') as HTMLTableCellElement;
     this.displayTransactionID = this.shadowRoot?.getElementById('displayTransactionID') as HTMLTableCellElement;
     this.displayAssetTotal = this.shadowRoot?.getElementById('displayAssetTotal') as HTMLTableCellElement;
+    this.displayAdditionalCustomerFee = this.shadowRoot?.getElementById('displayAdditionalCustomerFee') as HTMLTableCellElement;
     this.displayScanText = this.shadowRoot?.getElementById('displayScanText') as HTMLSpanElement;
     this.displayExpirationLeft = this.shadowRoot?.getElementById('displayExpirationLeft') as HTMLTableCellElement;
 
@@ -1192,7 +1201,7 @@ export class Checkout extends HTMLElement {
       this.hideProcessing();
 
       if (this.selectedWallet.id == 'manual') {
-        this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address);
+        this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
       } else {
 
         let walletSession = this.walletConnectService?.findSession(this.selectedWallet);
@@ -1205,7 +1214,7 @@ export class Checkout extends HTMLElement {
           const { uri, approval } = await this.walletConnectService?.connectWalletWithQrCode();
 
           if (uri) {
-            this.showQRCode(uri, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address);
+            this.showQRCode(uri, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
           }
 
           walletSession = await approval();
