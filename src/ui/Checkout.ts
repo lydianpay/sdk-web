@@ -235,6 +235,8 @@ export class Checkout extends HTMLElement {
       baseURI = BaseUrlProduction
     }
 
+    console.log("Connected to: "+baseURI+" | Dev: "+options.dev+" | Sandbox: "+options.sandbox);
+
     this.API = new API(baseURI, this.initOptions.publishableKey);
     this.render();
     await this.getSDKConfig();
