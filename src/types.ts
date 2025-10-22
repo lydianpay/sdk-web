@@ -13,6 +13,7 @@ export type Transaction = {
 }
 
 export type InitOptions = {
+  dev: boolean;
   sandbox: boolean;
   publishableKey: string;
   transaction: Transaction;

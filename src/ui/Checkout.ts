@@ -74,6 +74,7 @@ import {
   AssetUSDS,
   AssetUSDT,
   AssetZKsync,
+  BaseUrlDev,
   BaseUrlProduction,
   BaseUrlSandbox,
   CryptoTransactionStatusSuccess,
@@ -225,7 +226,16 @@ export class Checkout extends HTMLElement {
 
     this.initOptions = options;
 
-    this.API = new API(options.sandbox ? BaseUrlSandbox : BaseUrlProduction, this.initOptions.publishableKey);
+    // Default to Sandbox
+    let baseURI = BaseUrlSandbox;
+    if (options.dev) {
+      baseURI = BaseUrlDev;
+    }
+    if (!options.dev && !options.sandbox) {
+      baseURI = BaseUrlProduction
+    }
+
+    this.API = new API(baseURI, this.initOptions.publishableKey);
     this.render();
     await this.getSDKConfig();
     this.initializeComponents(); // TODO: update this section
