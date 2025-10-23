@@ -232,10 +232,8 @@ export class Checkout extends HTMLElement {
       baseURI = BaseUrlDev;
     }
     if (!options.dev && !options.sandbox) {
-      baseURI = BaseUrlProduction
+      baseURI = BaseUrlProduction;
     }
-
-    console.log("Connected to: "+baseURI+" | Dev: "+options.dev+" | Sandbox: "+options.sandbox);
 
     this.API = new API(baseURI, this.initOptions.publishableKey);
     this.render();
