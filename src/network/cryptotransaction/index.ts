@@ -1,5 +1,7 @@
 import { Base } from '../base.js';
 import {
+  CancelTransactionRequest,
+  CollectTransactionRequest,
   CreateTransactionRequest,
   CreateTransactionResponse,
   GetTransactionResponse,
@@ -17,5 +19,19 @@ export class CryptoTransactions extends Base {
 
   async getCryptoTransaction(transactionID: string) {
     return await this.request<GetTransactionResponse>(`/${resourceName}/${transactionID}`);
+  }
+
+  async collectCryptoTransaction(transactionID: string, collectTransaction: CollectTransactionRequest) {
+    return await this.request<CreateTransactionResponse>(`/${resourceName}/${transactionID}/collect`, {
+      method: 'POST',
+      body: JSON.stringify(collectTransaction),
+    });
+  }
+
+  async cancelCryptoTransaction(transactionID: string, cancelTransaction: CancelTransactionRequest) {
+    return await this.request<CreateTransactionResponse>(`/${resourceName}/${transactionID}/cancel`, {
+      method: 'PATCH',
+      body: JSON.stringify(cancelTransaction),
+    });
   }
 }

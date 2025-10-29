@@ -2,8 +2,13 @@
   <div id="testCanvas"></div>
   <div id="containerPaymentSuccess" class="hidden flex flex-col items-center justify-center min-h-[200px]">
     <p class="text-gray-600 text-lg font-medium">Payment Success!</p>
-    <img class="max-w-32 mt-4" src="https://tetherpay.com/images/475982cd-2f7b-4a57-c9b2-13b5014d7100/public"
-         alt="Payment Approved!" />
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M50.0002 91.6666C73.0127 91.6666 91.6668 73.0124 91.6668 49.9999C91.6668 26.9874 73.0127 8.33325 50.0002 8.33325C26.9877 8.33325 8.3335 26.9874 8.3335 49.9999C8.3335 73.0124 26.9877 91.6666 50.0002 91.6666Z"
+        stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M37.5 50.0001L45.8333 58.3334L62.5 41.6667" stroke="black" stroke-width="5" stroke-linecap="round"
+            stroke-linejoin="round" />
+    </svg>
   </div>
 
   <div id="containerPaymentFailure" class="hidden flex flex-col items-center justify-center">
@@ -29,8 +34,8 @@
         <td id="displayTotalAmount" class="text-right"></td>
       </tr>
       <tr>
-      <td>Payment Fee</td>
-      <td id="displayAdditionalCustomerFee" class="text-right"></td>
+        <td>Payment Fee</td>
+        <td id="displayAdditionalCustomerFee" class="text-right"></td>
       </tr>
       <tr>
         <td>Transaction ID</td>
@@ -158,14 +163,79 @@
   <!--  Modal for popup flow -->
   <dialog class="lg:w-2/3 w-full" id="modal" aria-labelledby="modalTitle" aria-modal="true">
     <div class="modal-header">
-      <button class="close-btn" id="modalBtnBack" type="button" aria-label="Back">←</button>
-      <div class="text-lg font-medium" id="modalTitle">Select an Asset</div>
+      <div class="w-full flex justify-between space-x-2">
+        <div class="flex flex-row items-center gap-2">
+          <button class="close-btn" id="modalBtnBack" type="button" aria-label="Back">←</button>
+          <div class="text-lg font-medium" id="modalTitle">Select an Asset</div>
+        </div>
+        <a class="text-gray-500" href="https://lydian.com/about.html#contactForm" target="_blank">Need Help?</a>
+      </div>
     </div>
     <div class="modal-body">
-      <div id="modalContainerPaymentSuccess" class="hidden flex flex-col items-center justify-center min-h-[200px]">
-        <p class="text-gray-600 text-lg font-medium">Payment Success!</p>
-        <img class="max-w-32 mt-4" src="https://tetherpay.com/images/475982cd-2f7b-4a57-c9b2-13b5014d7100/public"
-             alt="Payment Approved!" />
+      <div id="modalContainerPaymentSuccess"
+           class="flex flex-col items-center justify-center min-h-[200px]">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M50.0002 91.6666C73.0127 91.6666 91.6668 73.0124 91.6668 49.9999C91.6668 26.9874 73.0127 8.33325 50.0002 8.33325C26.9877 8.33325 8.3335 26.9874 8.3335 49.9999C8.3335 73.0124 26.9877 91.6666 50.0002 91.6666Z"
+            stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M37.5 50.0001L45.8333 58.3334L62.5 41.6667" stroke="black" stroke-width="5" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+        <p class="text-lg mt-4 font-bold">Transaction Complete</p>
+        <p class="text-gray-500 text-sm mt-1 font-medium">Lydian ID: <span
+          id="modalLydianID">JJLKLJ34NKL3</span></p>
+        <div id="modalOverpaidWarning" class="mt-4 mx-auto bg-red-100 rounded-xl p-2 md:w-[600px] w-full hidden">
+          <div class="flex items-start gap-2">
+            <svg width="42" height="38" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M10.5 2.23152L18.7952 16.7657H2.20476L10.5 2.23152ZM0.298949 15.6485C-0.549302 17.1344 0.508258 19 2.20476 19H18.7952C20.4917 19 21.5493 17.1344 20.7011 15.6485L12.4058 1.11436C11.5576 -0.371454 9.44244 -0.371454 8.59419 1.11436L0.298949 15.6485ZM9.39837 7.82846V10.0628C9.39837 10.6772 9.89411 11.1799 10.5 11.1799C11.1059 11.1799 11.6016 10.6772 11.6016 10.0628V7.82846C11.6016 7.21402 11.1059 6.7113 10.5 6.7113C9.89411 6.7113 9.39837 7.21402 9.39837 7.82846ZM9.39837 13.4142H11.6016V15.6485H9.39837V13.4142Z"
+                fill="#8B162B" />
+            </svg>
+            <p class="text-red-900">You transferred more USDt than required for this
+              purchase. The excess amount will be returned to you within 24 hours, minus any applicable gas fees. <a
+                href="https://lydian.com/about.html#contactForm" target="_blank">Need help?</a></p>
+          </div>
+        </div>
+        <div id="modalOverpaidLessThanGasFeesWarning"
+             class="mt-4 mx-auto bg-red-100 rounded-xl p-2 md:w-[600px] w-full hidden">
+          <div class="flex items-start gap-2">
+            <svg width="42" height="38" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M10.5 2.23152L18.7952 16.7657H2.20476L10.5 2.23152ZM0.298949 15.6485C-0.549302 17.1344 0.508258 19 2.20476 19H18.7952C20.4917 19 21.5493 17.1344 20.7011 15.6485L12.4058 1.11436C11.5576 -0.371454 9.44244 -0.371454 8.59419 1.11436L0.298949 15.6485ZM9.39837 7.82846V10.0628C9.39837 10.6772 9.89411 11.1799 10.5 11.1799C11.1059 11.1799 11.6016 10.6772 11.6016 10.0628V7.82846C11.6016 7.21402 11.1059 6.7113 10.5 6.7113C9.89411 6.7113 9.39837 7.21402 9.39837 7.82846ZM9.39837 13.4142H11.6016V15.6485H9.39837V13.4142Z"
+                fill="#8B162B" />
+            </svg>
+            <p class="text-red-900">You transferred more USDT than required for this purchase. However, the excess
+              amount is less than the gas fee, so we are unable to return it. <a
+                href="https://lydian.com/about.html#contactForm" target="_blank">Need help?</a></p>
+          </div>
+        </div>
+        <div class="flex flex-col justify-center items-center w-full">
+          <div class="flex flex-row justify-between w-full mt-8">
+            <p class="font-bold">Transaction Amount</p>
+            <p><span id="modalTransactionAmount">9.50</span></p>
+          </div>
+          <div class="flex flex-row justify-between w-full mt-2">
+            <p class="font-bold">Transaction Amount (USDt)</p>
+            <p><span id="modalTransactionAmountUSDT">9.9885</span> USDt</p>
+          </div>
+          <div class="flex flex-row justify-between w-full mt-2">
+            <p class="font-bold">Amount Paid (USDt)</p>
+            <p><span id="modalTransactionTotalAmountUSDT">19.9885</span> USDt</p>
+          </div>
+          <div id="modalTransactionOverpaidAmountUSDTContainer"
+               class="flex flex-row justify-between w-full mt-2 hidden">
+            <p class="font-bold">Over Payment Amount</p>
+            <p><span id="modalTransactionOverpaidAmountUSDT">10</span> USDt</p>
+          </div>
+          <div class="flex flex-row justify-between w-full mt-2">
+            <p class="font-bold">Gas Fees</p>
+            <p><span id="modalTransactionGasFeesUSDT">1.50</span> USDt</p>
+          </div>
+          <div id="modalTransactionReturnAmountUSDTContainer" class="flex flex-row justify-between w-full mt-2 hidden">
+            <p class="text-green-600 font-bold">Amount to be Returned</p>
+            <p class="text-green-600 font-bold"><span id="modalTransactionReturnAmountUSDT">9.50</span> USDt</p>
+          </div>
+        </div>
       </div>
 
       <div id="modalContainerPaymentFailure" class="hidden flex flex-col items-center justify-center">
@@ -173,6 +243,61 @@
       </div>
 
       <div id="modalContainerQRCode">
+        <div id="modalUnderpaidWarning"
+             class="mt-4 mx-auto bg-red-100 rounded-xl p-2 md:w-[600px] w-full hidden">
+          <div class="flex items-start gap-2">
+            <svg width="42" height="38" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M10.5 2.23152L18.7952 16.7657H2.20476L10.5 2.23152ZM0.298949 15.6485C-0.549302 17.1344 0.508258 19 2.20476 19H18.7952C20.4917 19 21.5493 17.1344 20.7011 15.6485L12.4058 1.11436C11.5576 -0.371454 9.44244 -0.371454 8.59419 1.11436L0.298949 15.6485ZM9.39837 7.82846V10.0628C9.39837 10.6772 9.89411 11.1799 10.5 11.1799C11.1059 11.1799 11.6016 10.6772 11.6016 10.0628V7.82846C11.6016 7.21402 11.1059 6.7113 10.5 6.7113C9.89411 6.7113 9.39837 7.21402 9.39837 7.82846ZM9.39837 13.4142H11.6016V15.6485H9.39837V13.4142Z"
+                fill="#8B162B" />
+            </svg>
+            <p class="text-red-900">You haven’t transferred enough USDt to complete this <span
+              id="modalTransactionAmountForUnderpaidWarning">$9</span> purchase. Please scan the new QR code
+              below to send the remaining balance.<a href="https://lydian.com/about.html#contactForm"
+                                                     target="_blank">Need help?</a></p>
+          </div>
+        </div>
+        <div id="modalUnderpaidAmountsBlock"
+             class="mt-4 p-4 mx-auto border-solid border-gray-200 border-2 rounded-xl p-2 md:w-[600px] w-full flex flex-col hidden">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex flex-col">
+              <p class="font-bold">Transaction Amount: </p>
+              <p><span id="modalTransactionAmountForUnderpaid">$9</span></p>
+            </div>
+            <div class="flex flex-col text-right">
+              <p class="font-bold">Amount Already Paid: </p>
+              <p>
+                <span id="modalTransactionPaidAmountForUnderpaid">$8</span>
+                <button id="modalButtonTransactionDetails"
+                        class="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        aria-label="Transaction Details">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+                       xmlns="http://www.w3.org/2000/svg">
+                    <g clipPath="url(#clip0_12225_39810)">
+                      <path
+                        d="M6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11Z"
+                        stroke="#757575" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M6 8V6" stroke="#757575" strokeLinecap="round"
+                            strokeLinejoin="round" />
+                      <path d="M6 4H6.005" stroke="#757575" strokeLinecap="round"
+                            strokeLinejoin="round" />
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_12225_39810">
+                        <rect width="12" height="12" fill="white" />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                  <span class="sr-only">Transaction Details</span>
+                </button>
+              </p>
+            </div>
+          </div>
+          <div id="modalTransactionDetailsContainer" class="hidden">
+            <hr class="text-gray-200 my-2" />
+            <div id="modalTransactionDetailItemsContainer" class="mt-6"></div>
+          </div>
+        </div>
         <div class="m-4 text-center">
           <span id="modalDisplayScanText"></span>
         </div>
@@ -254,6 +379,16 @@
             </div>
           </div>
         </div>
+        <div id="modalUnderpaidButtonsContainer" class="flex justify-center items-center gap-3 my-8 hidden">
+          <button id="modalButtonCancelTransaction"
+                  class="w-1/2 max-w-75 items-center rounded-md border border-neutral-400 bg-gray-100 px-12 py-2 text-sm font-semibold text-neutral-900 shadow-sm hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 hidden">
+            Cancel Transaction
+          </button>
+          <button id="modalButtonChooseDifferentAsset"
+                  class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+            Choose Different Asset
+          </button>
+        </div>
         <div class="mt-4 mx-auto bg-red-200 rounded-xl p-2 md:w-[600px] w-full">
           <div class="flex items-start gap-2">
             <svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -305,6 +440,40 @@
           Please ensure to select the correct network. Sending funds on the wrong
           network will result in a loss of your funds.
         </p>
+      </div>
+    </div>
+  </dialog>
+
+
+  <!--  Modal for popup flow -->
+  <dialog class="lg:w-2/3 w-full" id="modalCancelTransaction"
+          aria-labelledby="modalCancelTransactionTitle"
+          aria-modal="true">
+    <div class="modal-body w-full">
+      <svg class="mx-auto mt-12 block" width="92" height="92" viewBox="0 0 92 92" fill="none"
+           xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M83.2983 69.0001L52.6316 15.3334C51.963 14.1535 50.9933 13.1721 49.8215 12.4893C48.6497 11.8065 47.3178 11.4468 45.9616 11.4468C44.6055 11.4468 43.2735 11.8065 42.1018 12.4893C40.93 13.1721 39.9603 14.1535 39.2916 15.3334L8.62497 69.0001C7.94909 70.1706 7.59468 71.499 7.59768 72.8507C7.60067 74.2023 7.96096 75.5292 8.64202 76.6967C9.32308 77.8642 10.3007 78.831 11.4758 79.4989C12.6509 80.1668 13.9817 80.5122 15.3333 80.5001H76.6666C78.0118 80.4987 79.3328 80.1434 80.4972 79.47C81.6616 78.7965 82.6283 77.8286 83.3003 76.6633C83.9722 75.4981 84.3258 74.1765 84.3254 72.8314C84.3251 71.4863 83.9709 70.165 83.2983 69.0001Z"
+          stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M46 34.5V49.8333" stroke="black" stroke-width="5" stroke-linecap="round"
+              stroke-linejoin="round" />
+        <path d="M46 65.1666H46.0383" stroke="black" stroke-width="5" stroke-linecap="round"
+              stroke-linejoin="round" />
+      </svg>
+      <div class="text-lg font-bold mt-4 text-center" id="modalCancelTransactionTitle">Cancel Transaction</div>
+      <div class="flex items-center justify-center w-full">
+        <p class="text-gray-500 max-w-xs text-center mt-6">Are you sure you would like to receive a
+          refund for the amount paid less gas fees?</p>
+      </div>
+      <div class="flex justify-center items-center gap-3 my-12">
+        <button id="modalButtonRejectCancelTransaction"
+                class="w-1/2 max-w-75 items-center rounded-md border border-neutral-400 bg-gray-100 px-12 py-2 text-sm font-semibold text-neutral-900 shadow-sm hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+          No, Go Back
+        </button>
+        <button id="modalButtonAcceptCancelTransaction"
+                class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+          Yes, Cancel
+        </button>
       </div>
     </div>
   </dialog>
