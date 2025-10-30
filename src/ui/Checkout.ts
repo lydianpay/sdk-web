@@ -3,6 +3,7 @@ import checkoutTemplate from './checkout-template.html?raw';
 import {
   Asset,
   CreateTransactionResponse,
+  CryptoTransaction,
   currencies,
   GetSDKConfigResponse,
   InitOptions,
@@ -77,6 +78,7 @@ import {
   BaseUrlDev,
   BaseUrlProduction,
   BaseUrlSandbox,
+  CryptoTransactionStatusPending,
   CryptoTransactionStatusSuccess,
   NetworkAptos,
   NetworkArbitrum,
@@ -109,7 +111,14 @@ import AssetButton from './buttons/assetButton';
 import NetworkButton from './buttons/networkButton';
 
 import { WalletConnectService } from '../services/walletConnectService';
-import { capitalizeFirstLetter, parseQrCodeData } from '../utils';
+import {
+  capitalizeFirstLetter,
+  convertAmountToUSDT,
+  convertCryptoToUSDT,
+  formatCurrency,
+  formatDateForTransactionDetails,
+  parseQrCodeData,
+} from '../utils';
 import { encodeEthereumUsdtTransfer } from '../types/tether';
 import { Address } from '../types/ethereum';
 import WalletButton from './buttons/walletButton';
@@ -215,6 +224,37 @@ export class Checkout extends HTMLElement {
   private modalButtonCopyAssetTotal: HTMLButtonElement | null = null;
   private modalButtonCopyWalletAddress: HTMLButtonElement | null = null;
 
+  private modalTransactionOverpaidAmountUSDTContainer: HTMLDivElement | null = null;
+  private modalTransactionReturnAmountUSDTContainer: HTMLDivElement | null = null;
+  private modalLydianID: HTMLSpanElement | null = null;
+  private modalTransactionAmount: HTMLSpanElement | null = null;
+  private modalTransactionAmountUSDT: HTMLSpanElement | null = null;
+  private modalTransactionTotalAmountUSDT: HTMLSpanElement | null = null;
+  private modalTransactionOverpaidAmountUSDT: HTMLSpanElement | null = null;
+  private modalTransactionGasFeesUSDT: HTMLSpanElement | null = null;
+  private modalTransactionReturnAmountUSDT: HTMLSpanElement | null = null;
+  private modalOverpaidWarning: HTMLDivElement | null = null;
+  private modalOverpaidLessThanGasFeesWarning: HTMLDivElement | null = null;
+
+  private modalUnderpaidWarning: HTMLDivElement | null = null;
+  private modalUnderpaidAmountsBlock: HTMLDivElement | null = null;
+  private modalTransactionAmountForUnderpaidWarning: HTMLSpanElement | null = null;
+  private modalTransactionAmountForUnderpaid: HTMLSpanElement | null = null;
+  private modalTransactionPaidAmountForUnderpaid: HTMLSpanElement | null = null;
+  private modalTransactionDetailsContainer: HTMLDivElement | null = null;
+  private modalTransactionDetailItemsContainer: HTMLDivElement | null = null;
+  private modalButtonTransactionDetails: HTMLButtonElement | null = null;
+
+  private modalUnderpaidButtonsContainer: HTMLDivElement | null = null;
+  private modalButtonCancelTransaction: HTMLButtonElement | null = null;
+  private modalButtonChooseDifferentAsset: HTMLButtonElement | null = null;
+
+  private modalCancelTransaction: HTMLDialogElement | null = null;
+  private modalButtonRejectCancelTransaction: HTMLButtonElement | null = null;
+  private modalButtonAcceptCancelTransaction: HTMLButtonElement | null = null;
+
+  private processingUnderpayment: boolean = false;
+
   private timeInterval: NodeJS.Timeout | null = null;
 
   constructor() {
@@ -280,6 +320,11 @@ export class Checkout extends HTMLElement {
       this.btnCryptoPayment?.classList.remove('hidden');
     }
 
+    this.modalButtonCancelTransaction?.classList.add('hidden');
+    if (this.sdkConfig?.cancelTransactionEnabled) {
+      this.modalButtonCancelTransaction?.classList.remove('hidden');
+    }
+
     this.lydianUsdtPaymentContainer?.classList.add('hidden');
 
     // Pay with crypto container initial state
@@ -304,9 +349,20 @@ export class Checkout extends HTMLElement {
 
     this.modalContainerCryptoPayment?.classList.add('hidden');
 
+    this.modalOverpaidWarning?.classList.add('hidden');
+    this.modalOverpaidLessThanGasFeesWarning?.classList.add('hidden');
+    this.modalTransactionOverpaidAmountUSDTContainer?.classList.add('hidden');
+    this.modalTransactionReturnAmountUSDTContainer?.classList.add('hidden');
+
+    this.modalUnderpaidWarning?.classList.add('hidden');
+    this.modalUnderpaidAmountsBlock?.classList.add('hidden');
+
+    this.modalUnderpaidButtonsContainer?.classList.add('hidden');
+
     if (this.modalTitle) {
       this.modalTitle.innerText = 'Select an Asset';
     }
+    this.modalBtnBack?.classList.remove('hidden');
 
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
@@ -486,7 +542,7 @@ export class Checkout extends HTMLElement {
         this.displayAssetTotal.innerText = assetTotal;
       }
       if (this.displayAdditionalCustomerFee && additionalCustomerFee > 0) {
-        this.displayAdditionalCustomerFee.innerText = additionalCustomerFeeString
+        this.displayAdditionalCustomerFee.innerText = additionalCustomerFeeString;
       }
       if (this.displayTransactionID) {
         this.displayTransactionID.innerText = transactionID;
@@ -560,6 +616,14 @@ export class Checkout extends HTMLElement {
       case 'trustwallet':
         centerImg = 'https://imagedelivery.net/PC9Gitw-w-Qpo5uwdjlmgw/327c5e87-ea96-4b84-aa1f-8f99c2c70f00/public';
         break;
+    }
+
+    // Clear Canvas
+    if (this.canvasQRCode) {
+      this.canvasQRCode.innerHTML = '';
+    }
+    if (this.modalCanvasQRCode) {
+      this.modalCanvasQRCode.innerHTML = '';
     }
 
     const qrCode = new QRCodeStyling({
@@ -684,6 +748,36 @@ export class Checkout extends HTMLElement {
     this.modalDisplayWalletAddress = this.shadowRoot?.getElementById('modalDisplayWalletAddress') as HTMLParagraphElement;
     this.modalButtonCopyAssetTotal = this.shadowRoot?.getElementById('modalButtonCopyAssetTotal') as HTMLButtonElement;
     this.modalButtonCopyWalletAddress = this.shadowRoot?.getElementById('modalButtonCopyWalletAddress') as HTMLButtonElement;
+
+    this.modalTransactionOverpaidAmountUSDTContainer = this.shadowRoot?.getElementById('modalTransactionOverpaidAmountUSDTContainer') as HTMLDivElement;
+    this.modalTransactionReturnAmountUSDTContainer = this.shadowRoot?.getElementById('modalTransactionReturnAmountUSDTContainer') as HTMLDivElement;
+    this.modalLydianID = this.shadowRoot?.getElementById('modalLydianID') as HTMLSpanElement;
+    this.modalTransactionAmount = this.shadowRoot?.getElementById('modalTransactionAmount') as HTMLSpanElement;
+    this.modalTransactionAmountUSDT = this.shadowRoot?.getElementById('modalTransactionAmountUSDT') as HTMLSpanElement;
+    this.modalTransactionTotalAmountUSDT = this.shadowRoot?.getElementById('modalTransactionTotalAmountUSDT') as HTMLSpanElement;
+    this.modalTransactionOverpaidAmountUSDT = this.shadowRoot?.getElementById('modalTransactionOverpaidAmountUSDT') as HTMLSpanElement;
+    this.modalTransactionGasFeesUSDT = this.shadowRoot?.getElementById('modalTransactionGasFeesUSDT') as HTMLSpanElement;
+    this.modalTransactionReturnAmountUSDT = this.shadowRoot?.getElementById('modalTransactionReturnAmountUSDT') as HTMLSpanElement;
+    this.modalOverpaidWarning = this.shadowRoot?.getElementById('modalOverpaidWarning') as HTMLDivElement;
+    this.modalOverpaidLessThanGasFeesWarning = this.shadowRoot?.getElementById('modalOverpaidLessThanGasFeesWarning') as HTMLDivElement;
+
+    this.modalUnderpaidWarning = this.shadowRoot?.getElementById('modalUnderpaidWarning') as HTMLDivElement;
+    this.modalUnderpaidAmountsBlock = this.shadowRoot?.getElementById('modalUnderpaidAmountsBlock') as HTMLDivElement;
+    this.modalTransactionAmountForUnderpaidWarning = this.shadowRoot?.getElementById('modalTransactionAmountForUnderpaidWarning') as HTMLSpanElement;
+    this.modalTransactionAmountForUnderpaid = this.shadowRoot?.getElementById('modalTransactionAmountForUnderpaid') as HTMLSpanElement;
+    this.modalTransactionPaidAmountForUnderpaid = this.shadowRoot?.getElementById('modalTransactionPaidAmountForUnderpaid') as HTMLSpanElement;
+
+    this.modalTransactionDetailsContainer = this.shadowRoot?.getElementById('modalTransactionDetailsContainer') as HTMLDivElement;
+    this.modalTransactionDetailItemsContainer = this.shadowRoot?.getElementById('modalTransactionDetailItemsContainer') as HTMLDivElement;
+    this.modalButtonTransactionDetails = this.shadowRoot?.getElementById('modalButtonTransactionDetails') as HTMLButtonElement;
+
+    this.modalUnderpaidButtonsContainer = this.shadowRoot?.getElementById('modalUnderpaidButtonsContainer') as HTMLDivElement;
+    this.modalButtonCancelTransaction = this.shadowRoot?.getElementById('modalButtonCancelTransaction') as HTMLButtonElement;
+    this.modalButtonChooseDifferentAsset = this.shadowRoot?.getElementById('modalButtonChooseDifferentAsset') as HTMLButtonElement;
+
+    this.modalCancelTransaction = this.shadowRoot?.getElementById('modalCancelTransaction') as HTMLDialogElement;
+    this.modalButtonRejectCancelTransaction = this.shadowRoot?.getElementById('modalButtonRejectCancelTransaction') as HTMLButtonElement;
+    this.modalButtonAcceptCancelTransaction = this.shadowRoot?.getElementById('modalButtonAcceptCancelTransaction') as HTMLButtonElement;
   }
 
   private attachListeners(): void {
@@ -758,6 +852,47 @@ export class Checkout extends HTMLElement {
       const asset = this.modalDisplayWalletAddress?.innerText ?? '';
       navigator.clipboard.writeText(asset);
     });
+
+    this.modalButtonTransactionDetails?.addEventListener('click', () => {
+      this.modalTransactionDetailsContainer?.classList.toggle('hidden');
+    });
+
+    this.modalButtonCancelTransaction?.addEventListener('click', () => {
+      this.modalCancelTransaction?.showModal();
+    });
+
+    this.modalButtonChooseDifferentAsset?.addEventListener('click', () => {
+      this.clearInterval();
+      if (this.timeInterval) {
+        clearInterval(this.timeInterval);
+        this.timeInterval = null;
+        if (this.displayExpirationLeft?.innerHTML) this.displayExpirationLeft.innerHTML = '15:00';
+        if (this.modalDisplayExpirationLeft?.innerHTML) this.modalDisplayExpirationLeft.innerHTML = '15:00';
+      }
+      if (this.modalTitle) {
+        this.modalTitle.innerText = 'Select an Asset';
+      }
+      this.modalContainerCryptoPayment?.classList.remove('hidden');
+      // requestAnimationFrame was added because when a block of item was hidden that contained the button, the whole modal was closing.
+      requestAnimationFrame(() => this.modalContainerQRCode?.classList.add('hidden'));
+    });
+
+    this.modalButtonRejectCancelTransaction?.addEventListener('click', () => {
+      this.modalCancelTransaction?.close();
+    });
+
+    this.modalButtonAcceptCancelTransaction?.addEventListener('click', () => {
+      if (this.cryptoTransaction?.transactionId && this.API) {
+        this.API.cancelCryptoTransaction(this.cryptoTransaction?.transactionId, {
+          reason: 'Cancelled from the SDK',
+        });
+      }
+      this.modalCancelTransaction?.close();
+      this.modal?.close();
+      this.cryptoTransaction = null;
+      this.loadInitialState();
+      this.initOptions?.paymentCanceledListener();
+    });
   }
 
   private async createCryptoTransaction() {
@@ -794,14 +929,109 @@ export class Checkout extends HTMLElement {
       if (this.cryptoTransaction?.transactionId) {
         const transaction = await this.API?.getCryptoTransaction(this.cryptoTransaction?.transactionId);
         if (transaction) {
-          if (transaction.status === CryptoTransactionStatusSuccess) {
+          let gasFeesUSDT = 0.0;
+          let completedCryptoTransactions: CryptoTransaction[] = [];
+          let hasPendingCryptoTransaction = false;
+          for (const [id, tx] of Object.entries(transaction.cryptoTransactions)) {
+            const txExpirationDateTime = Date.parse(tx.expiration);
+            const txCurrentDateTime = Date.now();
+            if (tx.status === CryptoTransactionStatusSuccess) {
+              gasFeesUSDT -= convertCryptoToUSDT(tx.gasFee, tx.cryptoAsset);
+              completedCryptoTransactions.push(tx);
+            } else if (tx.status === CryptoTransactionStatusPending && txExpirationDateTime >= txCurrentDateTime) {
+              hasPendingCryptoTransaction = true;
+            }
+          }
+
+          const transactionAmountUSDT = convertAmountToUSDT(transaction.amount, transaction.amountCurrency);
+          const paidAmountUSDT = convertAmountToUSDT(transaction.amount - transaction.remainingBalance, transaction.amountCurrency);
+          const overpaidAmountUSDT = +(paidAmountUSDT - transactionAmountUSDT).toFixed(2);
+          const returnAmountUSDT = +(overpaidAmountUSDT + gasFeesUSDT).toFixed(2);
+
+          this.modalLydianID!.innerText = transaction.transactionID;
+          this.modalTransactionAmount!.innerText = formatCurrency(transaction.amount);
+          this.modalTransactionAmountUSDT!.innerText = transactionAmountUSDT.toString();
+          this.modalTransactionTotalAmountUSDT!.innerText = paidAmountUSDT.toString();
+          this.modalTransactionGasFeesUSDT!.innerText = gasFeesUSDT.toString();
+          this.modalTransactionOverpaidAmountUSDT!.innerText = overpaidAmountUSDT.toString();
+          this.modalTransactionReturnAmountUSDT!.innerText = returnAmountUSDT.toString();
+          this.modalTransactionAmountForUnderpaidWarning!.innerText = formatCurrency(transaction.amount, transaction.amountCurrency);
+          this.modalTransactionAmountForUnderpaid!.innerText = formatCurrency(transaction.amount, transaction.amountCurrency);
+          this.modalTransactionPaidAmountForUnderpaid!.innerText = formatCurrency(transaction.amount - transaction.remainingBalance, transaction.amountCurrency);
+
+          if (this.modalTransactionDetailItemsContainer) {
+            this.modalTransactionDetailItemsContainer!.innerHTML = '';
+            completedCryptoTransactions.forEach(cryptoTransaction => {
+              this.modalTransactionDetailItemsContainer!.innerHTML += `
+                <div class="flex items-bottom justify-between mt-2">
+                  <div class="flex flex-col">
+                    <p class="font-bold">${formatDateForTransactionDetails(cryptoTransaction.createdAt)}</p>
+                  </div>
+                  <span class="mb-1.5 grow mx-1 border-b border-dotted border-neutral-400"></span>
+                  <div class="flex flex-col text-right">
+                    <p><span class="font-bold">${formatCurrency(cryptoTransaction.amount, transaction.amountCurrency)} ${cryptoTransaction.cryptoAsset}</span> on ${cryptoTransaction.cryptoNetwork}</p>
+                  </div>
+                </div>
+              `;
+            });
+          }
+
+          let transactionCompleted = false;
+          let insufficientAmount = false;
+
+          if (paidAmountUSDT === transactionAmountUSDT || transaction.status === CryptoTransactionStatusSuccess) {
+            transactionCompleted = true;
+          } else if (returnAmountUSDT > 0) {
+            this.modalTransactionOverpaidAmountUSDTContainer?.classList.remove('hidden');
+            this.modalOverpaidWarning?.classList.remove('hidden');
+            this.modalTransactionReturnAmountUSDTContainer?.classList.remove('hidden');
+            transactionCompleted = true;
+          } else if (paidAmountUSDT > transactionAmountUSDT) {
+            this.modalTransactionOverpaidAmountUSDTContainer?.classList.remove('hidden');
+            this.modalOverpaidLessThanGasFeesWarning?.classList?.remove('hidden');
+            transactionCompleted = true;
+          } else if (completedCryptoTransactions.length > 0 && paidAmountUSDT < transactionAmountUSDT) {
+            insufficientAmount = true;
+            this.processingUnderpayment = true;
+          }
+
+          const expirationDateTime = Date.parse(transaction.expiration);
+          const currentDateTime = Date.now();
+
+          if (transactionCompleted) {
             this.showPaymentSuccess();
             this.clearInterval();
             this.initOptions?.paymentSuccessListener?.();
-          }
-          const expirationDateTime = Date.parse(transaction.expiration);
-          const currentDateTime = Date.now();
-          if (expirationDateTime < currentDateTime) {
+          } else if (!this.initOptions?.isEmbedded && insufficientAmount && this.API) {
+            // TODO: Implement it for embedded UI,
+            // TODO: UI for overpayment should also be updated for the embedded UI.
+            try {
+              if (this.selectedAsset && this.selectedNetwork) {
+                if (!hasPendingCryptoTransaction) {
+                  if (this.timeInterval) {
+                    clearInterval(this.timeInterval);
+                    this.timeInterval = null;
+                    if (this.displayExpirationLeft?.innerHTML) this.displayExpirationLeft.innerHTML = '15:00';
+                    if (this.modalDisplayExpirationLeft?.innerHTML) this.modalDisplayExpirationLeft.innerHTML = '15:00';
+                  }
+                  await this.beginWalletConnectTransaction();
+                }
+                this.modalUnderpaidWarning?.classList.remove('hidden');
+                this.modalUnderpaidAmountsBlock?.classList.remove('hidden');
+                this.modalUnderpaidButtonsContainer?.classList.remove('hidden');
+                if (this.modalTitle) {
+                  this.modalTitle.innerText = 'Pay Remaining Balance';
+                }
+                this.modalBtnBack?.classList.add('hidden');
+                // this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
+              } else {
+                this.loadInitialState();
+              }
+            } catch (error) {
+              console.log('error', error);
+              this.initOptions?.paymentFailedListener?.('Unable to collect underpaid amount.');
+            }
+          } else if (expirationDateTime < currentDateTime) {
             this.showPaymentFailure();
             this.clearInterval();
             this.initOptions?.paymentFailedListener?.('Transaction Timed Out / Failed!');
@@ -835,6 +1065,7 @@ export class Checkout extends HTMLElement {
   }
 
   private clearInterval() {
+    console.log('Clear interval called...');
     if (this.getCryptoTransactionIntervalID) {
       clearInterval(this.getCryptoTransactionIntervalID);
       this.getCryptoTransactionIntervalID = null;
@@ -929,7 +1160,7 @@ export class Checkout extends HTMLElement {
           }
         } else {
           this.setSelectedNetwork(asset.networks[0]);
-          this.showWalletConnectButtons();
+          await this.showWalletConnectButtons();
         }
       });
     });
@@ -1074,7 +1305,7 @@ export class Checkout extends HTMLElement {
       const networkBtn = this.shadowRoot?.getElementById('btnNetwork' + networkCode) as HTMLButtonElement;
       networkBtn?.addEventListener('click', async () => {
         this.setSelectedNetwork(networkCode);
-        this.showWalletConnectButtons();
+        await this.showWalletConnectButtons();
       });
     });
 
@@ -1120,7 +1351,7 @@ export class Checkout extends HTMLElement {
 
     if (!this.sdkConfig?.walletConnectEnabled) {
       this.setSelectedWallet(manualQrButton);
-      this.beginWalletConnectTransaction();
+      await this.beginWalletConnectTransaction();
       this.lydianBtnCancelWalletConnect?.addEventListener('click', async () => {
         this.loadInitialState();
       });
@@ -1170,7 +1401,7 @@ export class Checkout extends HTMLElement {
       const walletBtn = this.shadowRoot?.getElementById('btnWallet' + wallet.id) as HTMLButtonElement;
       walletBtn?.addEventListener('click', async () => {
         this.setSelectedWallet(wallet);
-        this.beginWalletConnectTransaction();
+        await this.beginWalletConnectTransaction();
       });
     });
 
@@ -1198,14 +1429,21 @@ export class Checkout extends HTMLElement {
     this.showProcessing('Generating QR Code');
 
     try {
-      this.cryptoTransaction = await this.API.createCryptoTransaction({
-        descriptor: this.initOptions.transaction.descriptor,
-        referenceNumber: this.initOptions.transaction.referenceNumber,
-        amount: this.initOptions.transaction.amount,
-        amountCurrency: this.initOptions.transaction.currency,
-        asset: this.selectedAsset.code,
-        network: this.selectedNetwork,
-      });
+      if (!this.processingUnderpayment || !this.cryptoTransaction?.transactionId) {
+        this.cryptoTransaction = await this.API.createCryptoTransaction({
+          descriptor: this.initOptions.transaction.descriptor,
+          referenceNumber: this.initOptions.transaction.referenceNumber,
+          amount: this.initOptions.transaction.amount,
+          amountCurrency: this.initOptions.transaction.currency,
+          asset: this.selectedAsset.code,
+          network: this.selectedNetwork,
+        });
+      } else {
+        this.cryptoTransaction = await this.API.collectCryptoTransaction(this.cryptoTransaction.transactionId, {
+          asset: this.selectedAsset.code,
+          network: this.selectedNetwork,
+        });
+      }
       console.log('transaction', this.cryptoTransaction);
 
       this.hideProcessing();

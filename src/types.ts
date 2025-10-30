@@ -19,6 +19,7 @@ export type InitOptions = {
   transaction: Transaction;
   paymentFailedListener: (failureMessage: string) => void;
   paymentSuccessListener: () => void;
+  paymentCanceledListener: () => void;
   isEmbedded?: boolean;
 };
 
@@ -39,9 +40,35 @@ export type CreateTransactionResponse = {
   address: string;
 };
 
+export type CollectTransactionRequest = {
+  asset: string;
+  network: string;
+};
+
+export type CancelTransactionRequest = {
+  reason: string;
+};
+
 export type GetTransactionResponse = {
   expiration: string;
   status: number;
+  transactionID: string;
+  amount: number;
+  amountCurrency: string;
+  remainingBalance: number;
+  cryptoTransactions: Record<string, CryptoTransaction>;
+}
+
+// TODO: If total gas fee is later added into the transaction modal,
+// TODO: we don't need to calculate gasFees from the cryptoTransactions.
+export type CryptoTransaction = {
+  amount: number;
+  gasFee: number;
+  cryptoAsset: string;
+  cryptoNetwork: string;
+  createdAt: string;
+  status: number;
+  expiration: string;
 }
 
 export type Asset = {
@@ -71,4 +98,5 @@ export type GetSDKConfigResponse = {
   lydianPayCluster: string;
   allowedAssets: Asset[];
   walletConnectEnabled: boolean;
+  cancelTransactionEnabled: boolean;
 }
