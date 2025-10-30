@@ -253,6 +253,8 @@ export class Checkout extends HTMLElement {
   private modalButtonRejectCancelTransaction: HTMLButtonElement | null = null;
   private modalButtonAcceptCancelTransaction: HTMLButtonElement | null = null;
 
+  private modalButtonNeedHelp: HTMLAnchorElement | null = null;
+
   private processingUnderpayment: boolean = false;
 
   private timeInterval: NodeJS.Timeout | null = null;
@@ -363,6 +365,16 @@ export class Checkout extends HTMLElement {
       this.modalTitle.innerText = 'Select an Asset';
     }
     this.modalBtnBack?.classList.remove('hidden');
+
+    this.modalButtonNeedHelp?.classList.add('hidden');
+    if (this.modalButtonNeedHelp && this.sdkConfig?.support && (this.sdkConfig?.support.email || this.sdkConfig?.support.link)) {
+      this.modalButtonNeedHelp?.classList.remove('hidden');
+      if (this.sdkConfig?.support.link) {
+        this.modalButtonNeedHelp.href = this.sdkConfig?.support.link;
+      } else {
+        this.modalButtonNeedHelp.href = 'mailto:' + this.sdkConfig?.support.email;
+      }
+    }
 
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
@@ -778,6 +790,8 @@ export class Checkout extends HTMLElement {
     this.modalCancelTransaction = this.shadowRoot?.getElementById('modalCancelTransaction') as HTMLDialogElement;
     this.modalButtonRejectCancelTransaction = this.shadowRoot?.getElementById('modalButtonRejectCancelTransaction') as HTMLButtonElement;
     this.modalButtonAcceptCancelTransaction = this.shadowRoot?.getElementById('modalButtonAcceptCancelTransaction') as HTMLButtonElement;
+
+    this.modalButtonNeedHelp = this.shadowRoot?.getElementById('modalButtonNeedHelp') as HTMLAnchorElement;
   }
 
   private attachListeners(): void {
