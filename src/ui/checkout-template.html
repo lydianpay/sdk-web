@@ -168,7 +168,7 @@
           <button class="close-btn" id="modalBtnBack" type="button" aria-label="Back">←</button>
           <div class="text-lg font-medium" id="modalTitle">Select an Asset</div>
         </div>
-        <a id="modalButtonNeedHelp" class=" hidden text-gray-500" href="https://lydian.com/about.html#contactForm" target="_blank">Need Help?</a>
+        <a id="modalHeaderButtonNeedHelp" class="hidden text-gray-500" href="#" target="_blank">Need Help?</a>
       </div>
     </div>
     <div class="modal-body">
@@ -193,7 +193,8 @@
             </svg>
             <p class="text-red-900">You transferred more USDt than required for this
               purchase. The excess amount will be returned to you within 24 hours, minus any applicable gas fees. <a
-                href="https://lydian.com/about.html#contactForm" target="_blank">Need help?</a></p>
+                id="modalTransactionCompleteButtonNeedHelp" class="hidden" href="#" target="_blank">Need help?</a>
+            </p>
           </div>
         </div>
         <div id="modalOverpaidLessThanGasFeesWarning"
@@ -206,7 +207,8 @@
             </svg>
             <p class="text-red-900">You transferred more USDT than required for this purchase. However, the excess
               amount is less than the gas fee, so we are unable to return it. <a
-                href="https://lydian.com/about.html#contactForm" target="_blank">Need help?</a></p>
+                id="modalOverpaidButtonNeedHelp" class="hidden" href="#" target="_blank">Need help?</a>
+            </p>
           </div>
         </div>
         <div class="flex flex-col justify-center items-center w-full">
@@ -253,8 +255,9 @@
             </svg>
             <p class="text-red-900">You haven’t transferred enough USDt to complete this <span
               id="modalTransactionAmountForUnderpaidWarning">$9</span> purchase. Please scan the new QR code
-              below to send the remaining balance.<a href="https://lydian.com/about.html#contactForm"
-                                                     target="_blank">Need help?</a></p>
+              below to send the remaining balance.<a href="#" id="modalUnderpaidButtonNeedHelp" class="hidden"
+                                                     target="_blank">Need help?</a>
+            </p>
           </div>
         </div>
         <div id="modalUnderpaidAmountsBlock"
@@ -444,8 +447,7 @@
     </div>
   </dialog>
 
-
-  <!--  Modal for popup flow -->
+  <!--  Modal for cancel transaction -->
   <dialog class="lg:w-2/3 w-full" id="modalCancelTransaction"
           aria-labelledby="modalCancelTransactionTitle"
           aria-modal="true">
@@ -473,6 +475,39 @@
         <button id="modalButtonAcceptCancelTransaction"
                 class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
           Yes, Cancel
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!--  Modal for close transaction modal -->
+  <dialog class="lg:w-2/3 w-full" id="modalCloseTransactionModal"
+          aria-labelledby="modalCloseTransactionModalTitle"
+          aria-modal="true">
+    <div class="modal-body w-full">
+      <svg class="mx-auto mt-12 block" width="92" height="92" viewBox="0 0 92 92" fill="none"
+           xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M83.2983 69.0001L52.6316 15.3334C51.963 14.1535 50.9933 13.1721 49.8215 12.4893C48.6497 11.8065 47.3178 11.4468 45.9616 11.4468C44.6055 11.4468 43.2735 11.8065 42.1018 12.4893C40.93 13.1721 39.9603 14.1535 39.2916 15.3334L8.62497 69.0001C7.94909 70.1706 7.59468 71.499 7.59768 72.8507C7.60067 74.2023 7.96096 75.5292 8.64202 76.6967C9.32308 77.8642 10.3007 78.831 11.4758 79.4989C12.6509 80.1668 13.9817 80.5122 15.3333 80.5001H76.6666C78.0118 80.4987 79.3328 80.1434 80.4972 79.47C81.6616 78.7965 82.6283 77.8286 83.3003 76.6633C83.9722 75.4981 84.3258 74.1765 84.3254 72.8314C84.3251 71.4863 83.9709 70.165 83.2983 69.0001Z"
+          stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M46 34.5V49.8333" stroke="black" stroke-width="5" stroke-linecap="round"
+              stroke-linejoin="round" />
+        <path d="M46 65.1666H46.0383" stroke="black" stroke-width="5" stroke-linecap="round"
+              stroke-linejoin="round" />
+      </svg>
+      <div class="text-lg font-bold mt-4 text-center" id="modalCloseTransactionModalTitle">Are you sure?</div>
+      <div class="flex items-center justify-center w-full">
+        <p id="modalCloseTransactionModalDescription" class="text-gray-500 max-w-xs text-center mt-6">Are you sure you
+          want to close this modal? If you continue, you will loose any progress you have made.</p>
+      </div>
+      <div class="flex justify-center items-center gap-3 my-12">
+        <button id="modalButtonAcceptTransactionModalClose"
+                class="w-1/2 max-w-75 items-center rounded-md border text-red-800 border-red-800 bg-gray-100 px-12 py-2 text-sm font-semibold  shadow-sm hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+          Close
+        </button>
+        <button id="modalButtonRejectTransactionModalClose"
+                class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+          Go Back to Transaction
         </button>
       </div>
     </div>
