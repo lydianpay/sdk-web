@@ -253,6 +253,16 @@ export class Checkout extends HTMLElement {
   private modalButtonRejectCancelTransaction: HTMLButtonElement | null = null;
   private modalButtonAcceptCancelTransaction: HTMLButtonElement | null = null;
 
+  private modalHeaderButtonNeedHelp: HTMLAnchorElement | null = null;
+  private modalTransactionCompleteButtonNeedHelp: HTMLAnchorElement | null = null;
+  private modalOverpaidButtonNeedHelp: HTMLAnchorElement | null = null;
+  private modalUnderpaidButtonNeedHelp: HTMLAnchorElement | null = null;
+
+  private modalCloseTransactionModal: HTMLDialogElement | null = null;
+  private modalButtonAcceptTransactionModalClose: HTMLButtonElement | null = null;
+  private modalButtonRejectTransactionModalClose: HTMLButtonElement | null = null;
+  private modalCloseTransactionModalDescription: HTMLParagraphElement | null = null;
+
   private processingUnderpayment: boolean = false;
 
   private timeInterval: NodeJS.Timeout | null = null;
@@ -363,6 +373,40 @@ export class Checkout extends HTMLElement {
       this.modalTitle.innerText = 'Select an Asset';
     }
     this.modalBtnBack?.classList.remove('hidden');
+
+    this.modalHeaderButtonNeedHelp?.classList.add('hidden');
+    this.modalTransactionCompleteButtonNeedHelp?.classList.add('hidden');
+    this.modalOverpaidButtonNeedHelp?.classList.add('hidden');
+    this.modalUnderpaidButtonNeedHelp?.classList.add('hidden');
+
+    if (this.sdkConfig?.support && (this.sdkConfig?.support.email || this.sdkConfig?.support.link)) {
+      this.modalHeaderButtonNeedHelp?.classList.remove('hidden');
+      this.modalTransactionCompleteButtonNeedHelp?.classList.remove('hidden');
+      this.modalOverpaidButtonNeedHelp?.classList.remove('hidden');
+      this.modalUnderpaidButtonNeedHelp?.classList.remove('hidden');
+
+      if (this.modalHeaderButtonNeedHelp) {
+        this.modalHeaderButtonNeedHelp.href = this.sdkConfig?.support.link ? this.sdkConfig?.support.link : `mailto: ${this.sdkConfig?.support.email}`;
+      }
+      if (this.modalTransactionCompleteButtonNeedHelp) {
+        this.modalTransactionCompleteButtonNeedHelp.href = this.sdkConfig?.support.link ? this.sdkConfig?.support.link : `mailto: ${this.sdkConfig?.support.email}`;
+      }
+      if (this.modalOverpaidButtonNeedHelp) {
+        this.modalOverpaidButtonNeedHelp.href = this.sdkConfig?.support.link ? this.sdkConfig?.support.link : `mailto: ${this.sdkConfig?.support.email}`;
+      }
+      if (this.modalUnderpaidButtonNeedHelp) {
+        this.modalUnderpaidButtonNeedHelp.href = this.sdkConfig?.support.link ? this.sdkConfig?.support.link : `mailto: ${this.sdkConfig?.support.email}`;
+      }
+    }
+
+    if (this.modalButtonAcceptTransactionModalClose) {
+      this.modalButtonAcceptTransactionModalClose.innerText = 'Close';
+    }
+    if (this.modalCloseTransactionModalDescription) {
+      this.modalCloseTransactionModalDescription.innerText = 'Are you sure you want to close this modal? If you continue, you will loose any progress you have made.';
+    }
+
+    this.cryptoTransaction = null;
 
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
@@ -778,6 +822,16 @@ export class Checkout extends HTMLElement {
     this.modalCancelTransaction = this.shadowRoot?.getElementById('modalCancelTransaction') as HTMLDialogElement;
     this.modalButtonRejectCancelTransaction = this.shadowRoot?.getElementById('modalButtonRejectCancelTransaction') as HTMLButtonElement;
     this.modalButtonAcceptCancelTransaction = this.shadowRoot?.getElementById('modalButtonAcceptCancelTransaction') as HTMLButtonElement;
+
+    this.modalHeaderButtonNeedHelp = this.shadowRoot?.getElementById('modalHeaderButtonNeedHelp') as HTMLAnchorElement;
+    this.modalTransactionCompleteButtonNeedHelp = this.shadowRoot?.getElementById('modalTransactionCompleteButtonNeedHelp') as HTMLAnchorElement;
+    this.modalOverpaidButtonNeedHelp = this.shadowRoot?.getElementById('modalOverpaidButtonNeedHelp') as HTMLAnchorElement;
+    this.modalUnderpaidButtonNeedHelp = this.shadowRoot?.getElementById('modalUnderpaidButtonNeedHelp') as HTMLAnchorElement;
+
+    this.modalCloseTransactionModal = this.shadowRoot?.getElementById('modalCloseTransactionModal') as HTMLDialogElement;
+    this.modalButtonAcceptTransactionModalClose = this.shadowRoot?.getElementById('modalButtonAcceptTransactionModalClose') as HTMLButtonElement;
+    this.modalButtonRejectTransactionModalClose = this.shadowRoot?.getElementById('modalButtonRejectTransactionModalClose') as HTMLButtonElement;
+    this.modalCloseTransactionModalDescription = this.shadowRoot?.getElementById('modalCloseTransactionModalDescription') as HTMLParagraphElement;
   }
 
   private attachListeners(): void {
@@ -796,8 +850,28 @@ export class Checkout extends HTMLElement {
     });
 
     this.modalBtnBack?.addEventListener('click', () => {
+      if (this.modalContainerPaymentSuccess?.classList.contains('hidden')) {
+        this.modalCloseTransactionModal?.showModal();
+      } else {
+        this.modal?.close();
+        this.loadInitialState();
+      }
+    });
+
+    this.modalButtonAcceptTransactionModalClose?.addEventListener('click', () => {
+      if (this.cryptoTransaction?.transactionId && this.API) {
+        this.API.cancelCryptoTransaction(this.cryptoTransaction?.transactionId, {
+          reason: 'Cancelled from the SDK',
+        });
+      }
+      this.modalCloseTransactionModal?.close();
       this.modal?.close();
       this.loadInitialState();
+      this.initOptions?.paymentCanceledListener();
+    });
+
+    this.modalButtonRejectTransactionModalClose?.addEventListener('click', () => {
+      this.modalCloseTransactionModal?.close();
     });
 
     // Optional: click outside the dialog box to close (when not full-screen)
@@ -812,8 +886,12 @@ export class Checkout extends HTMLElement {
           e.clientY <= r.bottom;
       }
       if (!inDialog) {
-        this.modal?.close();
-        this.loadInitialState();
+        if (this.modalContainerPaymentSuccess?.classList.contains('hidden')) {
+          this.modalCloseTransactionModal?.showModal();
+        } else {
+          this.modal?.close();
+          this.loadInitialState();
+        }
       }
     });
 
@@ -1023,7 +1101,14 @@ export class Checkout extends HTMLElement {
                   this.modalTitle.innerText = 'Pay Remaining Balance';
                 }
                 this.modalBtnBack?.classList.add('hidden');
-                // this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
+                if (this.sdkConfig?.cancelTransactionEnabled) {
+                  if (this.modalButtonAcceptTransactionModalClose) {
+                    this.modalButtonAcceptTransactionModalClose.innerText = 'Close and Forfeit Funds';
+                  }
+                  if (this.modalCloseTransactionModalDescription) {
+                    this.modalCloseTransactionModalDescription.innerText = `Are you sure you want to close this modal? If you continue, you will forfeit the ${paidAmountUSDT} USDT already transferred, and your order will not be placed.`;
+                  }
+                }
               } else {
                 this.loadInitialState();
               }

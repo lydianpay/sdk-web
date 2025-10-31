@@ -92,6 +92,11 @@ export type WalletConnectWallet = {
   wcPeerName?: string;
 }
 
+export type Support  = {
+  email: string;
+  link: string;
+}
+
 export type GetSDKConfigResponse = {
   appPayEnabled: boolean;
   cryptoPayEnabled: boolean;
@@ -99,4 +104,5 @@ export type GetSDKConfigResponse = {
   allowedAssets: Asset[];
   walletConnectEnabled: boolean;
   cancelTransactionEnabled: boolean;
+  support: Support;
 }
