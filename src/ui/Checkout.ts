@@ -849,7 +849,9 @@ export class Checkout extends HTMLElement {
       }
     });
 
-    this.modalBtnBack?.addEventListener('click', () => {
+    this.modalBtnBack?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (this.modalContainerPaymentSuccess?.classList.contains('hidden')) {
         this.modalCloseTransactionModal?.showModal();
       } else {
@@ -859,15 +861,9 @@ export class Checkout extends HTMLElement {
     });
 
     this.modalButtonAcceptTransactionModalClose?.addEventListener('click', () => {
-      if (this.cryptoTransaction?.transactionId && this.API) {
-        this.API.cancelCryptoTransaction(this.cryptoTransaction?.transactionId, {
-          reason: 'Cancelled from the SDK',
-        });
-      }
       this.modalCloseTransactionModal?.close();
       this.modal?.close();
       this.loadInitialState();
-      this.initOptions?.paymentCanceledListener();
     });
 
     this.modalButtonRejectTransactionModalClose?.addEventListener('click', () => {
@@ -1057,9 +1053,7 @@ export class Checkout extends HTMLElement {
           let transactionCompleted = false;
           let insufficientAmount = false;
 
-          if (paidAmountUSDT === transactionAmountUSDT || transaction.status === CryptoTransactionStatusSuccess) {
-            transactionCompleted = true;
-          } else if (returnAmountUSDT > 0) {
+          if (returnAmountUSDT > 0) {
             this.modalTransactionOverpaidAmountUSDTContainer?.classList.remove('hidden');
             this.modalOverpaidWarning?.classList.remove('hidden');
             this.modalTransactionReturnAmountUSDTContainer?.classList.remove('hidden');
@@ -1071,14 +1065,16 @@ export class Checkout extends HTMLElement {
           } else if (completedCryptoTransactions.length > 0 && paidAmountUSDT < transactionAmountUSDT) {
             insufficientAmount = true;
             this.processingUnderpayment = true;
+          } else if (paidAmountUSDT === transactionAmountUSDT && transaction.status === CryptoTransactionStatusSuccess) {
+            transactionCompleted = true;
           }
 
           const expirationDateTime = Date.parse(transaction.expiration);
           const currentDateTime = Date.now();
 
           if (transactionCompleted) {
-            this.showPaymentSuccess();
             this.clearInterval();
+            this.showPaymentSuccess();
             this.initOptions?.paymentSuccessListener?.();
           } else if (!this.initOptions?.isEmbedded && insufficientAmount && this.API) {
             // TODO: Implement it for embedded UI,
@@ -1086,6 +1082,7 @@ export class Checkout extends HTMLElement {
             try {
               if (this.selectedAsset && this.selectedNetwork) {
                 if (!hasPendingCryptoTransaction) {
+                  this.clearInterval();
                   if (this.timeInterval) {
                     clearInterval(this.timeInterval);
                     this.timeInterval = null;
