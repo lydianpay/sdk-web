@@ -231,7 +231,6 @@ export class Checkout extends HTMLElement {
   private modalTransactionAmountUSDT: HTMLSpanElement | null = null;
   private modalTransactionTotalAmountUSDT: HTMLSpanElement | null = null;
   private modalTransactionOverpaidAmountUSDT: HTMLSpanElement | null = null;
-  private modalTransactionGasFeesUSDT: HTMLSpanElement | null = null;
   private modalTransactionReturnAmountUSDT: HTMLSpanElement | null = null;
   private modalOverpaidWarning: HTMLDivElement | null = null;
   private modalOverpaidLessThanGasFeesWarning: HTMLDivElement | null = null;
@@ -800,7 +799,6 @@ export class Checkout extends HTMLElement {
     this.modalTransactionAmountUSDT = this.shadowRoot?.getElementById('modalTransactionAmountUSDT') as HTMLSpanElement;
     this.modalTransactionTotalAmountUSDT = this.shadowRoot?.getElementById('modalTransactionTotalAmountUSDT') as HTMLSpanElement;
     this.modalTransactionOverpaidAmountUSDT = this.shadowRoot?.getElementById('modalTransactionOverpaidAmountUSDT') as HTMLSpanElement;
-    this.modalTransactionGasFeesUSDT = this.shadowRoot?.getElementById('modalTransactionGasFeesUSDT') as HTMLSpanElement;
     this.modalTransactionReturnAmountUSDT = this.shadowRoot?.getElementById('modalTransactionReturnAmountUSDT') as HTMLSpanElement;
     this.modalOverpaidWarning = this.shadowRoot?.getElementById('modalOverpaidWarning') as HTMLDivElement;
     this.modalOverpaidLessThanGasFeesWarning = this.shadowRoot?.getElementById('modalOverpaidLessThanGasFeesWarning') as HTMLDivElement;
@@ -1026,7 +1024,6 @@ export class Checkout extends HTMLElement {
           this.modalTransactionAmount!.innerText = formatCurrency(transaction.amount);
           this.modalTransactionAmountUSDT!.innerText = transactionAmountUSDT.toString();
           this.modalTransactionTotalAmountUSDT!.innerText = paidAmountUSDT.toString();
-          this.modalTransactionGasFeesUSDT!.innerText = gasFeesUSDT.toString();
           this.modalTransactionOverpaidAmountUSDT!.innerText = overpaidAmountUSDT.toString();
           this.modalTransactionReturnAmountUSDT!.innerText = returnAmountUSDT.toString();
           this.modalTransactionAmountForUnderpaidWarning!.innerText = formatCurrency(transaction.amount, transaction.amountCurrency);

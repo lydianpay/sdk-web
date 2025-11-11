@@ -229,10 +229,6 @@
             <p class="font-bold">Over Payment Amount</p>
             <p><span id="modalTransactionOverpaidAmountUSDT">10</span> USDt</p>
           </div>
-          <div class="flex flex-row justify-between w-full mt-2">
-            <p class="font-bold">Gas Fees</p>
-            <p><span id="modalTransactionGasFeesUSDT">1.50</span> USDt</p>
-          </div>
           <div id="modalTransactionReturnAmountUSDTContainer" class="flex flex-row justify-between w-full mt-2 hidden">
             <p class="text-green-600 font-bold">Amount to be Returned</p>
             <p class="text-green-600 font-bold"><span id="modalTransactionReturnAmountUSDT">9.50</span> USDt</p>
@@ -272,7 +268,7 @@
               <p>
                 <span id="modalTransactionPaidAmountForUnderpaid">$8</span>
                 <button id="modalButtonTransactionDetails"
-                        class="rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        class="rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100"
                         aria-label="Transaction Details">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_12225_39810)">
@@ -328,7 +324,7 @@
               <p class="text-4xl font-bold"><span id="modalDisplayAssetTotal">9.9885 USDt</span>
                 <button id="modalButtonCopyAssetTotal"
                         data-copy=""
-                        class="ms-2 p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        class="ms-2 p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100"
                         aria-label="Copy">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                        xmlns="http://www.w3.org/2000/svg">
@@ -358,7 +354,7 @@
                   <button
                     id="modalButtonCopyWalletAddress"
                     data-copy=""
-                    class="shrink-0 p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    class="shrink-0 p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100"
                     aria-label="Copy">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                          xmlns="http://www.w3.org/2000/svg">
@@ -381,11 +377,11 @@
         </div>
         <div id="modalUnderpaidButtonsContainer" class="flex justify-center items-center gap-3 my-8 hidden">
           <button id="modalButtonCancelTransaction"
-                  class="w-1/2 max-w-75 items-center rounded-md border border-neutral-400 bg-gray-100 px-12 py-2 text-sm font-semibold text-neutral-900 shadow-sm hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 hidden">
+                  class="w-1/2 max-w-75 items-center rounded-md border border-neutral-400 bg-gray-100 px-12 py-2 text-sm font-semibold text-neutral-900 shadow-sm hover:bg-neutral-50 hidden">
             Cancel Transaction
           </button>
           <button id="modalButtonChooseDifferentAsset"
-                  class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+                  class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900">
             Choose Different Asset
           </button>
         </div>
@@ -466,11 +462,11 @@
       </div>
       <div class="flex justify-center items-center gap-3 my-12">
         <button id="modalButtonRejectCancelTransaction"
-                class="w-1/2 max-w-75 items-center rounded-md border border-neutral-400 bg-gray-100 px-12 py-2 text-sm font-semibold text-neutral-900 shadow-sm hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+                class="w-1/2 max-w-75 items-center rounded-md border border-neutral-400 bg-gray-100 px-12 py-2 text-sm font-semibold text-neutral-900 shadow-sm hover:bg-neutral-50">
           No, Go Back
         </button>
         <button id="modalButtonAcceptCancelTransaction"
-                class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+                class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900">
           Yes, Cancel
         </button>
       </div>
@@ -499,11 +495,11 @@
       </div>
       <div class="flex justify-center items-center gap-3 my-12">
         <button id="modalButtonAcceptTransactionModalClose"
-                class="w-1/2 max-w-75 items-center rounded-md border text-red-800 border-red-800 bg-gray-100 px-12 py-2 text-sm font-semibold  shadow-sm hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+                class="w-1/2 max-w-75 items-center rounded-md border text-red-800 border-red-800 bg-gray-100 px-12 py-2 text-sm font-semibold  shadow-sm hover:bg-neutral-50">
           Close
         </button>
         <button id="modalButtonRejectTransactionModalClose"
-                class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2">
+                class="w-1/2 max-w-75 items-center rounded-md bg-neutral-800 px-12 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900">
           Go Back to Transaction
         </button>
       </div>
