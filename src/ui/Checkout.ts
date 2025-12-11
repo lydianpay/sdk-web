@@ -79,6 +79,7 @@ import {
   BaseUrlProduction,
   BaseUrlSandbox,
   CryptoTransactionStatusPending,
+  CryptoTransactionStatusPendingKYCVerification,
   CryptoTransactionStatusSuccess,
   NetworkAptos,
   NetworkArbitrum,
@@ -262,6 +263,22 @@ export class Checkout extends HTMLElement {
   private modalButtonRejectTransactionModalClose: HTMLButtonElement | null = null;
   private modalCloseTransactionModalDescription: HTMLParagraphElement | null = null;
 
+  // KYC & Travel Rules
+  private modalContainerKYCAndTravelRulesContainer: HTMLDivElement | null = null;
+  private modalEmail: HTMLInputElement | null = null;
+  private modalFirstName: HTMLInputElement | null = null;
+  private modalLastName: HTMLInputElement | null = null;
+  private modalStreet: HTMLInputElement | null = null;
+  private modalCity: HTMLInputElement | null = null;
+  private modalRegion: HTMLInputElement | null = null;
+  private modalPostalCode: HTMLInputElement | null = null;
+  private modalCountry: HTMLSelectElement | null = null;
+  private modalDocumentType: HTMLSelectElement | null = null;
+  private modalDocumentFileFront: HTMLInputElement | null = null;
+  private modalDocumentFileBackContainer: HTMLDivElement | null = null;
+  private modalDocumentFileBack: HTMLInputElement | null = null;
+  private modelButtonKYCVerificationAndTravelRules: HTMLButtonElement | null = null;
+
   private processingUnderpayment: boolean = false;
 
   private timeInterval: NodeJS.Timeout | null = null;
@@ -318,6 +335,11 @@ export class Checkout extends HTMLElement {
     this.hidePaymentSuccess();
 
     this.showButtons();
+
+    this.containerPaymentFailure?.classList.add('hidden');
+    this.modalContainerPaymentFailure?.classList.add('hidden');
+    this.containerPaymentSuccess?.classList.add('hidden');
+    this.modalContainerPaymentSuccess?.classList.add('hidden');
 
     this.btnAppPayment?.classList.add('hidden');
     if (this.sdkConfig?.appPayEnabled) {
@@ -412,6 +434,44 @@ export class Checkout extends HTMLElement {
       this.timeInterval = null;
       if (this.displayExpirationLeft?.innerHTML) this.displayExpirationLeft.innerHTML = '15:00';
       if (this.modalDisplayExpirationLeft?.innerHTML) this.modalDisplayExpirationLeft.innerHTML = '15:00';
+    }
+
+    // KYC & Travel Rules
+    this.modalContainerKYCAndTravelRulesContainer?.classList.add('hidden');
+    this.modalDocumentFileBackContainer?.classList.remove('hidden');
+
+    if (this.modalEmail) {
+      this.modalEmail.value = '';
+    }
+    if (this.modalFirstName) {
+      this.modalFirstName.value = '';
+    }
+    if (this.modalLastName) {
+      this.modalLastName.value = '';
+    }
+    if (this.modalStreet) {
+      this.modalStreet.value = '';
+    }
+    if (this.modalCity) {
+      this.modalCity.value = '';
+    }
+    if (this.modalRegion) {
+      this.modalRegion.value = '';
+    }
+    if (this.modalPostalCode) {
+      this.modalPostalCode.value = '';
+    }
+    if (this.modalCountry) {
+      this.modalCountry.value = 'US';
+    }
+    if (this.modalDocumentType) {
+      this.modalDocumentType.value = 'ID_CARD';
+    }
+    if (this.modalDocumentFileFront) {
+      this.modalDocumentFileFront.value = '';
+    }
+    if (this.modalDocumentFileBack) {
+      this.modalDocumentFileBack.value = '';
     }
   }
 
@@ -830,6 +890,22 @@ export class Checkout extends HTMLElement {
     this.modalButtonAcceptTransactionModalClose = this.shadowRoot?.getElementById('modalButtonAcceptTransactionModalClose') as HTMLButtonElement;
     this.modalButtonRejectTransactionModalClose = this.shadowRoot?.getElementById('modalButtonRejectTransactionModalClose') as HTMLButtonElement;
     this.modalCloseTransactionModalDescription = this.shadowRoot?.getElementById('modalCloseTransactionModalDescription') as HTMLParagraphElement;
+
+    // KYC & Travel Rules
+    this.modalContainerKYCAndTravelRulesContainer = this.shadowRoot?.getElementById('modalContainerKYCAndTravelRulesContainer') as HTMLDivElement;
+    this.modalEmail = this.shadowRoot?.getElementById('modalEmail') as HTMLInputElement;
+    this.modalFirstName = this.shadowRoot?.getElementById('modalFirstName') as HTMLInputElement;
+    this.modalLastName = this.shadowRoot?.getElementById('modalLastName') as HTMLInputElement;
+    this.modalStreet = this.shadowRoot?.getElementById('modalStreet') as HTMLInputElement;
+    this.modalCity = this.shadowRoot?.getElementById('modalCity') as HTMLInputElement;
+    this.modalRegion = this.shadowRoot?.getElementById('modalRegion') as HTMLInputElement;
+    this.modalPostalCode = this.shadowRoot?.getElementById('modalPostalCode') as HTMLInputElement;
+    this.modalCountry = this.shadowRoot?.getElementById('modalCountry') as HTMLSelectElement;
+    this.modalDocumentType = this.shadowRoot?.getElementById('modalDocumentType') as HTMLSelectElement;
+    this.modalDocumentFileFront = this.shadowRoot?.getElementById('modalDocumentFileFront') as HTMLInputElement;
+    this.modalDocumentFileBackContainer = this.shadowRoot?.getElementById('modalDocumentFileBackContainer') as HTMLDivElement;
+    this.modalDocumentFileBack = this.shadowRoot?.getElementById('modalDocumentFileBack') as HTMLInputElement;
+    this.modelButtonKYCVerificationAndTravelRules = this.shadowRoot?.getElementById('modelButtonKYCVerificationAndTravelRules') as HTMLButtonElement;
   }
 
   private attachListeners(): void {
@@ -964,6 +1040,100 @@ export class Checkout extends HTMLElement {
       this.cryptoTransaction = null;
       this.loadInitialState();
       this.initOptions?.paymentCanceledListener();
+    });
+
+    // KYC & Travel Rules
+    this.modalDocumentType?.addEventListener('change', (e) => {
+      if (this.modalDocumentType?.value === 'PASSPORT' || this.modalDocumentType?.value === 'RESIDENCE_PERMIT') {
+        this.modalDocumentFileBackContainer?.classList?.add('hidden');
+      } else {
+        this.modalDocumentFileBackContainer?.classList?.remove('hidden');
+      }
+    });
+
+    this.modelButtonKYCVerificationAndTravelRules?.addEventListener('click', async () => {
+      // TODO: Add KYC & Travel Rules Submission Validation.
+
+      if (!this.selectedAsset || !this.selectedNetwork) {
+        this.initOptions?.paymentFailedListener?.('Asset and network selection required.');
+        return;
+      }
+      if (!this.initOptions || !this.API) {
+        this.initOptions?.paymentFailedListener?.('Lydian not initialized.');
+        return;
+      }
+      if (!this.cryptoTransaction) {
+        this.initOptions?.paymentFailedListener?.('Transaction not created.');
+        return;
+      }
+
+      const email = this.modalEmail?.value ?? '';
+      const firstName = this.modalFirstName?.value ?? '';
+      const lastName = this.modalLastName?.value ?? '';
+      const street = this.modalStreet?.value ?? '';
+      const city = this.modalCity?.value ?? '';
+      const region = this.modalRegion?.value ?? '';
+      const postalCode = this.modalPostalCode?.value ?? '';
+      const country = this.modalCountry?.value ?? '';
+      const documentType = this.modalDocumentType?.value ?? '';
+      const documentFileFront = this.modalDocumentFileFront?.files?.[0];
+      const documentFileBack = this.modalDocumentFileBack?.files?.[0];
+
+      if (this.cryptoTransaction?.requiredFields.includes(email) && email == '') {
+        alert('Please enter your email address.');
+        return;
+      } else if (this.cryptoTransaction?.requiredFields.includes('firstName') && firstName == '') {
+        alert('Please enter your first name.');
+        return;
+      } else if (this.cryptoTransaction?.requiredFields.includes('lastName') && lastName == '') {
+        alert('Please enter your last name.');
+        return;
+      } else if (this.cryptoTransaction?.requiredFields.includes('address') &&
+        (street == '' || city == '' || region == '' || postalCode == '' || country == '')) {
+        alert('Please enter your complete address.');
+        return;
+      } else if (!documentFileFront) {
+        alert('Please upload front image of the selected document.');
+        return;
+      } else if ((documentType === 'ID_CARD' || documentType === 'DRIVERS') && !documentFileBack) {
+        alert('Please upload back image of the selected document.');
+        return;
+      }
+
+      this.showProcessing('Submitting your information');
+
+      // requestAnimationFrame was added because when a block of item was hidden that contained the button, the whole modal was closing.
+      requestAnimationFrame(() => this.modalContainerKYCAndTravelRulesContainer?.classList.add('hidden'));
+
+      const kycVerificationRequest = {
+        asset: this.selectedAsset.code,
+        network: this.selectedNetwork,
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        street: street,
+        city: city,
+        region: region,
+        postalCode: postalCode,
+        country: country,
+        documentType: documentType,
+        documentFiles: [documentFileFront],
+      };
+      if ((documentType === 'ID_CARD' || documentType === 'DRIVERS') && documentFileBack) {
+        kycVerificationRequest.documentFiles.push(documentFileBack);
+      }
+
+      try {
+        this.cryptoTransaction = await this.API.kycVerification(this.cryptoTransaction.transactionId, kycVerificationRequest);
+        console.log('transaction', this.cryptoTransaction);
+        this.hideProcessing();
+        await this.handleCreatedTransactionAndStartListening();
+      } catch (error) {
+        this.hideProcessing();
+        this.showPaymentFailure();
+        this.clearInterval();
+        this.initOptions?.paymentFailedListener?.('Unable to verify customer.');
+      }
     });
   }
 
@@ -1227,9 +1397,9 @@ export class Checkout extends HTMLElement {
         this.setSelectedAsset(asset.code);
 
         if (this.initOptions?.isEmbedded) {
-          this.containerCryptoPayment?.classList.add('hidden');
+          requestAnimationFrame(() => this.containerCryptoPayment?.classList.add('hidden'));
         } else {
-          this.modalContainerCryptoPayment?.classList.add('hidden');
+          requestAnimationFrame(() => this.modalContainerCryptoPayment?.classList.add('hidden'));
         }
 
         if (asset.type == 'token') {
@@ -1415,9 +1585,9 @@ export class Checkout extends HTMLElement {
     this.containerMoreWallets.innerHTML = '';
 
     if (this.initOptions?.isEmbedded) {
-      this.containerNetworks?.classList.add('hidden');
+      requestAnimationFrame(() => this.containerNetworks?.classList.add('hidden'));
     } else {
-      this.modalContainerNetworks?.classList.add('hidden');
+      requestAnimationFrame(() => this.modalContainerNetworks?.classList.add('hidden'));
     }
 
     this.connectWalletButtonsContainer.classList.remove('hidden');
@@ -1524,82 +1694,105 @@ export class Checkout extends HTMLElement {
         });
       }
       console.log('transaction', this.cryptoTransaction);
-
       this.hideProcessing();
 
-      if (this.selectedWallet.id == 'manual') {
-        this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
+      if (this.cryptoTransaction.status === CryptoTransactionStatusPendingKYCVerification) {
+        this.modalContainerKYCAndTravelRulesContainer?.classList.remove('hidden');
+        if (this.modalTitle) {
+          this.modalTitle.innerText = 'Submit Your Information';
+        }
       } else {
-
-        let walletSession = this.walletConnectService?.findSession(this.selectedWallet);
-
-        console.log('selected wallet', this.selectedWallet);
-        console.log('matching wallet session', walletSession);
-
-        // Display QR for session connection
-        if (!walletSession) {
-          const { uri, approval } = await this.walletConnectService?.connectWalletWithQrCode();
-
-          if (uri) {
-            this.showQRCode(uri, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
-          }
-
-          walletSession = await approval();
-
-          console.log('Session established:', walletSession);
-          this.walletConnectService.currentSession = walletSession;
-          this.hideQRCode();
-        }
-
-
-        const fromAddress = this.walletConnectService.getSessionAddress(walletSession, 'eip155:1');
-        if (!fromAddress) {
-          throw new Error('failed to find wallet address from current session');
-        }
-
-        const params = parseQrCodeData(this.cryptoTransaction.qrData);
-        console.log('parsedQrCodeData', params);
-
-        let transferData;
-        if (this.selectedAsset.code === 'USDT') {
-          transferData = encodeEthereumUsdtTransfer({
-            fromAddress: fromAddress as Address,
-            toAddress: params.address,
-            uint256: parseInt(params.uint256),
-          });
-        } else if (this.selectedAsset.code === 'USDC') {
-          transferData = encodeEthereumUsdcTransfer({
-            fromAddress: fromAddress as Address,
-            toAddress: params.address,
-            // TODO: remove once uint256 value is corrected for USDC
-            uint256: parseFloat(params.uint256) * USDC_ERC20_MAIN.multiplier,
-          });
-        } else {
-          throw new Error(`unable to encode unkown asset code "${this.selectedAsset.code}"`);
-        }
-
-        try {
-          this.showProcessing(`Waiting for transaction approval from ${walletSession.peer.metadata.name}...`);
-          const transferResp = await this.walletConnectService.sendEthTransaction(transferData, walletSession);
-          // TODO: do something with this response?
-
-          this.hideProcessing();
-          this.showPaymentSuccess();
-          this.clearInterval();
-          this.initOptions?.paymentSuccessListener?.();
-        } catch (error) {
-          this.hideProcessing();
-          this.showPaymentFailure();
-          this.clearInterval();
-        }
-      } // End if/else from manual
-      this.startListeningCryptoTransaction();
-      if (isMobile()) {
-        window.location.href = this.cryptoTransaction.qrData;
+        await this.handleCreatedTransactionAndStartListening();
       }
+
     } catch (error) {
       this.hideProcessing();
       this.initOptions?.paymentFailedListener?.('Unable to create cryptotransaction.');
+    }
+  }
+
+  private async handleCreatedTransactionAndStartListening() {
+    if (!this.selectedAsset || !this.selectedNetwork) {
+      this.initOptions?.paymentFailedListener?.('Asset and network selection required.');
+      return;
+    }
+    if (!this.walletConnectService) {
+      this.initOptions?.paymentFailedListener?.('Wallet Connect not initialized.');
+      return;
+    }
+    if (!this.cryptoTransaction) {
+      this.initOptions?.paymentFailedListener?.('Crypto transaction not created..');
+      return;
+    }
+    if (this.selectedWallet.id == 'manual') {
+      this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
+    } else {
+
+      let walletSession = this.walletConnectService?.findSession(this.selectedWallet);
+
+      console.log('selected wallet', this.selectedWallet);
+      console.log('matching wallet session', walletSession);
+
+      // Display QR for session connection
+      if (!walletSession) {
+        const { uri, approval } = await this.walletConnectService?.connectWalletWithQrCode();
+
+        if (uri) {
+          this.showQRCode(uri, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
+        }
+
+        walletSession = await approval();
+
+        console.log('Session established:', walletSession);
+        this.walletConnectService.currentSession = walletSession;
+        this.hideQRCode();
+      }
+
+
+      const fromAddress = this.walletConnectService.getSessionAddress(walletSession, 'eip155:1');
+      if (!fromAddress) {
+        throw new Error('failed to find wallet address from current session');
+      }
+
+      const params = parseQrCodeData(this.cryptoTransaction.qrData);
+      console.log('parsedQrCodeData', params);
+
+      let transferData;
+      if (this.selectedAsset.code === 'USDT') {
+        transferData = encodeEthereumUsdtTransfer({
+          fromAddress: fromAddress as Address,
+          toAddress: params.address,
+          uint256: parseInt(params.uint256),
+        });
+      } else if (this.selectedAsset.code === 'USDC') {
+        transferData = encodeEthereumUsdcTransfer({
+          fromAddress: fromAddress as Address,
+          toAddress: params.address,
+          // TODO: remove once uint256 value is corrected for USDC
+          uint256: parseFloat(params.uint256) * USDC_ERC20_MAIN.multiplier,
+        });
+      } else {
+        throw new Error(`unable to encode unkown asset code "${this.selectedAsset.code}"`);
+      }
+
+      try {
+        this.showProcessing(`Waiting for transaction approval from ${walletSession.peer.metadata.name}...`);
+        const transferResp = await this.walletConnectService.sendEthTransaction(transferData, walletSession);
+        // TODO: do something with this response?
+
+        this.hideProcessing();
+        this.showPaymentSuccess();
+        this.clearInterval();
+        this.initOptions?.paymentSuccessListener?.();
+      } catch (error) {
+        this.hideProcessing();
+        this.showPaymentFailure();
+        this.clearInterval();
+      }
+    } // End if/else from manual
+    this.startListeningCryptoTransaction();
+    if (isMobile()) {
+      window.location.href = this.cryptoTransaction.qrData;
     }
   }
 }

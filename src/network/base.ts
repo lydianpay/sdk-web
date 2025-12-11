@@ -36,6 +36,24 @@ export abstract class Base {
     throw new Error(response.statusText);
   }
 
+  protected async requestWithFormData<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    const url = `${this.baseUri}${endpoint}`;
+
+    const headers = {
+      'X-Publishable-Key': `${this.publishableKey}`,
+    };
+
+    const config = Object.assign({}, options, { headers });
+    const response = await fetch(url, config);
+
+    if (response.ok) {
+      const data = await response.json();
+      return data as T;
+    }
+
+    throw new Error(response.statusText);
+  }
+
   protected async requestCluster<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${this.clusterBaseUri}${endpoint}`;
 

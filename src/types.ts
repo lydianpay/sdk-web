@@ -38,7 +38,25 @@ export type CreateTransactionResponse = {
   assetAmount: number;
   additionalCustomerFee: number;
   address: string;
+  status: number;
+  requiredFields: string[];
+  supportedDocumentsTypes: string[];
 };
+
+export type KYCVerificationRequest = {
+  asset: string;
+  network: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  street: string;
+  city: string;
+  region: string;
+  postalCode: string;
+  country: string;
+  documentType: string;
+  documentFiles: File[];
+}
 
 export type CollectTransactionRequest = {
   asset: string;
@@ -92,7 +110,7 @@ export type WalletConnectWallet = {
   wcPeerName?: string;
 }
 
-export type Support  = {
+export type Support = {
   email: string;
   link: string;
 }
