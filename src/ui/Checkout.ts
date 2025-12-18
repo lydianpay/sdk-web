@@ -263,7 +263,7 @@ export class Checkout extends HTMLElement {
   private modalButtonRejectTransactionModalClose: HTMLButtonElement | null = null;
   private modalCloseTransactionModalDescription: HTMLParagraphElement | null = null;
 
-  // KYC & Travel Rules
+  // KYC & Travel Rules (Modal UI)
   private modalContainerKYCAndTravelRulesContainer: HTMLDivElement | null = null;
   private modalEmail: HTMLInputElement | null = null;
   private modalFirstName: HTMLInputElement | null = null;
@@ -278,6 +278,22 @@ export class Checkout extends HTMLElement {
   private modalDocumentFileBackContainer: HTMLDivElement | null = null;
   private modalDocumentFileBack: HTMLInputElement | null = null;
   private modelButtonKYCVerificationAndTravelRules: HTMLButtonElement | null = null;
+
+  // KYC & Travel Rules (Embedded UI)
+  private containerKYCAndTravelRules: HTMLDivElement | null = null;
+  private email: HTMLInputElement | null = null;
+  private firstName: HTMLInputElement | null = null;
+  private lastName: HTMLInputElement | null = null;
+  private street: HTMLInputElement | null = null;
+  private city: HTMLInputElement | null = null;
+  private region: HTMLInputElement | null = null;
+  private postalCode: HTMLInputElement | null = null;
+  private country: HTMLSelectElement | null = null;
+  private documentType: HTMLSelectElement | null = null;
+  private documentFileFront: HTMLInputElement | null = null;
+  private documentFileBackContainer: HTMLDivElement | null = null;
+  private documentFileBack: HTMLInputElement | null = null;
+  private buttonKYCVerificationAndTravelRules: HTMLButtonElement | null = null;
 
   private processingUnderpayment: boolean = false;
 
@@ -436,7 +452,7 @@ export class Checkout extends HTMLElement {
       if (this.modalDisplayExpirationLeft?.innerHTML) this.modalDisplayExpirationLeft.innerHTML = '15:00';
     }
 
-    // KYC & Travel Rules
+    // KYC & Travel Rules (Modal UI)
     this.modalContainerKYCAndTravelRulesContainer?.classList.add('hidden');
     this.modalDocumentFileBackContainer?.classList.remove('hidden');
 
@@ -472,6 +488,44 @@ export class Checkout extends HTMLElement {
     }
     if (this.modalDocumentFileBack) {
       this.modalDocumentFileBack.value = '';
+    }
+
+    // KYC & Travel Rules (Embedded UI)
+    this.containerKYCAndTravelRules?.classList.add('hidden');
+    this.documentFileBackContainer?.classList.remove('hidden');
+
+    if (this.email) {
+      this.email.value = '';
+    }
+    if (this.firstName) {
+      this.firstName.value = '';
+    }
+    if (this.lastName) {
+      this.lastName.value = '';
+    }
+    if (this.street) {
+      this.street.value = '';
+    }
+    if (this.city) {
+      this.city.value = '';
+    }
+    if (this.region) {
+      this.region.value = '';
+    }
+    if (this.postalCode) {
+      this.postalCode.value = '';
+    }
+    if (this.country) {
+      this.country.value = 'US';
+    }
+    if (this.documentType) {
+      this.documentType.value = 'ID_CARD';
+    }
+    if (this.documentFileFront) {
+      this.documentFileFront.value = '';
+    }
+    if (this.documentFileBack) {
+      this.documentFileBack.value = '';
     }
   }
 
@@ -891,7 +945,7 @@ export class Checkout extends HTMLElement {
     this.modalButtonRejectTransactionModalClose = this.shadowRoot?.getElementById('modalButtonRejectTransactionModalClose') as HTMLButtonElement;
     this.modalCloseTransactionModalDescription = this.shadowRoot?.getElementById('modalCloseTransactionModalDescription') as HTMLParagraphElement;
 
-    // KYC & Travel Rules
+    // KYC & Travel Rules (Modal UI)
     this.modalContainerKYCAndTravelRulesContainer = this.shadowRoot?.getElementById('modalContainerKYCAndTravelRulesContainer') as HTMLDivElement;
     this.modalEmail = this.shadowRoot?.getElementById('modalEmail') as HTMLInputElement;
     this.modalFirstName = this.shadowRoot?.getElementById('modalFirstName') as HTMLInputElement;
@@ -906,6 +960,22 @@ export class Checkout extends HTMLElement {
     this.modalDocumentFileBackContainer = this.shadowRoot?.getElementById('modalDocumentFileBackContainer') as HTMLDivElement;
     this.modalDocumentFileBack = this.shadowRoot?.getElementById('modalDocumentFileBack') as HTMLInputElement;
     this.modelButtonKYCVerificationAndTravelRules = this.shadowRoot?.getElementById('modelButtonKYCVerificationAndTravelRules') as HTMLButtonElement;
+
+    // KYC & Travel Rules (Embedded UI)
+    this.containerKYCAndTravelRules = this.shadowRoot?.getElementById('containerKYCAndTravelRules') as HTMLDivElement;
+    this.email = this.shadowRoot?.getElementById('containerCustomerVerification') as HTMLInputElement;
+    this.firstName = this.shadowRoot?.getElementById('firstName') as HTMLInputElement;
+    this.lastName = this.shadowRoot?.getElementById('lastName') as HTMLInputElement;
+    this.street = this.shadowRoot?.getElementById('street') as HTMLInputElement;
+    this.city = this.shadowRoot?.getElementById('city') as HTMLInputElement;
+    this.region = this.shadowRoot?.getElementById('region') as HTMLInputElement;
+    this.postalCode = this.shadowRoot?.getElementById('postalCode') as HTMLInputElement;
+    this.country = this.shadowRoot?.getElementById('country') as HTMLSelectElement;
+    this.documentType = this.shadowRoot?.getElementById('documentType') as HTMLSelectElement;
+    this.documentFileFront = this.shadowRoot?.getElementById('documentFileFront') as HTMLInputElement;
+    this.documentFileBackContainer = this.shadowRoot?.getElementById('documentFileBackContainer') as HTMLDivElement;
+    this.documentFileBack = this.shadowRoot?.getElementById('documentFileBack') as HTMLInputElement;
+    this.buttonKYCVerificationAndTravelRules = this.shadowRoot?.getElementById('buttonKYCVerificationAndTravelRules') as HTMLButtonElement;
   }
 
   private attachListeners(): void {
@@ -1050,90 +1120,19 @@ export class Checkout extends HTMLElement {
         this.modalDocumentFileBackContainer?.classList?.remove('hidden');
       }
     });
+    this.documentType?.addEventListener('change', (e) => {
+      if (this.documentType?.value === 'PASSPORT' || this.documentType?.value === 'RESIDENCE_PERMIT') {
+        this.documentFileBackContainer?.classList?.add('hidden');
+      } else {
+        this.documentFileBackContainer?.classList?.remove('hidden');
+      }
+    });
 
     this.modelButtonKYCVerificationAndTravelRules?.addEventListener('click', async () => {
-      // TODO: Add KYC & Travel Rules Submission Validation.
-
-      if (!this.selectedAsset || !this.selectedNetwork) {
-        this.initOptions?.paymentFailedListener?.('Asset and network selection required.');
-        return;
-      }
-      if (!this.initOptions || !this.API) {
-        this.initOptions?.paymentFailedListener?.('Lydian not initialized.');
-        return;
-      }
-      if (!this.cryptoTransaction) {
-        this.initOptions?.paymentFailedListener?.('Transaction not created.');
-        return;
-      }
-
-      const email = this.modalEmail?.value ?? '';
-      const firstName = this.modalFirstName?.value ?? '';
-      const lastName = this.modalLastName?.value ?? '';
-      const street = this.modalStreet?.value ?? '';
-      const city = this.modalCity?.value ?? '';
-      const region = this.modalRegion?.value ?? '';
-      const postalCode = this.modalPostalCode?.value ?? '';
-      const country = this.modalCountry?.value ?? '';
-      const documentType = this.modalDocumentType?.value ?? '';
-      const documentFileFront = this.modalDocumentFileFront?.files?.[0];
-      const documentFileBack = this.modalDocumentFileBack?.files?.[0];
-
-      if (this.cryptoTransaction?.requiredFields.includes(email) && email == '') {
-        alert('Please enter your email address.');
-        return;
-      } else if (this.cryptoTransaction?.requiredFields.includes('firstName') && firstName == '') {
-        alert('Please enter your first name.');
-        return;
-      } else if (this.cryptoTransaction?.requiredFields.includes('lastName') && lastName == '') {
-        alert('Please enter your last name.');
-        return;
-      } else if (this.cryptoTransaction?.requiredFields.includes('address') &&
-        (street == '' || city == '' || region == '' || postalCode == '' || country == '')) {
-        alert('Please enter your complete address.');
-        return;
-      } else if (!documentFileFront) {
-        alert('Please upload front image of the selected document.');
-        return;
-      } else if ((documentType === 'ID_CARD' || documentType === 'DRIVERS') && !documentFileBack) {
-        alert('Please upload back image of the selected document.');
-        return;
-      }
-
-      this.showProcessing('Submitting your information');
-
-      // requestAnimationFrame was added because when a block of item was hidden that contained the button, the whole modal was closing.
-      requestAnimationFrame(() => this.modalContainerKYCAndTravelRulesContainer?.classList.add('hidden'));
-
-      const kycVerificationRequest = {
-        asset: this.selectedAsset.code,
-        network: this.selectedNetwork,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        street: street,
-        city: city,
-        region: region,
-        postalCode: postalCode,
-        country: country,
-        documentType: documentType,
-        documentFiles: [documentFileFront],
-      };
-      if ((documentType === 'ID_CARD' || documentType === 'DRIVERS') && documentFileBack) {
-        kycVerificationRequest.documentFiles.push(documentFileBack);
-      }
-
-      try {
-        this.cryptoTransaction = await this.API.kycVerification(this.cryptoTransaction.transactionId, kycVerificationRequest);
-        console.log('transaction', this.cryptoTransaction);
-        this.hideProcessing();
-        await this.handleCreatedTransactionAndStartListening();
-      } catch (error) {
-        this.hideProcessing();
-        this.showPaymentFailure();
-        this.clearInterval();
-        this.initOptions?.paymentFailedListener?.('Unable to verify customer.');
-      }
+      await this.handleKYCAndTravelRulesFormSubmission();
+    });
+    this.buttonKYCVerificationAndTravelRules?.addEventListener('click', async () => {
+      await this.handleKYCAndTravelRulesFormSubmission();
     });
   }
 
@@ -1697,9 +1696,13 @@ export class Checkout extends HTMLElement {
       this.hideProcessing();
 
       if (this.cryptoTransaction.status === CryptoTransactionStatusPendingKYCVerification) {
-        this.modalContainerKYCAndTravelRulesContainer?.classList.remove('hidden');
-        if (this.modalTitle) {
-          this.modalTitle.innerText = 'Submit Your Information';
+        if (this.initOptions.isEmbedded) {
+          this.containerKYCAndTravelRules?.classList.remove('hidden');
+        } else {
+          this.modalContainerKYCAndTravelRulesContainer?.classList.remove('hidden');
+          if (this.modalTitle) {
+            this.modalTitle.innerText = 'Submit Your Information';
+          }
         }
       } else {
         await this.handleCreatedTransactionAndStartListening();
@@ -1793,6 +1796,107 @@ export class Checkout extends HTMLElement {
     this.startListeningCryptoTransaction();
     if (isMobile()) {
       window.location.href = this.cryptoTransaction.qrData;
+    }
+  }
+
+  private async handleKYCAndTravelRulesFormSubmission() {
+    if (!this.selectedAsset || !this.selectedNetwork) {
+      this.initOptions?.paymentFailedListener?.('Asset and network selection required.');
+      return;
+    }
+    if (!this.initOptions || !this.API) {
+      this.initOptions?.paymentFailedListener?.('Lydian not initialized.');
+      return;
+    }
+    if (!this.cryptoTransaction) {
+      this.initOptions?.paymentFailedListener?.('Transaction not created.');
+      return;
+    }
+
+    let email: string, firstName: string, lastName: string, street: string, city: string, region: string, postalCode: string, country: string, documentType: string;
+    let documentFileFront: File | undefined, documentFileBack: File | undefined;
+
+    if (this.initOptions.isEmbedded) {
+      email = this.email?.value ?? '';
+      firstName = this.firstName?.value ?? '';
+      lastName = this.lastName?.value ?? '';
+      street = this.street?.value ?? '';
+      city = this.city?.value ?? '';
+      region = this.region?.value ?? '';
+      postalCode = this.postalCode?.value ?? '';
+      country = this.country?.value ?? '';
+      documentType = this.documentType?.value ?? '';
+      documentFileFront = this.documentFileFront?.files?.[0];
+      documentFileBack = this.documentFileBack?.files?.[0];
+    } else {
+      email = this.modalEmail?.value ?? '';
+      firstName = this.modalFirstName?.value ?? '';
+      lastName = this.modalLastName?.value ?? '';
+      street = this.modalStreet?.value ?? '';
+      city = this.modalCity?.value ?? '';
+      region = this.modalRegion?.value ?? '';
+      postalCode = this.modalPostalCode?.value ?? '';
+      country = this.modalCountry?.value ?? '';
+      documentType = this.modalDocumentType?.value ?? '';
+      documentFileFront = this.modalDocumentFileFront?.files?.[0];
+      documentFileBack = this.modalDocumentFileBack?.files?.[0];
+    }
+
+    if (this.cryptoTransaction?.requiredFields.includes(email) && email == '') {
+      alert('Please enter your email address.');
+      return;
+    } else if (this.cryptoTransaction?.requiredFields.includes('firstName') && firstName == '') {
+      alert('Please enter your first name.');
+      return;
+    } else if (this.cryptoTransaction?.requiredFields.includes('lastName') && lastName == '') {
+      alert('Please enter your last name.');
+      return;
+    } else if (this.cryptoTransaction?.requiredFields.includes('address') &&
+      (street == '' || city == '' || region == '' || postalCode == '' || country == '')) {
+      alert('Please enter your complete address.');
+      return;
+    } else if (!documentFileFront) {
+      alert('Please upload front image of the selected document.');
+      return;
+    } else if ((documentType === 'ID_CARD' || documentType === 'DRIVERS') && !documentFileBack) {
+      alert('Please upload back image of the selected document.');
+      return;
+    }
+
+    this.showProcessing('Submitting your information');
+
+    // requestAnimationFrame was added because when a block of item was hidden that contained the button, the whole modal was closing.
+    requestAnimationFrame(() => this.modalContainerKYCAndTravelRulesContainer?.classList.add('hidden'));
+    this.containerKYCAndTravelRules?.classList.add('hidden');
+
+    const kycVerificationRequest = {
+      asset: this.selectedAsset.code,
+      network: this.selectedNetwork,
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      street: street,
+      city: city,
+      region: region,
+      postalCode: postalCode,
+      country: country,
+      documentType: documentType,
+      documentFiles: [documentFileFront],
+    };
+    if ((documentType === 'ID_CARD' || documentType === 'DRIVERS') && documentFileBack) {
+      kycVerificationRequest.documentFiles.push(documentFileBack);
+    }
+
+    try {
+      this.cryptoTransaction = await this.API.kycVerification(this.cryptoTransaction.transactionId, kycVerificationRequest);
+      console.log('transaction', this.cryptoTransaction);
+      this.hideProcessing();
+      await this.handleCreatedTransactionAndStartListening();
+    } catch (error) {
+      this.hideProcessing();
+      this.showPaymentFailure();
+      this.clearInterval();
+      this.initOptions?.paymentFailedListener?.('Unable to verify customer.');
     }
   }
 }
