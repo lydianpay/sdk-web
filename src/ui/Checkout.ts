@@ -1005,9 +1005,17 @@ export class Checkout extends HTMLElement {
     });
 
     this.modalButtonAcceptTransactionModalClose?.addEventListener('click', () => {
+      if (this.cryptoTransaction?.transactionId && this.API) {
+        this.API.cancelCryptoTransaction(this.cryptoTransaction?.transactionId, {
+          reason: 'Cancelled from the SDK',
+          forfeit: !this.sdkConfig?.cancelTransactionEnabled,
+        });
+      }
       this.modalCloseTransactionModal?.close();
       this.modal?.close();
+      this.cryptoTransaction = null;
       this.loadInitialState();
+      this.initOptions?.paymentCanceledListener();
     });
 
     this.modalButtonRejectTransactionModalClose?.addEventListener('click', () => {
@@ -1813,7 +1821,8 @@ export class Checkout extends HTMLElement {
       return;
     }
 
-    let email: string, firstName: string, lastName: string, street: string, city: string, region: string, postalCode: string, country: string, documentType: string;
+    let email: string, firstName: string, lastName: string, street: string, city: string, region: string,
+      postalCode: string, country: string, documentType: string;
     let documentFileFront: File | undefined, documentFileBack: File | undefined;
 
     if (this.initOptions.isEmbedded) {

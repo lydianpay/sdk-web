@@ -65,6 +65,7 @@ export type CollectTransactionRequest = {
 
 export type CancelTransactionRequest = {
   reason: string;
+  forfeit?: boolean;
 };
 
 export type GetTransactionResponse = {
