@@ -48,7 +48,9 @@ export class CryptoTransactions extends Base {
     formData.append('region', kycVerificationRequest.region);
     formData.append('postalCode', kycVerificationRequest.postalCode);
     formData.append('country', kycVerificationRequest.country);
-    formData.append('documentType', kycVerificationRequest.documentType);
+    if (kycVerificationRequest.documentType) {
+      formData.append('documentType', kycVerificationRequest.documentType);
+    }
     for (const file of kycVerificationRequest.documentFiles) {
       formData.append('documentFiles', file);
     }
