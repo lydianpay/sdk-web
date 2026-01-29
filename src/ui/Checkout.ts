@@ -278,6 +278,7 @@ export class Checkout extends HTMLElement {
   private modalDocumentFileBackContainer: HTMLDivElement | null = null;
   private modalDocumentFileBack: HTMLInputElement | null = null;
   private modelButtonKYCVerificationAndTravelRules: HTMLButtonElement | null = null;
+  private modalContainerKYCAndTravelRulesDocument: HTMLDivElement | null = null;
 
   // KYC & Travel Rules (Embedded UI)
   private containerKYCAndTravelRules: HTMLDivElement | null = null;
@@ -294,6 +295,7 @@ export class Checkout extends HTMLElement {
   private documentFileBackContainer: HTMLDivElement | null = null;
   private documentFileBack: HTMLInputElement | null = null;
   private buttonKYCVerificationAndTravelRules: HTMLButtonElement | null = null;
+  private containerKYCAndTravelRulesDocument: HTMLDivElement | null = null;
 
   private processingUnderpayment: boolean = false;
 
@@ -455,6 +457,7 @@ export class Checkout extends HTMLElement {
     // KYC & Travel Rules (Modal UI)
     this.modalContainerKYCAndTravelRulesContainer?.classList.add('hidden');
     this.modalDocumentFileBackContainer?.classList.remove('hidden');
+    this.modalContainerKYCAndTravelRulesDocument?.classList.add('hidden');
 
     if (this.modalEmail) {
       this.modalEmail.value = '';
@@ -493,6 +496,7 @@ export class Checkout extends HTMLElement {
     // KYC & Travel Rules (Embedded UI)
     this.containerKYCAndTravelRules?.classList.add('hidden');
     this.documentFileBackContainer?.classList.remove('hidden');
+    this.containerKYCAndTravelRulesDocument?.classList.add('hidden');
 
     if (this.email) {
       this.email.value = '';
@@ -960,6 +964,7 @@ export class Checkout extends HTMLElement {
     this.modalDocumentFileBackContainer = this.shadowRoot?.getElementById('modalDocumentFileBackContainer') as HTMLDivElement;
     this.modalDocumentFileBack = this.shadowRoot?.getElementById('modalDocumentFileBack') as HTMLInputElement;
     this.modelButtonKYCVerificationAndTravelRules = this.shadowRoot?.getElementById('modelButtonKYCVerificationAndTravelRules') as HTMLButtonElement;
+    this.modalContainerKYCAndTravelRulesDocument = this.shadowRoot?.getElementById('modalContainerKYCAndTravelRulesDocument') as HTMLDivElement;
 
     // KYC & Travel Rules (Embedded UI)
     this.containerKYCAndTravelRules = this.shadowRoot?.getElementById('containerKYCAndTravelRules') as HTMLDivElement;
@@ -976,6 +981,7 @@ export class Checkout extends HTMLElement {
     this.documentFileBackContainer = this.shadowRoot?.getElementById('documentFileBackContainer') as HTMLDivElement;
     this.documentFileBack = this.shadowRoot?.getElementById('documentFileBack') as HTMLInputElement;
     this.buttonKYCVerificationAndTravelRules = this.shadowRoot?.getElementById('buttonKYCVerificationAndTravelRules') as HTMLButtonElement;
+    this.containerKYCAndTravelRulesDocument = this.shadowRoot?.getElementById('containerKYCAndTravelRulesDocument') as HTMLDivElement;
   }
 
   private attachListeners(): void {
@@ -1706,8 +1712,18 @@ export class Checkout extends HTMLElement {
       if (this.cryptoTransaction.status === CryptoTransactionStatusPendingKYCVerification) {
         if (this.initOptions.isEmbedded) {
           this.containerKYCAndTravelRules?.classList.remove('hidden');
+          if (this.cryptoTransaction.supportedDocumentTypes.length > 0) {
+            this.containerKYCAndTravelRulesDocument?.classList.remove('hidden');
+          } else {
+            this.containerKYCAndTravelRulesDocument?.classList.add('hidden');
+          }
         } else {
           this.modalContainerKYCAndTravelRulesContainer?.classList.remove('hidden');
+          if (this.cryptoTransaction.supportedDocumentTypes.length > 0) {
+            this.modalContainerKYCAndTravelRulesDocument?.classList.remove('hidden');
+          } else {
+            this.modalContainerKYCAndTravelRulesDocument?.classList.add('hidden');
+          }
           if (this.modalTitle) {
             this.modalTitle.innerText = 'Submit Your Information';
           }
@@ -1834,9 +1850,9 @@ export class Checkout extends HTMLElement {
       region = this.region?.value ?? '';
       postalCode = this.postalCode?.value ?? '';
       country = this.country?.value ?? '';
-      documentType = this.documentType?.value ?? '';
-      documentFileFront = this.documentFileFront?.files?.[0];
-      documentFileBack = this.documentFileBack?.files?.[0];
+      documentType = this.cryptoTransaction?.supportedDocumentTypes?.length > 0 ? this.documentType?.value ?? '' : '';
+      documentFileFront = this.cryptoTransaction?.supportedDocumentTypes?.length > 0 ? this.documentFileFront?.files?.[0] : undefined;
+      documentFileBack = this.cryptoTransaction?.supportedDocumentTypes?.length > 0 ? this.documentFileBack?.files?.[0] : undefined;
     } else {
       email = this.modalEmail?.value ?? '';
       firstName = this.modalFirstName?.value ?? '';
@@ -1846,9 +1862,9 @@ export class Checkout extends HTMLElement {
       region = this.modalRegion?.value ?? '';
       postalCode = this.modalPostalCode?.value ?? '';
       country = this.modalCountry?.value ?? '';
-      documentType = this.modalDocumentType?.value ?? '';
-      documentFileFront = this.modalDocumentFileFront?.files?.[0];
-      documentFileBack = this.modalDocumentFileBack?.files?.[0];
+      documentType = this.cryptoTransaction?.supportedDocumentTypes?.length > 0 ? this.modalDocumentType?.value ?? '' : '';
+      documentFileFront = this.cryptoTransaction?.supportedDocumentTypes?.length > 0 ? this.modalDocumentFileFront?.files?.[0] : undefined;
+      documentFileBack = this.cryptoTransaction?.supportedDocumentTypes?.length > 0 ? this.modalDocumentFileBack?.files?.[0] : undefined;
     }
 
     if (this.cryptoTransaction?.requiredFields.includes(email) && email == '') {
@@ -1864,10 +1880,10 @@ export class Checkout extends HTMLElement {
       (street == '' || city == '' || region == '' || postalCode == '' || country == '')) {
       alert('Please enter your complete address.');
       return;
-    } else if (!documentFileFront) {
+    } else if (this.cryptoTransaction?.supportedDocumentTypes?.length > 0 && !documentFileFront) {
       alert('Please upload front image of the selected document.');
       return;
-    } else if ((documentType === 'ID_CARD' || documentType === 'DRIVERS') && !documentFileBack) {
+    } else if (this.cryptoTransaction?.supportedDocumentTypes?.length > 0 && (documentType === 'ID_CARD' || documentType === 'DRIVERS') && !documentFileBack) {
       alert('Please upload back image of the selected document.');
       return;
     }
@@ -1889,8 +1905,8 @@ export class Checkout extends HTMLElement {
       region: region,
       postalCode: postalCode,
       country: country,
-      documentType: documentType,
-      documentFiles: [documentFileFront],
+      documentType: this.cryptoTransaction?.supportedDocumentTypes?.length > 0 ? documentType : undefined,
+      documentFiles: documentFileFront ? [documentFileFront] : [],
     };
     if ((documentType === 'ID_CARD' || documentType === 'DRIVERS') && documentFileBack) {
       kycVerificationRequest.documentFiles.push(documentFileBack);

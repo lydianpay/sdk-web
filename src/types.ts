@@ -40,7 +40,7 @@ export type CreateTransactionResponse = {
   address: string;
   status: number;
   requiredFields: string[];
-  supportedDocumentsTypes: string[];
+  supportedDocumentTypes: string[];
 };
 
 export type KYCVerificationRequest = {
@@ -54,7 +54,7 @@ export type KYCVerificationRequest = {
   region: string;
   postalCode: string;
   country: string;
-  documentType: string;
+  documentType: string | undefined;
   documentFiles: File[];
 }
 
