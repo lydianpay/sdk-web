@@ -117,7 +117,7 @@ import {
   convertAmountToUSDT,
   convertCryptoToUSDT,
   formatCurrency,
-  formatDateForTransactionDetails,
+  formatDateForTransactionDetails, formatToTwoDecimals,
   parseQrCodeData,
 } from '../utils';
 import { encodeEthereumUsdtTransfer } from '../types/tether';
@@ -685,7 +685,7 @@ export class Checkout extends HTMLElement {
     if (!this.selectedAsset) {
       return;
     }
-    const assetTotal = amount + ' ' + this.selectedAsset.code.toUpperCase();
+    const assetTotal = formatToTwoDecimals(amount) + ' ' + this.selectedAsset.code.toUpperCase();
     const network = this.selectedNetwork ? capitalizeFirstLetter(this.selectedNetwork) : this.selectedAsset.networks[0];
     const transactionID = <string>this.initOptions?.transaction.referenceNumber;
     const totalAmount = <string>this.initOptions?.transaction.amount.toLocaleString('en-US', {

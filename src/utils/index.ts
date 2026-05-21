@@ -130,3 +130,11 @@ export function formatDateForTransactionDetails(isoDateString: string): string {
   // Format the date
   return formatter.format(date);
 }
+
+export function formatToTwoDecimals(num: number): string {
+  return formatToNDecimals(num, 2);
+}
+
+export function formatToNDecimals(num: number, precision: number): string {
+  return num.toFixed(precision);
+}
