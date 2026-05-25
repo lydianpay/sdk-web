@@ -32,29 +32,6 @@ import {
   AllowedAssetUSDS,
   AllowedAssetUSDT,
   AllowedAssetZKsync,
-  AllowedNetworkAptos,
-  AllowedNetworkArbitrum,
-  AllowedNetworkAvalanche,
-  AllowedNetworkBase,
-  AllowedNetworkBitcoin,
-  AllowedNetworkCelo,
-  AllowedNetworkEos,
-  AllowedNetworkEthereum,
-  AllowedNetworkHedara,
-  AllowedNetworkKaia,
-  AllowedNetworkLinea,
-  AllowedNetworkNear,
-  AllowedNetworkOPMainnet,
-  AllowedNetworkPolygon,
-  AllowedNetworkSolana,
-  AllowedNetworkSonic,
-  AllowedNetworkSui,
-  AllowedNetworkTezos,
-  AllowedNetworkTon,
-  AllowedNetworkTron,
-  AllowedNetworkUnichain,
-  AllowedNetworkUniswap,
-  AllowedNetworkZKsync,
   AssetArbitrum,
   AssetBase,
   AssetBitcoin,
@@ -81,29 +58,6 @@ import {
   CryptoTransactionStatusPending,
   CryptoTransactionStatusPendingKYCVerification,
   CryptoTransactionStatusSuccess,
-  NetworkAptos,
-  NetworkArbitrum,
-  NetworkAvalanche,
-  NetworkBase,
-  NetworkBitcoin,
-  NetworkCelo,
-  NetworkEos,
-  NetworkEthereum,
-  NetworkHedara,
-  NetworkKaia,
-  NetworkLinea,
-  NetworkNear,
-  NetworkOPMainnet,
-  NetworkPolygon,
-  NetworkSolana,
-  NetworkSonic,
-  NetworkSui,
-  NetworkTezos,
-  NetworkTon,
-  NetworkTron,
-  NetworkUnichain,
-  NetworkUniswap,
-  NetworkZKsync,
 } from '../constants';
 import { API } from '../network';
 import isMobile from 'is-mobile';
@@ -117,7 +71,8 @@ import {
   convertAmountToUSDT,
   convertCryptoToUSDT,
   formatCurrency,
-  formatDateForTransactionDetails, formatToTwoDecimals,
+  formatDateForTransactionDetails,
+  formatToTwoDecimals,
   parseQrCodeData,
 } from '../utils';
 import { encodeEthereumUsdtTransfer } from '../types/tether';
@@ -125,6 +80,8 @@ import { Address } from '../types/ethereum';
 import WalletButton from './buttons/walletButton';
 import QRCodeStyling from '@solana/qr-code-styling';
 import { encodeEthereumUsdcTransfer, USDC_ERC20_MAIN } from '../types/usdc';
+
+import assets from '../assets.json';
 
 export class Checkout extends HTMLElement {
   private shadow: ShadowRoot;
@@ -1464,78 +1421,15 @@ export class Checkout extends HTMLElement {
     console.log('asset', asset);
 
     asset?.networks.forEach((chain, index) => {
-      let button;
-      switch (chain) {
-        case AllowedNetworkBitcoin:
-          button = NetworkButton(NetworkBitcoin);
-          break;
-        case AllowedNetworkEthereum:
-          button = NetworkButton(NetworkEthereum);
-          break;
-        case AllowedNetworkTron:
-          button = NetworkButton(NetworkTron);
-          break;
-        case AllowedNetworkSolana:
-          button = NetworkButton(NetworkSolana);
-          break;
-        case AllowedNetworkTon:
-          button = NetworkButton(NetworkTon);
-          break;
-        case AllowedNetworkAvalanche:
-          button = NetworkButton(NetworkAvalanche);
-          break;
-        case AllowedNetworkAptos:
-          button = NetworkButton(NetworkAptos);
-          break;
-        case AllowedNetworkArbitrum:
-          button = NetworkButton(NetworkArbitrum);
-          break;
-        case AllowedNetworkBase:
-          button = NetworkButton(NetworkBase);
-          break;
-        case AllowedNetworkCelo:
-          button = NetworkButton(NetworkCelo);
-          break;
-        case AllowedNetworkLinea:
-          button = NetworkButton(NetworkLinea);
-          break;
-        case AllowedNetworkOPMainnet:
-          button = NetworkButton(NetworkOPMainnet);
-          break;
-        case AllowedNetworkPolygon:
-          button = NetworkButton(NetworkPolygon);
-          break;
-        case AllowedNetworkSonic:
-          button = NetworkButton(NetworkSonic);
-          break;
-        case AllowedNetworkUnichain:
-          button = NetworkButton(NetworkUnichain);
-          break;
-        case AllowedNetworkZKsync:
-          button = NetworkButton(NetworkZKsync);
-          break;
-        case AllowedNetworkSui:
-          button = NetworkButton(NetworkSui);
-          break;
-        case AllowedNetworkTezos:
-          button = NetworkButton(NetworkTezos);
-          break;
-        case AllowedNetworkKaia:
-          button = NetworkButton(NetworkKaia);
-          break;
-        case AllowedNetworkEos:
-          button = NetworkButton(NetworkEos);
-          break;
-        case AllowedNetworkUniswap:
-          button = NetworkButton(NetworkUniswap);
-          break;
-        case AllowedNetworkHedara:
-          button = NetworkButton(NetworkHedara);
-          break;
-        case AllowedNetworkNear:
-          button = NetworkButton(NetworkNear);
-          break;
+      const network = assets.networks.filter((network) => network.code === chain);
+      if (network.length === 0) {
+        return;
       }
+      const button = NetworkButton({
+        code: network[0].code,
+        name: network[0].name,
+        img: network[0].logo.url,
+      });
 
       if (index >= 4 && this.initOptions?.isEmbedded && this.containerMoreNetworks) {
         this.containerMoreNetworks.innerHTML += button;
