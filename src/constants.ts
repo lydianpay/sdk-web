@@ -7,9 +7,9 @@ export const CryptoTransactionStatusPending = 0;
 export const CryptoTransactionStatusSuccess = 1;
 export const CryptoTransactionStatusPendingKYCVerification = -3;
 
-export const BaseUrlDev = 'https://gateway.lydian.dev';
-export const BaseUrlSandbox = 'https://gateway.sandbox.lydian.com';
-export const BaseUrlProduction = 'https://gateway.lydian.com';
+export const BaseUrlDev = 'https://api.lydian.dev';
+export const BaseUrlSandbox = 'https://api.sandbox.lydian.com';
+export const BaseUrlProduction = 'https://api.lydian.com';
 
 
 export const AllowedAssetArbitrum = 'ARB';
