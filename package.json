@@ -1,6 +1,6 @@
 {
   "name": "@lydianpay/sdk-web",
-  "version": "1.0.0",
+  "version": "0.0.0-managed",
   "type": "module",
   "main": "dist/lydian.iife.js",
   "files": [
@@ -10,6 +10,7 @@
     "access": "public"
   },
   "scripts": {
+    "prepublishOnly": "[ \"$CI\" = \"true\" ] || (echo 'Publish via CI release only' && exit 1)",
     "test": "vitest run",
     "build:css": "npx tailwindcss -i src/ui/lydian.css -o ./src/ui/lydian.generated.css --minify",
     "build": "npm run build:css && vite build",
