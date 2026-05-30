@@ -5,12 +5,7 @@ interface EIP6963ProviderInfo {
     icon: string
 }
 
-interface EIP6963ProviderDetail {
-    info: EIP6963ProviderInfo
-    provider: EIP1193Provider
-}
-
-type EIP6963AnnounceProviderEvent = {
+export type EIP6963AnnounceProviderEvent = {
     detail: {
         info: EIP6963ProviderInfo
         provider: Readonly<EIP1193Provider>
