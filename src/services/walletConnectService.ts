@@ -1,6 +1,5 @@
 import Client, { SignClient } from "@walletconnect/sign-client";
 import { SessionTypes } from "@walletconnect/types";
-import { walletConnectProjectId } from "../constants";
 import { EthereumTransactionParams } from "../types/ethereum";
 import { WalletConnectWallet } from "src/types";
 
@@ -46,8 +45,8 @@ export class WalletConnectService {
         return this.client.session.getAll().find((session) => session.peer.metadata.name === wallet.wcPeerName)
     }
 
-    public async init() {
-        this.client = await SignClient.init({ projectId: walletConnectProjectId });
+    public async init(projectId: string) {
+        this.client = await SignClient.init({ projectId });
         this.session = this.restoreLastSession();
 
         this.client.on("session_event", (event) => {

@@ -1,8 +1,8 @@
 export const currencies = ['USD', 'TRY'] as const;
 export type Currency = typeof currencies[number];
 
-export function isCurrency(value: any): value is Currency {
-  return currencies.includes(value);
+export function isCurrency(value: unknown): value is Currency {
+  return typeof value === 'string' && (currencies as readonly string[]).includes(value);
 }
 
 export type Transaction = {
@@ -16,6 +16,7 @@ export type InitOptions = {
   dev: boolean;
   sandbox: boolean;
   publishableKey: string;
+  walletConnectProjectId: string;
   transaction: Transaction;
   paymentFailedListener: (failureMessage: string) => void;
   paymentSuccessListener: () => void;

@@ -1,6 +1,7 @@
 {
   "name": "@lydianpay/sdk-web",
   "version": "0.0.0-managed",
+  "license": "MIT",
   "type": "module",
   "main": "dist/lydian.iife.js",
   "files": [
@@ -11,7 +12,9 @@
   },
   "scripts": {
     "prepublishOnly": "[ \"$CI\" = \"true\" ] || (echo 'Publish via CI release only' && exit 1)",
+    "lint": "eslint .",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage --coverage.provider=v8 --coverage.reporter=lcov --coverage.reporter=text",
     "build:css": "npx tailwindcss -i src/ui/lydian.css -o ./src/ui/lydian.generated.css --minify",
     "build": "npm run build:css && vite build",
     "build:watch": "npm run build:css && vite build --watch",
@@ -19,7 +22,12 @@
     "dev": "vite"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/qrcode": "^1.5.5",
+    "@vitest/coverage-v8": "^3.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^16.0.0",
+    "typescript-eslint": "^8.0.0",
     "autoprefixer": "^10.4.0",
     "is-mobile": "^5.0.0",
     "postcss": "^8.4.6",

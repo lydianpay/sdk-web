@@ -1,8 +1,6 @@
 import { Asset } from './types';
 
 
-export const walletConnectProjectId = 'cbc90b58aec5c9ab2085a2d691461868';
-
 export const CryptoTransactionStatusPending = 0;
 export const CryptoTransactionStatusSuccess = 1;
 export const CryptoTransactionStatusPendingKYCVerification = -3;

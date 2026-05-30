@@ -3,15 +3,11 @@ import { CryptoTransactions } from './cryptotransaction';
 import { applyMixins } from './utils';
 import { Config } from './config';
 
-class API extends Base {
-}
+class ApiBase extends Base {}
+applyMixins(ApiBase, [Config, CryptoTransactions]);
 
-interface API extends Config {
-}
-
-interface API extends CryptoTransactions {
-}
-
-applyMixins(API, [Config, CryptoTransactions]);
-
-export { API };
+export type API = Base & Config & CryptoTransactions;
+export const API = ApiBase as unknown as new (
+  baseUri: string,
+  publishableKey: string,
+) => API;

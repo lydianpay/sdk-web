@@ -74,7 +74,7 @@ export function formatCurrency(
 // TODO: Should we convert fiat to USDT locally, or send converted value from Backend?
 export function convertAmountToUSDT(amount: number, currency: string): number {
   let conversionRate = 1.0;
-  let precision = 2;
+  const precision = 2;
 
   switch (currency) {
     case 'USD':
@@ -93,7 +93,7 @@ export function convertAmountToUSDT(amount: number, currency: string): number {
 // TODO: Should we convert crypto to USDT locally, or send converted value from Backend?
 export function convertCryptoToUSDT(cryptoAmount: number, asset: string): number {
   let cryptoRate = 1.00;
-  let precision = 2;
+  const precision = 2;
 
   switch (asset) {
     case 'BTC':

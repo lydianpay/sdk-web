@@ -3,7 +3,10 @@
  * @param derivedCtor - The derived class
  * @param baseCtors - An array of base classes
  */
-export function applyMixins(derivedCtor: any, baseCtors: any[]) {
+export function applyMixins(
+  derivedCtor: { prototype: object },
+  baseCtors: Array<{ prototype: object }>,
+) {
   baseCtors.forEach((baseCtor) => {
     Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
       const descriptor = Object.getOwnPropertyDescriptor(baseCtor.prototype, name);

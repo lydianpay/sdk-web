@@ -134,7 +134,7 @@ export class Checkout extends HTMLElement {
   private selectedAsset: Asset | null = null;
   private selectedAssetNetworks: string[] | null = null;
   private selectedNetwork: string | null = null;
-  private selectedWallet: any;
+  private selectedWallet!: WalletConnectWallet & { code?: string };
 
   private connectWalletButtonsContainer: HTMLDivElement | null = null;
   private containerMoreWallets: HTMLDivElement | null = null;
@@ -283,7 +283,7 @@ export class Checkout extends HTMLElement {
     this.attachListeners();
     this.loadInitialState();
 
-    await this.walletConnectService?.init();
+    await this.walletConnectService?.init(this.initOptions.walletConnectProjectId);
   }
 
   public async updateTransaction(transaction: Transaction) {
@@ -557,7 +557,7 @@ export class Checkout extends HTMLElement {
     this.selectedNetwork = network;
   }
 
-  private setSelectedWallet(wallet: any) {
+  private setSelectedWallet(wallet: WalletConnectWallet & { code?: string }) {
     this.selectedWallet = wallet;
   }
 
@@ -940,7 +940,7 @@ export class Checkout extends HTMLElement {
   }
 
   private attachListeners(): void {
-    this.btnAppPayment?.addEventListener('click', (e) => {
+    this.btnAppPayment?.addEventListener('click', () => {
       console.log('TODO: NOT IMPLEMENTED');
     });
 
@@ -1031,7 +1031,7 @@ export class Checkout extends HTMLElement {
       this.loadInitialState();
     });
 
-    this.modalButtonCopyAssetTotal?.addEventListener('click', (event) => {
+    this.modalButtonCopyAssetTotal?.addEventListener('click', () => {
       const asset = this.modalDisplayAssetTotal?.innerText ?? '';
       navigator.clipboard.writeText(asset);
     });
@@ -1082,14 +1082,14 @@ export class Checkout extends HTMLElement {
     });
 
     // KYC & Travel Rules
-    this.modalDocumentType?.addEventListener('change', (e) => {
+    this.modalDocumentType?.addEventListener('change', () => {
       if (this.modalDocumentType?.value === 'PASSPORT' || this.modalDocumentType?.value === 'RESIDENCE_PERMIT') {
         this.modalDocumentFileBackContainer?.classList?.add('hidden');
       } else {
         this.modalDocumentFileBackContainer?.classList?.remove('hidden');
       }
     });
-    this.documentType?.addEventListener('change', (e) => {
+    this.documentType?.addEventListener('change', () => {
       if (this.documentType?.value === 'PASSPORT' || this.documentType?.value === 'RESIDENCE_PERMIT') {
         this.documentFileBackContainer?.classList?.add('hidden');
       } else {
@@ -1124,7 +1124,7 @@ export class Checkout extends HTMLElement {
           network: this.selectedNetwork,
         });
         console.log('transaction', this.cryptoTransaction);
-      } catch (error) {
+      } catch {
         this.initOptions?.paymentFailedListener?.('Unable to create transaction.');
       }
 
@@ -1140,9 +1140,9 @@ export class Checkout extends HTMLElement {
         const transaction = await this.API?.getCryptoTransaction(this.cryptoTransaction?.transactionId);
         if (transaction) {
           let gasFeesUSDT = 0.0;
-          let completedCryptoTransactions: CryptoTransaction[] = [];
+          const completedCryptoTransactions: CryptoTransaction[] = [];
           let hasPendingCryptoTransaction = false;
-          for (const [id, tx] of Object.entries(transaction.cryptoTransactions)) {
+          for (const [, tx] of Object.entries(transaction.cryptoTransactions)) {
             const txExpirationDateTime = Date.parse(tx.expiration);
             const txCurrentDateTime = Date.now();
             if (tx.status === CryptoTransactionStatusSuccess) {
@@ -1273,7 +1273,7 @@ export class Checkout extends HTMLElement {
       return;
     }
 
-    const buttons = this.sdkConfig?.allowedAssets?.map((asset, index) => {
+    const buttons = this.sdkConfig?.allowedAssets?.map((asset) => {
       switch (asset.code) {
         case AllowedAssetBitcoin:
           return AssetButton(AssetBitcoin);
@@ -1315,7 +1315,7 @@ export class Checkout extends HTMLElement {
     } else {
       this.modalContainerAssets!.innerHTML = '';
 
-      buttons?.filter(v => v).forEach((button, index) => {
+      buttons?.filter(v => v).forEach((button) => {
         if (this.modalContainerAssets) {
           this.modalContainerAssets.innerHTML += button;
         }
@@ -1383,7 +1383,7 @@ export class Checkout extends HTMLElement {
       this.modalAssetImg!.src = <string>this.selectedAsset?.img;
     }
 
-    let allowedAssets = this.sdkConfig?.allowedAssets;
+    const allowedAssets = this.sdkConfig?.allowedAssets;
     const asset = allowedAssets?.find(a => a.code === this.selectedAsset?.code);
     if (asset == undefined) {
       console.log('Unknown asset: ', this.selectedAsset?.code);
@@ -1445,7 +1445,7 @@ export class Checkout extends HTMLElement {
     if (this.API) {
       try {
         this.sdkConfig = await this.API.getSDKConfig();
-      } catch (error) {
+      } catch {
         this.initOptions?.paymentFailedListener?.('Unable to load SDK configuration.');
       }
     } else {
@@ -1596,7 +1596,7 @@ export class Checkout extends HTMLElement {
         await this.handleCreatedTransactionAndStartListening();
       }
 
-    } catch (error) {
+    } catch {
       this.hideProcessing();
       this.initOptions?.paymentFailedListener?.('Unable to create cryptotransaction.');
     }
@@ -1618,15 +1618,18 @@ export class Checkout extends HTMLElement {
     if (this.selectedWallet.id == 'manual') {
       this.showQRCode(this.cryptoTransaction.qrData, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
     } else {
+      if (!this.walletConnectService) {
+        throw new Error('WalletConnect service not initialized');
+      }
 
-      let walletSession = this.walletConnectService?.findSession(this.selectedWallet);
+      let walletSession = this.walletConnectService.findSession(this.selectedWallet);
 
       console.log('selected wallet', this.selectedWallet);
       console.log('matching wallet session', walletSession);
 
       // Display QR for session connection
       if (!walletSession) {
-        const { uri, approval } = await this.walletConnectService?.connectWalletWithQrCode();
+        const { uri, approval } = await this.walletConnectService.connectWalletWithQrCode();
 
         if (uri) {
           this.showQRCode(uri, this.cryptoTransaction.assetAmount, this.cryptoTransaction.address, this.cryptoTransaction.additionalCustomerFee);
@@ -1668,14 +1671,14 @@ export class Checkout extends HTMLElement {
 
       try {
         this.showProcessing(`Waiting for transaction approval from ${walletSession.peer.metadata.name}...`);
-        const transferResp = await this.walletConnectService.sendEthTransaction(transferData, walletSession);
         // TODO: do something with this response?
+        await this.walletConnectService.sendEthTransaction(transferData, walletSession);
 
         this.hideProcessing();
         this.showPaymentSuccess();
         this.clearInterval();
         this.initOptions?.paymentSuccessListener?.();
-      } catch (error) {
+      } catch {
         this.hideProcessing();
         this.showPaymentFailure();
         this.clearInterval();
@@ -1781,7 +1784,7 @@ export class Checkout extends HTMLElement {
       console.log('transaction', this.cryptoTransaction);
       this.hideProcessing();
       await this.handleCreatedTransactionAndStartListening();
-    } catch (error) {
+    } catch {
       this.hideProcessing();
       this.showPaymentFailure();
       this.clearInterval();

@@ -1,4 +1,5 @@
 import { CreateTransactionResponse } from 'src/types';
+import { EIP6963AnnounceProviderEvent } from 'src/types/eip6963';
 import { encodeFunctionData } from 'viem';
 
 export type Address = `0x${string}`;
