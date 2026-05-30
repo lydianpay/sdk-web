@@ -1,7 +1,27 @@
 {
   "name": "@lydianpay/sdk-web",
   "version": "0.0.0-managed",
+  "description": "Drop-in crypto payment checkout for the web — a <lydian-checkout> web component and window.Lydian API across 20+ chains and major stablecoins.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lydianpay/sdk-web.git"
+  },
+  "homepage": "https://github.com/lydianpay/sdk-web#readme",
+  "bugs": "https://github.com/lydianpay/sdk-web/issues",
+  "keywords": [
+    "lydian",
+    "crypto",
+    "payments",
+    "checkout",
+    "stablecoin",
+    "usdt",
+    "usdc",
+    "web3",
+    "walletconnect",
+    "web-component",
+    "sdk"
+  ],
   "type": "module",
   "main": "dist/lydian.iife.js",
   "files": [
