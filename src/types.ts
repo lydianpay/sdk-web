@@ -119,7 +119,6 @@ export type Support = {
 export type GetSDKConfigResponse = {
   appPayEnabled: boolean;
   cryptoPayEnabled: boolean;
-  lydianPayCluster: string;
   allowedAssets: Asset[];
   walletConnectEnabled: boolean;
   cancelTransactionEnabled: boolean;

@@ -91,8 +91,6 @@ export class Checkout extends HTMLElement {
   private sdkConfig: GetSDKConfigResponse | null = null;
   private cryptoTransaction: CreateTransactionResponse | null = null;
   private getCryptoTransactionIntervalID: NodeJS.Timeout | null = null;
-  private lydianTransaction: CreateTransactionResponse | null = null;
-  private getLydianTransactionIntervalID: NodeJS.Timeout | null = null;
 
   private walletConnectService: WalletConnectService | null = null;
 
@@ -1260,38 +1258,11 @@ export class Checkout extends HTMLElement {
     }, 2000);
   }
 
-  private startListeningLydianTransaction() {
-    this.clearInterval();
-    this.getLydianTransactionIntervalID = setInterval(async () => {
-      if (this.lydianTransaction?.transactionId) {
-        const transaction = await this.API?.getClusterTransaction(this.lydianTransaction?.transactionId);
-        if (transaction) {
-          if (transaction.status === CryptoTransactionStatusSuccess) {
-            this.showPaymentSuccess();
-            this.clearInterval();
-            this.initOptions?.paymentSuccessListener?.();
-          }
-          const expirationDateTime = Date.parse(transaction.expiration);
-          const currentDateTime = Date.now();
-          if (expirationDateTime < currentDateTime) {
-            this.showPaymentFailure();
-            this.clearInterval();
-            this.initOptions?.paymentFailedListener?.('Transaction Timed Out / Failed!');
-          }
-        }
-      }
-    }, 2000);
-  }
-
   private clearInterval() {
     console.log('Clear interval called...');
     if (this.getCryptoTransactionIntervalID) {
       clearInterval(this.getCryptoTransactionIntervalID);
       this.getCryptoTransactionIntervalID = null;
-    }
-    if (this.getLydianTransactionIntervalID) {
-      clearInterval(this.getLydianTransactionIntervalID);
-      this.getLydianTransactionIntervalID = null;
     }
   }
 
@@ -1474,7 +1445,6 @@ export class Checkout extends HTMLElement {
     if (this.API) {
       try {
         this.sdkConfig = await this.API.getSDKConfig();
-        this.API.setClusterBaseUri(this.sdkConfig.lydianPayCluster);
       } catch (error) {
         this.initOptions?.paymentFailedListener?.('Unable to load SDK configuration.');
       }
