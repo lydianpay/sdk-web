@@ -77,7 +77,6 @@ import {
 } from '../utils';
 import { encodeEthereumUsdtTransfer } from '../types/tether';
 import { Address } from '../types/ethereum';
-import WalletButton from './buttons/walletButton';
 import QRCodeStyling from '@solana/qr-code-styling';
 import { encodeEthereumUsdcTransfer, USDC_ERC20_MAIN } from '../types/usdc';
 
@@ -1445,75 +1444,21 @@ export class Checkout extends HTMLElement {
   }
 
   private async showWalletConnectButtons() {
-    if (!this.connectWalletButtonsContainer || !this.containerMoreWallets || !this.containerWalletList) {
-      return;
-    }
-
-    this.containerWalletList.innerHTML = '';
-    this.containerMoreWallets.innerHTML = '';
-
     if (this.initOptions?.isEmbedded) {
       requestAnimationFrame(() => this.containerNetworks?.classList.add('hidden'));
     } else {
       requestAnimationFrame(() => this.modalContainerNetworks?.classList.add('hidden'));
     }
 
-    this.connectWalletButtonsContainer.classList.remove('hidden');
-
+    // WalletConnect wallets are disabled until LydianConnect (the WalletConnect
+    // replacement) is integrated. Go straight to the manual QR code flow.
     const manualQrButton = {
       id: 'manual',
       name: 'Manual QR Code',
       img: 'https://tetherpay.com/images/95de9fd2-da4f-4415-3ec7-bb1befdbc500/public',
     };
-
-    if (this.containerWalletManual) {
-      this.containerWalletManual.innerHTML = '';
-      this.containerWalletManual.innerHTML += WalletButton(manualQrButton);
-    }
-
-    // TODO: extract this to constants
-    const wallets: WalletConnectWallet[] = [
-      {
-        id: 'metamask',
-        name: 'MetaMask',
-        img: 'https://tetherpay.com/images/a0ddd685-4a84-4f5c-ab6d-9796994cf500/public',
-        wcPeerName: 'MetaMask Wallet',
-      },
-      {
-        id: 'trustwallet',
-        name: 'Trust Wallet',
-        img: 'https://logowik.com/content/uploads/images/trust-wallet-shield4830.logowik.com.webp',
-        wcPeerName: 'Trust Wallet',
-      },
-    ];
-
-    wallets.forEach((wallet, index) => {
-      const button = WalletButton(wallet, !!this.walletConnectService?.findSession(wallet));
-      if (index >= 3 && this.containerMoreWallets) {
-        this.containerMoreWallets.innerHTML += button;
-      } else if (this.containerWalletList) {
-        this.containerWalletList.innerHTML += button;
-      }
-    });
-
-    if (wallets.length <= 3) {
-      this.containerMoreWallets?.classList.add('hidden');
-    }
-
-    this.containerWalletList?.classList.remove('hidden');
-
-    this.attachListenerOnWallets([...wallets, manualQrButton]);
-  }
-
-  private attachListenerOnWallets(wallets: WalletConnectWallet[]) {
-    wallets.forEach((wallet) => {
-      const walletBtn = this.shadowRoot?.getElementById('btnWallet' + wallet.id) as HTMLButtonElement;
-      walletBtn?.addEventListener('click', async () => {
-        this.setSelectedWallet(wallet);
-        await this.beginWalletConnectTransaction();
-      });
-    });
-
+    this.setSelectedWallet(manualQrButton);
+    await this.beginWalletConnectTransaction();
     this.lydianBtnCancelWalletConnect?.addEventListener('click', async () => {
       this.loadInitialState();
     });
