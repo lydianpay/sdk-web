@@ -314,15 +314,11 @@ export class Checkout extends HTMLElement {
     this.containerPaymentSuccess?.classList.add('hidden');
     this.modalContainerPaymentSuccess?.classList.add('hidden');
 
+    // App pay is not implemented yet — keep it hidden.
     this.btnAppPayment?.classList.add('hidden');
-    if (this.sdkConfig?.appPayEnabled) {
-      this.btnAppPayment?.classList.remove('hidden');
-    }
 
-    this.btnCryptoPayment?.classList.add('hidden');
-    if (this.sdkConfig?.cryptoPayEnabled) {
-      this.btnCryptoPayment?.classList.remove('hidden');
-    }
+    // Crypto pay is always available.
+    this.btnCryptoPayment?.classList.remove('hidden');
 
     this.modalButtonCancelTransaction?.classList.add('hidden');
     if (this.sdkConfig?.cancelTransactionEnabled) {
@@ -616,12 +612,7 @@ export class Checkout extends HTMLElement {
   }
 
   private showButtons(): void {
-    if (this.sdkConfig?.appPayEnabled) {
-      this.btnAppPayment?.classList.remove('hidden');
-    }
-    if (this.sdkConfig?.cryptoPayEnabled) {
-      this.btnCryptoPayment?.classList.remove('hidden');
-    }
+    this.btnCryptoPayment?.classList.remove('hidden');
   }
 
   private hideButtons(): void {
@@ -1474,14 +1465,6 @@ export class Checkout extends HTMLElement {
       name: 'Manual QR Code',
       img: 'https://tetherpay.com/images/95de9fd2-da4f-4415-3ec7-bb1befdbc500/public',
     };
-
-    if (!this.sdkConfig?.walletConnectEnabled) {
-      this.setSelectedWallet(manualQrButton);
-      await this.beginWalletConnectTransaction();
-      this.lydianBtnCancelWalletConnect?.addEventListener('click', async () => {
-        this.loadInitialState();
-      });
-    }
 
     if (this.containerWalletManual) {
       this.containerWalletManual.innerHTML = '';

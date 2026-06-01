@@ -1,7 +1,7 @@
 import { Base } from '../base';
 import { GetSDKConfigResponse } from '../../types';
 
-const resourceName = 'config';
+const resourceName = 'merchant/config';
 
 export class Config extends Base {
   async getSDKConfig(): Promise<GetSDKConfigResponse> {

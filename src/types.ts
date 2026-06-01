@@ -118,10 +118,7 @@ export type Support = {
 }
 
 export type GetSDKConfigResponse = {
-  appPayEnabled: boolean;
-  cryptoPayEnabled: boolean;
   allowedAssets: Asset[];
-  walletConnectEnabled: boolean;
   cancelTransactionEnabled: boolean;
   support: Support;
 }
