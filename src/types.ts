@@ -36,7 +36,7 @@ export type CreateTransactionRequest = {
 export type CreateTransactionResponse = {
   transactionId: string;
   qrData: string;
-  assetAmount: number;
+  assetAmount: string; // decimal string for crypto precision, e.g. "0.02397188"
   additionalCustomerFee: number;
   address: string;
   status: number;

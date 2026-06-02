@@ -72,7 +72,6 @@ import {
   convertCryptoToUSDT,
   formatCurrency,
   formatDateForTransactionDetails,
-  formatToTwoDecimals,
   parseQrCodeData,
 } from '../utils';
 import { encodeEthereumUsdtTransfer } from '../types/tether';
@@ -626,11 +625,12 @@ export class Checkout extends HTMLElement {
     this.modalContainerNetworks?.classList.add('hidden');
   }
 
-  private showQRCode(qrData: string, amount: number, address: string, additionalCustomerFee: number): void {
+  private showQRCode(qrData: string, amount: string, address: string, additionalCustomerFee: number): void {
     if (!this.selectedAsset) {
       return;
     }
-    const assetTotal = formatToTwoDecimals(amount) + ' ' + this.selectedAsset.code.toUpperCase();
+    const trimmedAmount = amount.includes('.') ? amount.replace(/\.?0+$/, '') : amount;
+    const assetTotal = trimmedAmount + ' ' + this.selectedAsset.code.toUpperCase();
     const network = this.selectedNetwork ? capitalizeFirstLetter(this.selectedNetwork) : this.selectedAsset.networks[0];
     const transactionID = <string>this.initOptions?.transaction.referenceNumber;
     const totalAmount = <string>this.initOptions?.transaction.amount.toLocaleString('en-US', {
