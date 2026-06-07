@@ -1,99 +1,24 @@
 name: Claude Code
 
 on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
   pull_request:
-    types: [opened, synchronize, ready_for_review]
+    types: [opened, synchronize]
 
-concurrency:
-  group: claude-pr-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
 
 jobs:
   claude:
-    name: PR Review
-    if: github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-      id-token: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
-        with:
-          fetch-depth: 0
-
-      - name: PR Review with Progress Tracking
-        uses: anthropics/claude-code-action@0ee1beea589a67d33340072691a5d42abec7ae6b #v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: |
-            --model opus
-            --allowedTools "Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
-          track_progress: true
-          prompt: |
-              # PR Review (TypeScript Web SDK)
-
-              You are a senior frontend/TypeScript engineer reviewing this pull request. Read the entire diff. Be blunt and direct. Do not hedge or sugarcoat.
-
-              Review every changed file in a single pass. Be exhaustive — the next reviewer should not find new issues you missed.
-
-              sdk-web is a PUBLIC, embeddable checkout SDK that runs inside third-party merchant pages and ships as a single IIFE bundle. A bug here breaks real merchants' checkouts, and a security flaw executes on their customers' browsers. Hold the bar high.
-
-              ## 1. Determine Review Scope
-
-              Decide which passes apply based on what changed:
-              - **code-review** (always): CLAUDE.md compliance, bugs, code quality, TypeScript soundness.
-              - **security-review** (always): DOM-injection/XSS sinks (innerHTML with non-static content), secret/key leakage, unsafe message/postMessage handling, supply-chain risk from new deps — this code runs on other people's sites.
-              - **api-contract-review** (if `src/network/**` changed): request paths/methods/headers match the Gateway Swagger contract; hand-maintained types in `types.ts` match the wire shape; multipart vs JSON handled correctly (e.g. KYC `documentFiles` is an array of files, no JSON content-type).
-              - **web-component-review** (if `src/ui/**` changed): shadow-DOM node lookups, event-listener and `setInterval` lifecycle (every interval cleared on success/failure/expiry/teardown — leaked intervals are a known bug class), no state leaking across re-inits.
-              - **test-analyzer** (if `*.test.ts` changed or logic added without tests): Vitest coverage gaps. New logic without tests is a Warning; a bug fix must include a regression test.
-              - **bundle-review** (if `package.json`/deps changed): new dependency justified and size-conscious — every byte ships to third-party pages.
-              - **release-review** (if `package.json` version, `release-package.yml`, or `.npmrc` changed): version stays the `0.0.0-managed` placeholder (never hand-bump); workflow keeps OIDC `id-token: write`, SHA-pinned actions, and no committed npm token.
-
-              ## 2. Detailed Review Checklist
-
-              **Correctness & Bugs:**
-              - Logic errors, off-by-one, wrong conditions, bad async/await or unhandled promise rejections
-              - Edge cases: empty inputs, null/undefined, missing optional config, network failure paths
-              - `setInterval`/`setTimeout`/event-listener leaks; intervals not cleared on every exit path
-              - Breaking changes to `window.Lydian` public API, `<lydian-checkout>` attributes, or the listener callbacks merchants depend on
-              - Failures surfaced via `paymentFailedListener`, not thrown into the host page
-
-              **Security (runs on third-party sites):**
-              - Unsanitized `innerHTML` / `dangerouslySetInnerHTML` with dynamic data
-              - Hardcoded/logged secrets; remember `X-Publishable-Key` is publishable by design but nothing else is
-              - `fetch` only to the intended Gateway origin; no eval/dynamic code; safe `postMessage` origin checks
-              - New dependencies: necessary, reputable, size-appropriate
-
-              **Web SDK Specifics:**
-              - Network calls go through `Base` (`request`/`requestWithFormData`); new endpoints are methods on a resource class mixed in via `applyMixins`.
-              - Base URLs come from `constants.ts` (`api.lydian.*`).
-              - Don't edit `lydian.generated.css` (generated) — change `lydian.css`.
-              - Follow patterns documented in this repo's `CLAUDE.md`.
-
-              ## 3. Execute Review Passes
-
-              Run each applicable pass against the changed files. Focus only on the diff — do not review unchanged code. Never fabricate line numbers — if you can't pin the exact line, reference the file and describe the location.
-
-              ## 4. Output Format
-
-              Post a single top-level comment with the summary below. Do not use inline comments. Do not list strengths or what's well-done. Omit sections with no findings. If everything looks clean, say so in one line.
-
-              End with a one-line verdict: 👍 if mergeable as-is or with only suggestions, 👎 if any critical or important issues are present.
-
-              ```
-              ## PR Review Summary
-
-              ### Critical Issues (must fix before merge)
-              - [review-pass]: Issue description [file:line] — what's wrong, why it matters, suggested fix
-
-              ### Important Issues (should fix)
-              - [review-pass]: Issue description [file:line] — what's wrong, why it matters, suggested fix
-
-              ### Suggestions (nice to have)
-              - [review-pass]: Issue description [file:line] — suggested change
-
-              **Verdict:** 👍 | 👎 — one-sentence reason
-              ```
+    uses: lydianpay/ci/.github/workflows/claude-review.yml@main
+    with:
+      base: frontend-base
+    secrets: inherit

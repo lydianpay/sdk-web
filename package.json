@@ -33,6 +33,7 @@
   "scripts": {
     "prepublishOnly": "[ \"$CI\" = \"true\" ] || (echo 'Publish via CI release only' && exit 1)",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage --coverage.provider=v8 --coverage.reporter=lcov --coverage.reporter=text",
     "build:css": "npx tailwindcss -i src/ui/lydian.css -o ./src/ui/lydian.generated.css --minify",
