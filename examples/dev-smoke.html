@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--
+  Dev smoke harness for the checkout SDK against the dev gateway.
+
+  Setup:
+    1. cp .env.example .env.local   (then fill in a dev publishable key + WC project id)
+    2. npm run build                (builds dist/lydian.iife.js, which this page loads)
+    3. npm run dev                  (Vite dev server)
+    4. open http://localhost:5173/examples/dev-smoke.html
+
+  Config is read from .env.local (gitignored) via Vite import.meta.env — no secrets in this file.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lydian SDK Dev Smoke</title>
+</head>
+<body>
+<h1>Lydian SDK Dev Smoke (dev)</h1>
+<script src="../dist/lydian.iife.js"></script>
+
+<div style="width: 35%">
+  <lydian-checkout></lydian-checkout>
+</div>
+
+<!-- Config comes from .env.local (gitignored) via Vite import.meta.env. -->
+<script type="module">
+  try {
+    await window.Lydian.init({
+      dev: true,
+      sandbox: false,
+      publishableKey: import.meta.env.VITE_PUBLISHABLE_KEY,
+      walletConnectProjectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID,
+      transaction: {
+        amount: 2.45,
+        currency: 'TRY',
+        descriptor: 'DEV_SMOKE',
+        referenceNumber: 'dev-smoke-001',
+      },
+      paymentFailedListener: (failureMessage) => {
+        console.error('PAYMENT_FAILED:', failureMessage);
+      },
+      paymentSuccessListener: () => {
+        console.log('PAYMENT_SUCCESS');
+      },
+    });
+  } catch (e) {
+    console.error('INIT_ERROR:', e);
+  }
+</script>
+</body>
+</html>

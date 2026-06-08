@@ -71,48 +71,6 @@ export function formatCurrency(
   }).format(amount);
 }
 
-// TODO: Should we convert fiat to USDT locally, or send converted value from Backend?
-export function convertAmountToUSDT(amount: number, currency: string): number {
-  let conversionRate = 1.0;
-  const precision = 2;
-
-  switch (currency) {
-    case 'USD':
-      conversionRate = 1.0;
-      break;
-    case 'TRY':
-      conversionRate = 41.00; // TODO: this should be variable
-      break;
-    default:
-      conversionRate = 1.0;
-  }
-
-  return +((amount / conversionRate).toFixed(precision));
-}
-
-// TODO: Should we convert crypto to USDT locally, or send converted value from Backend?
-export function convertCryptoToUSDT(cryptoAmount: number, asset: string): number {
-  let cryptoRate = 1.00;
-  const precision = 2;
-
-  switch (asset) {
-    case 'BTC':
-      cryptoRate = 114983.41;
-      break;
-    case 'ETH':
-      cryptoRate = 4148.15;
-      break;
-    case 'SOL':
-      cryptoRate = 199.77;
-      break;
-    case 'TRX':
-      cryptoRate = 0.30;
-      break;
-  }
-
-  return +((cryptoAmount * cryptoRate).toFixed(precision));
-}
-
 export function formatDateForTransactionDetails(isoDateString: string): string {
   // Create a new Date object from the ISO string
   const date = new Date(isoDateString);
