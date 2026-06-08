@@ -5,6 +5,21 @@ export const CryptoTransactionStatusPending = 0;
 export const CryptoTransactionStatusSuccess = 1;
 export const CryptoTransactionStatusPendingKYCVerification = -3;
 
+// Transaction (order) status — negative values are terminal (cancelled/fraud/timeout)
+export const TransactionStatusPending = 0;
+export const TransactionStatusSuccess = 1;
+
+// PaymentStatus — collection progress
+export const PaymentStatusUnpaid = 0;
+export const PaymentStatusPartiallyPaid = 1;
+export const PaymentStatusPaid = 2;
+export const PaymentStatusOverpaid = 3;
+
+// PaymentRequestStatus — per deposit attempt
+export const PaymentRequestStatusExpired = -1;
+export const PaymentRequestStatusPending = 0;
+export const PaymentRequestStatusConfirmed = 1;
+
 export const BaseUrlDev = 'https://api.lydian.dev';
 export const BaseUrlSandbox = 'https://api.sandbox.lydian.com';
 export const BaseUrlProduction = 'https://api.lydian.com';

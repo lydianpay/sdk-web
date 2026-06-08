@@ -35,6 +35,7 @@ export type CreateTransactionRequest = {
 
 export type CreateTransactionResponse = {
   transactionId: string;
+  paymentRequestId: string;
   qrData: string;
   assetAmount: string; // decimal string for crypto precision, e.g. "0.02397188"
   additionalCustomerFee: number;
@@ -59,7 +60,7 @@ export type KYCVerificationRequest = {
   documentFiles: File[];
 }
 
-export type CollectTransactionRequest = {
+export type CreatePaymentRequest = {
   asset: string;
   network: string;
 };
@@ -69,26 +70,57 @@ export type CancelTransactionRequest = {
   forfeit?: boolean;
 };
 
-export type GetTransactionResponse = {
-  expiration: string;
-  status: number;
-  transactionID: string;
-  amount: number;
-  amountCurrency: string;
-  remainingBalance: number;
-  cryptoTransactions: Record<string, CryptoTransaction>;
-}
+export type Amounts = {
+  currency: string;
+  fxRateToUSD: number;
+  totalLocal: number;
+  totalUSD: number;
+  customerFeeUSD: number;
+  receivedUSD: number;
+};
 
-// TODO: If total gas fee is later added into the transaction modal,
-// TODO: we don't need to calculate gasFees from the cryptoTransactions.
-export type CryptoTransaction = {
-  amount: number;
-  gasFee: number;
+// A single deposit attempt. `status` is a PaymentRequestStatus
+// (-1 expired / 0 pending / 1 confirmed).
+export type PaymentRequest = {
+  paymentRequestID: string;
+  transactionID: string;
   cryptoAsset: string;
   cryptoNetwork: string;
-  createdAt: string;
-  status: number;
+  cryptoRatePerUSD: number;
+  expectedUSD: number;
+  expectedCrypto: number;
+  address: string;
+  qrData: string;
+  walletName: string;
   expiration: string;
+  status: number;
+  receivedCrypto: number;
+  receivedUSD: number;
+  txnHash: string;
+  fromAddress: string;
+  confirmationCount: number;
+  completedAt: string;
+  gasFee: number;
+  gasFeeUnits: string;
+};
+
+// GET /transaction/{id}: the transaction (top-level fields) + derived remaining
+// balances + joined payment requests. `status` = transaction status;
+// `paymentStatus` = PaymentStatus (0 unpaid / 1 partial / 2 paid / 3 overpaid).
+export type GetTransactionResponse = {
+  transactionID: string;
+  merchantID: string;
+  accountID: string;
+  referenceNumber: string;
+  descriptor: string;
+  status: number;
+  paymentStatus: number;
+  expiration: string;
+  cancellationReason?: string;
+  amounts: Amounts;
+  remainingUSD: number;
+  remainingLocal: number;
+  payments: PaymentRequest[];
 }
 
 export type Asset = {

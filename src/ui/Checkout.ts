@@ -3,7 +3,6 @@ import checkoutTemplate from './checkout-template.html?raw';
 import {
   Asset,
   CreateTransactionResponse,
-  CryptoTransaction,
   currencies,
   GetSDKConfigResponse,
   InitOptions,
@@ -55,9 +54,13 @@ import {
   BaseUrlDev,
   BaseUrlProduction,
   BaseUrlSandbox,
-  CryptoTransactionStatusPending,
   CryptoTransactionStatusPendingKYCVerification,
-  CryptoTransactionStatusSuccess,
+  TransactionStatusPending,
+  TransactionStatusSuccess,
+  PaymentStatusPartiallyPaid,
+  PaymentStatusOverpaid,
+  PaymentRequestStatusConfirmed,
+  PaymentRequestStatusPending,
 } from '../constants';
 import { API } from '../network';
 import isMobile from 'is-mobile';
@@ -68,8 +71,6 @@ import NetworkButton from './buttons/networkButton';
 import { WalletConnectService } from '../services/walletConnectService';
 import {
   capitalizeFirstLetter,
-  convertAmountToUSDT,
-  convertCryptoToUSDT,
   formatCurrency,
   formatDateForTransactionDetails,
   parseQrCodeData,
@@ -1129,84 +1130,65 @@ export class Checkout extends HTMLElement {
       if (this.cryptoTransaction?.transactionId) {
         const transaction = await this.API?.getCryptoTransaction(this.cryptoTransaction?.transactionId);
         if (transaction) {
-          let gasFeesUSDT = 0.0;
-          const completedCryptoTransactions: CryptoTransaction[] = [];
-          let hasPendingCryptoTransaction = false;
-          for (const [, tx] of Object.entries(transaction.cryptoTransactions)) {
-            const txExpirationDateTime = Date.parse(tx.expiration);
-            const txCurrentDateTime = Date.now();
-            if (tx.status === CryptoTransactionStatusSuccess) {
-              gasFeesUSDT -= convertCryptoToUSDT(tx.gasFee, tx.cryptoAsset);
-              completedCryptoTransactions.push(tx);
-            } else if (tx.status === CryptoTransactionStatusPending && txExpirationDateTime >= txCurrentDateTime) {
-              hasPendingCryptoTransaction = true;
-            }
-          }
+          const { amounts } = transaction;
+          const overpaidUSD = +(amounts.receivedUSD - amounts.totalUSD).toFixed(2);
 
-          const transactionAmountUSDT = convertAmountToUSDT(transaction.amount, transaction.amountCurrency);
-          const paidAmountUSDT = convertAmountToUSDT(transaction.amount - transaction.remainingBalance, transaction.amountCurrency);
-          const overpaidAmountUSDT = +(paidAmountUSDT - transactionAmountUSDT).toFixed(2);
-          const returnAmountUSDT = +(overpaidAmountUSDT + gasFeesUSDT).toFixed(2);
-
+          // Display sourced entirely from backend amounts — no client-side FX.
           this.modalLydianID!.innerText = transaction.transactionID;
-          this.modalTransactionAmount!.innerText = formatCurrency(transaction.amount);
-          this.modalTransactionAmountUSDT!.innerText = transactionAmountUSDT.toString();
-          this.modalTransactionTotalAmountUSDT!.innerText = paidAmountUSDT.toString();
-          this.modalTransactionOverpaidAmountUSDT!.innerText = overpaidAmountUSDT.toString();
-          this.modalTransactionReturnAmountUSDT!.innerText = returnAmountUSDT.toString();
-          this.modalTransactionAmountForUnderpaidWarning!.innerText = formatCurrency(transaction.amount, transaction.amountCurrency);
-          this.modalTransactionAmountForUnderpaid!.innerText = formatCurrency(transaction.amount, transaction.amountCurrency);
-          this.modalTransactionPaidAmountForUnderpaid!.innerText = formatCurrency(transaction.amount - transaction.remainingBalance, transaction.amountCurrency);
+          this.modalTransactionAmount!.innerText = formatCurrency(amounts.totalLocal, amounts.currency);
+          this.modalTransactionAmountUSDT!.innerText = amounts.totalUSD.toString();
+          this.modalTransactionTotalAmountUSDT!.innerText = amounts.receivedUSD.toString();
+          this.modalTransactionOverpaidAmountUSDT!.innerText = (overpaidUSD > 0 ? overpaidUSD : 0).toString();
+          this.modalTransactionReturnAmountUSDT!.innerText = (overpaidUSD > 0 ? overpaidUSD : 0).toString();
+          this.modalTransactionAmountForUnderpaidWarning!.innerText = formatCurrency(amounts.totalLocal, amounts.currency);
+          this.modalTransactionAmountForUnderpaid!.innerText = formatCurrency(amounts.totalLocal, amounts.currency);
+          this.modalTransactionPaidAmountForUnderpaid!.innerText = formatCurrency(amounts.totalLocal - transaction.remainingLocal, amounts.currency);
 
+          const confirmedPayments = transaction.payments.filter(p => p.status === PaymentRequestStatusConfirmed);
           if (this.modalTransactionDetailItemsContainer) {
             this.modalTransactionDetailItemsContainer!.innerHTML = '';
-            completedCryptoTransactions.forEach(cryptoTransaction => {
+            confirmedPayments.forEach(payment => {
               this.modalTransactionDetailItemsContainer!.innerHTML += `
                 <div class="flex items-bottom justify-between mt-2">
                   <div class="flex flex-col">
-                    <p class="font-bold">${formatDateForTransactionDetails(cryptoTransaction.createdAt)}</p>
+                    <p class="font-bold">${formatDateForTransactionDetails(payment.completedAt)}</p>
                   </div>
                   <span class="mb-1.5 grow mx-1 border-b border-dotted border-neutral-400"></span>
                   <div class="flex flex-col text-right">
-                    <p><span class="font-bold">${formatCurrency(cryptoTransaction.amount, transaction.amountCurrency)} ${cryptoTransaction.cryptoAsset}</span> on ${cryptoTransaction.cryptoNetwork}</p>
+                    <p><span class="font-bold">${payment.receivedCrypto} ${payment.cryptoAsset}</span> on ${payment.cryptoNetwork}</p>
                   </div>
                 </div>
               `;
             });
           }
 
-          let transactionCompleted = false;
-          let insufficientAmount = false;
+          const expired = Date.parse(transaction.expiration) < Date.now();
 
-          if (returnAmountUSDT > 0) {
-            this.modalTransactionOverpaidAmountUSDTContainer?.classList.remove('hidden');
-            this.modalOverpaidWarning?.classList.remove('hidden');
-            this.modalTransactionReturnAmountUSDTContainer?.classList.remove('hidden');
-            transactionCompleted = true;
-          } else if (paidAmountUSDT > transactionAmountUSDT) {
-            this.modalTransactionOverpaidAmountUSDTContainer?.classList.remove('hidden');
-            this.modalOverpaidLessThanGasFeesWarning?.classList?.remove('hidden');
-            transactionCompleted = true;
-          } else if (completedCryptoTransactions.length > 0 && paidAmountUSDT < transactionAmountUSDT) {
-            insufficientAmount = true;
-            this.processingUnderpayment = true;
-          } else if (paidAmountUSDT === transactionAmountUSDT && transaction.status === CryptoTransactionStatusSuccess) {
-            transactionCompleted = true;
-          }
-
-          const expirationDateTime = Date.parse(transaction.expiration);
-          const currentDateTime = Date.now();
-
-          if (transactionCompleted) {
+          if (transaction.status === TransactionStatusSuccess) {
+            // Backend promotes to Success only once fully paid (or overpaid).
+            if (transaction.paymentStatus === PaymentStatusOverpaid) {
+              this.modalTransactionOverpaidAmountUSDTContainer?.classList.remove('hidden');
+              this.modalOverpaidWarning?.classList.remove('hidden');
+              this.modalTransactionReturnAmountUSDTContainer?.classList.remove('hidden');
+            }
             this.clearInterval();
             this.showPaymentSuccess();
             this.initOptions?.paymentSuccessListener?.();
-          } else if (!this.initOptions?.isEmbedded && insufficientAmount && this.API) {
-            // TODO: Implement it for embedded UI,
-            // TODO: UI for overpayment should also be updated for the embedded UI.
+          } else if (transaction.status < TransactionStatusPending && transaction.status !== CryptoTransactionStatusPendingKYCVerification) {
+            // Negative (non-KYC) status is terminal — cancelled / fraud / timeout.
+            this.showPaymentFailure();
+            this.clearInterval();
+            this.initOptions?.paymentFailedListener?.('Transaction Failed!');
+          } else if (transaction.paymentStatus === PaymentStatusPartiallyPaid && !this.initOptions?.isEmbedded && this.API) {
+            // Underpaid — collect the remaining balance.
+            // TODO: Implement the underpaid flow for the embedded UI.
+            this.processingUnderpayment = true;
             try {
               if (this.selectedAsset && this.selectedNetwork) {
-                if (!hasPendingCryptoTransaction) {
+                const hasPendingPayment = transaction.payments.some(
+                  p => p.status === PaymentRequestStatusPending && Date.parse(p.expiration) >= Date.now(),
+                );
+                if (!hasPendingPayment) {
                   this.clearInterval();
                   if (this.timeInterval) {
                     clearInterval(this.timeInterval);
@@ -1228,7 +1210,7 @@ export class Checkout extends HTMLElement {
                     this.modalButtonAcceptTransactionModalClose.innerText = 'Close and Forfeit Funds';
                   }
                   if (this.modalCloseTransactionModalDescription) {
-                    this.modalCloseTransactionModalDescription.innerText = `Are you sure you want to close this modal? If you continue, you will forfeit the ${paidAmountUSDT} USDT already transferred, and your order will not be placed.`;
+                    this.modalCloseTransactionModalDescription.innerText = `Are you sure you want to close this modal? If you continue, you will forfeit the ${amounts.receivedUSD} USDT already transferred, and your order will not be placed.`;
                   }
                 }
               } else {
@@ -1238,11 +1220,12 @@ export class Checkout extends HTMLElement {
               console.log('error', error);
               this.initOptions?.paymentFailedListener?.('Unable to collect underpaid amount.');
             }
-          } else if (expirationDateTime < currentDateTime) {
+          } else if (expired) {
             this.showPaymentFailure();
             this.clearInterval();
             this.initOptions?.paymentFailedListener?.('Transaction Timed Out / Failed!');
           }
+          // else: Unpaid / not yet confirmed — keep polling.
         }
       }
     }, 2000);
@@ -1493,7 +1476,7 @@ export class Checkout extends HTMLElement {
           network: this.selectedNetwork,
         });
       } else {
-        this.cryptoTransaction = await this.API.collectCryptoTransaction(this.cryptoTransaction.transactionId, {
+        this.cryptoTransaction = await this.API.createPaymentRequest(this.cryptoTransaction.transactionId, {
           asset: this.selectedAsset.code,
           network: this.selectedNetwork,
         });

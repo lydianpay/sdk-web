@@ -34,9 +34,9 @@ describe('CryptoTransactions client', () => {
     expect(cfg.method).toBeUndefined(); // default GET
   });
 
-  it('collect and cancel hit the right sub-routes and methods', async () => {
-    await api.collectCryptoTransaction('abc', { asset: 'USDT', network: 'ETH' } as never);
-    expect(lastCall()[0]).toBe(`${BASE}/transaction/abc/collect`);
+  it('payment and cancel hit the right sub-routes and methods', async () => {
+    await api.createPaymentRequest('abc', { asset: 'USDT', network: 'ETH' } as never);
+    expect(lastCall()[0]).toBe(`${BASE}/transaction/abc/payment`);
     expect(lastCall()[1].method).toBe('POST');
 
     await api.cancelCryptoTransaction('abc', { reason: 'x' } as never);
